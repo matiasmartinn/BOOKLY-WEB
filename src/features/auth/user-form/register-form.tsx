@@ -12,7 +12,7 @@ import {
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { userSchema, type UserFormFields } from './schema';
-import { AuthCard } from 'shared/ui';
+import { AuthCard } from 'shared/ui/components';
 import { PATHS } from 'app/router';
 import { Link } from 'react-router-dom';
 

@@ -1,10 +1,10 @@
 import type { RouteObject } from 'react-router-dom';
-import { AuthLayout } from 'app/pages/public/auth/auth-layout';
 import { RegisterForm } from 'features/auth/user-form/register-form';
 import { LoginPage } from 'app/pages/public/auth/login-page';
 import { RecoverAccountForm } from 'features/auth/recover-account-form/recover-account-form';
 import { SecretaryPasswordForm } from 'features/auth/secretary-password-form/secretary-password-form';
-import { AppLayout } from 'app/layouts';
+import { AppLayout, AuthLayout, DashboardLayout } from 'app/layouts';
+import { SchedulesForm } from 'features/schedules/schedules-form';
 
 const Placeholder = () => <div style={{ padding: 24 }}>Pantalla</div>;
 
@@ -14,11 +14,8 @@ export const appRoutes: RouteObject[] = [
     element: <AppLayout />,
     children: [
       { index: true, element: <Placeholder /> },
-
-      // cualquier ruta random tipo pepito400
       { path: 'pepito400', element: <Placeholder /> },
 
-      // auth
       {
         path: 'auth',
         element: <AuthLayout />,
@@ -29,18 +26,22 @@ export const appRoutes: RouteObject[] = [
           { path: 'secretary-password-form', element: <SecretaryPasswordForm /> },
         ],
       },
-
-      // dashboard (rutas hijas reales)
-      {
-        path: 'dashboard',
-        children: [
-          { index: true, element: <Placeholder /> },
-          { path: 'overview', element: <Placeholder /> },
-          { path: 'appointments', element: <Placeholder /> },
-          { path: 'schedules', element: <Placeholder /> },
-          // etc
-        ],
-      },
+    ],
+  },
+  {
+    path: '/dashboard',
+    element: <DashboardLayout />,
+    children: [
+      { index: true, element: <Placeholder /> },
+      { path: 'overview', element: <Placeholder /> },
+      { path: 'appointments', element: <Placeholder /> },
+      { path: 'schedules', element: <SchedulesForm /> },
+      { path: 'service', element: <Placeholder /> },
+      { path: 'unavailability', element: <Placeholder /> },
+      { path: 'status', element: <Placeholder /> },
+      { path: 'team', element: <Placeholder /> },
+      { path: 'profile', element: <Placeholder /> },
+      { path: 'settings', element: <Placeholder /> },
     ],
   },
 ];

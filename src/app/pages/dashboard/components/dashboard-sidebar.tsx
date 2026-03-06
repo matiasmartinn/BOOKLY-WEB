@@ -1,6 +1,7 @@
-import { NavLink, Stack, Divider, Tooltip, Text } from '@mantine/core';
+import { NavLink, Stack, Divider, Tooltip, Text, Group, ActionIcon } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+  faBars,
   faChartPie,
   faCalendarCheck,
   faClock,
@@ -14,6 +15,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PATHS } from 'app/router/PATHS';
+
 interface NavItem {
   label: string;
   icon: IconDefinition;
@@ -54,14 +56,33 @@ const NAV_SECTIONS: NavSection[] = [
 
 interface DashboardSidebarProps {
   collapsed: boolean;
+  onToggleSidebar: () => void;
 }
 
-export function DashboardSidebar({ collapsed }: DashboardSidebarProps) {
+export function DashboardSidebar({ collapsed, onToggleSidebar }: DashboardSidebarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
   return (
-    <Stack gap="xs" p="sm" h="100%">
+    <Stack gap="sm" p="sm" h="100%">
+      <Group
+        justify={collapsed ? 'center' : 'space-between'}
+        align="center"
+        px={collapsed ? 0 : 'xs'}
+      >
+        <ActionIcon variant="subtle" color="brand" onClick={onToggleSidebar} size="lg">
+          <FontAwesomeIcon icon={faBars} />
+        </ActionIcon>
+
+        {!collapsed && (
+          <Text fw={800} c="brand.6">
+            Bookly
+          </Text>
+        )}
+      </Group>
+
+      <Divider />
+
       {NAV_SECTIONS.map((section, index) => (
         <Stack key={section.label} gap={4}>
           {index > 0 && <Divider my="xs" />}
@@ -73,12 +94,7 @@ export function DashboardSidebar({ collapsed }: DashboardSidebarProps) {
           )}
 
           {section.items.map((item) => (
-            <Tooltip
-              key={item.path}
-              label={item.label}
-              position="right"
-              disabled={!collapsed}
-            >
+            <Tooltip key={item.path} label={item.label} position="right" disabled={!collapsed}>
               <NavLink
                 color="brand"
                 label={collapsed ? undefined : item.label}

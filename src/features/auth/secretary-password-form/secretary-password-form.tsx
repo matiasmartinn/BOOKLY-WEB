@@ -1,5 +1,5 @@
 import { Button, PasswordInput, Stack, Text, Title } from '@mantine/core';
-import { AuthCard } from 'shared/ui';
+import { AuthCard } from 'shared/ui/components';
 
 export function SecretaryPasswordForm() {
   return (

@@ -1,5 +1,5 @@
 import { Stack, TextInput, Title, Text, Button } from '@mantine/core';
-import { AuthCard } from 'shared/ui';
+import { AuthCard } from 'shared/ui/components';
 
 export function RecoverAccountForm() {
   return (

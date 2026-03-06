@@ -1,7 +1,7 @@
 import { Stack, Title, Text, TextInput, PasswordInput, Button, Anchor } from '@mantine/core';
 import { PATHS } from 'app/router';
 import { Link } from 'react-router-dom';
-import { AuthCard } from 'shared/ui';
+import { AuthCard } from 'shared/ui/components';
 
 export function LoginForm() {
   return (
