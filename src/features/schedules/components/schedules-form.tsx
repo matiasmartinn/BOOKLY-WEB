@@ -1,4 +1,4 @@
-import { Button, Group, Stack, Switch, Box } from '@mantine/core';
+import { Button, Group, Stack, Switch, Box, ActionIcon } from '@mantine/core';
 import { useState } from 'react';
 import { SelectDayTimePicker } from 'shared/ui/components';
 
@@ -78,18 +78,19 @@ export function SchedulesForm() {
         const extraRanges = schedule.ranges.slice(1);
 
         return (
-          <Stack key={day} gap={8}>
+          <Stack key={day}>
             <Group align="flex-start" wrap="nowrap">
-              <Box miw={140}>
+              <Box miw={120}>
                 <Switch
                   label={day}
                   checked={schedule.enabled}
                   onChange={(event) => toggleDay(day, event.currentTarget.checked)}
                 />
               </Box>
+
               {schedule.enabled && (
                 <Stack gap={8} flex={1}>
-                  <Group wrap="nowrap" align="center">
+                  <Group align="flex-start" wrap="wrap">
                     <SelectDayTimePicker
                       startValue={firstRange.start}
                       endValue={firstRange.end}
@@ -97,9 +98,15 @@ export function SchedulesForm() {
                       onEndChange={(value) => updateRange(day, 0, 'end', value)}
                     />
 
-                    <Button variant="light" size="xs" onClick={() => addRange(day)}>
-                      + Agregar franja horaria
-                    </Button>
+                    <ActionIcon
+                      variant="light"
+                      color="brand"
+                      size="lg"
+                      onClick={() => addRange(day)}
+                      aria-label="Agregar franja"
+                    >
+                      +
+                    </ActionIcon>
                   </Group>
 
                   {extraRanges.length > 0 && (

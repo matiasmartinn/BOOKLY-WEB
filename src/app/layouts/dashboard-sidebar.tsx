@@ -1,4 +1,4 @@
-import { NavLink, Stack, Divider, Tooltip, Text, Group, ActionIcon } from '@mantine/core';
+import { NavLink, Stack, Divider, Tooltip, Text, Group, ActionIcon, Box } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
@@ -57,29 +57,76 @@ const NAV_SECTIONS: NavSection[] = [
 interface DashboardSidebarProps {
   collapsed: boolean;
   onToggleSidebar: () => void;
+  onNavigate?: () => void;
 }
 
-export function DashboardSidebar({ collapsed, onToggleSidebar }: DashboardSidebarProps) {
+export function DashboardSidebar({
+  collapsed,
+  onToggleSidebar,
+  onNavigate,
+}: DashboardSidebarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    onNavigate?.();
+  };
+
   return (
     <Stack gap="sm" p="sm" h="100%">
-      <Group
-        justify={collapsed ? 'center' : 'space-between'}
-        align="center"
-        px={collapsed ? 0 : 'xs'}
-      >
-        <ActionIcon variant="subtle" color="brand" onClick={onToggleSidebar} size="lg">
-          <FontAwesomeIcon icon={faBars} />
-        </ActionIcon>
+      <Stack gap={collapsed ? 8 : 0}>
+        <Group
+          justify={collapsed ? 'center' : 'space-between'}
+          align="center"
+          px={collapsed ? 0 : 'xs'}
+        >
+          <Group gap="sm" wrap="nowrap" justify={collapsed ? 'center' : 'flex-start'}>
+            <Box
+              w={28}
+              h={28}
+              style={{
+                borderRadius: 8,
+                backgroundColor: 'var(--mantine-color-brand-6)',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 800,
+                flexShrink: 0,
+              }}
+            >
+              B
+            </Box>
 
-        {!collapsed && (
-          <Text fw={800} c="brand.6">
-            Bookly
-          </Text>
+            {!collapsed && (
+              <Text fw={800} c="brand.6">
+                Bookly
+              </Text>
+            )}
+          </Group>
+
+          {!collapsed && (
+            <ActionIcon
+              variant="subtle"
+              color="brand"
+              onClick={onToggleSidebar}
+              size="lg"
+              visibleFrom="md"
+            >
+              <FontAwesomeIcon icon={faBars} />
+            </ActionIcon>
+          )}
+        </Group>
+
+        {collapsed && (
+          <Group justify="center" visibleFrom="md">
+            <ActionIcon variant="subtle" color="brand" onClick={onToggleSidebar} size="lg">
+              <FontAwesomeIcon icon={faBars} />
+            </ActionIcon>
+          </Group>
         )}
-      </Group>
+      </Stack>
 
       <Divider />
 
@@ -100,7 +147,7 @@ export function DashboardSidebar({ collapsed, onToggleSidebar }: DashboardSideba
                 label={collapsed ? undefined : item.label}
                 leftSection={<FontAwesomeIcon icon={item.icon} />}
                 active={pathname === item.path}
-                onClick={() => navigate(item.path)}
+                onClick={() => handleNavigate(item.path)}
               />
             </Tooltip>
           ))}

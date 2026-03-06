@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 
 export function AuthLayout() {
   return (
-    <Center mih="100vh">
+    <Center mih="100dvh">
       <Stack align="center" gap="lg">
         {/* Logo acá cuando lo tengas */}
         <Outlet />

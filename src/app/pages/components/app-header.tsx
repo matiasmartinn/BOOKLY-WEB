@@ -3,7 +3,7 @@ import { Group, Button, Text } from '@mantine/core';
 export function AppHeader() {
   return (
     <Group h="100%" px="md" justify="space-between" align="center">
-      <Text fw={800} c="brand.6">
+      <Text size="lg" fw={800} c="brand.6">
         Bookly
       </Text>
 

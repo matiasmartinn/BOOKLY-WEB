@@ -1,10 +1,10 @@
 import { AppShell } from '@mantine/core';
+import { AppHeader } from 'app/pages/components';
 import { Outlet } from 'react-router-dom';
-import { AppHeader } from '../pages/public/components/app-header';
 
 export function AppLayout() {
   return (
-    <AppShell header={{ height: 60 }} padding="md">
+    <AppShell header={{ height: '8dvh' }}>
       <AppShell.Header>
         <AppHeader />
       </AppShell.Header>

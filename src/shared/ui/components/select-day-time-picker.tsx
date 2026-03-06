@@ -1,4 +1,4 @@
-import { ActionIcon, Group, Select } from '@mantine/core';
+import { ActionIcon, Flex, Select } from '@mantine/core';
 
 type Props = {
   startValue: string | null;
@@ -8,12 +8,6 @@ type Props = {
   onRemove?: () => void;
 };
 
-const timeOptions = Array.from({ length: 24 * 2 }, (_, i) => {
-  const h = String(Math.floor(i / 2)).padStart(2, '0');
-  const m = i % 2 === 0 ? '00' : '30';
-  return `${h}:${m}`;
-});
-
 export function SelectDayTimePicker({
   startValue,
   endValue,
@@ -21,29 +15,41 @@ export function SelectDayTimePicker({
   onEndChange,
   onRemove,
 }: Props) {
+  const timeOptions = Array.from({ length: 24 * 2 }, (_, i) => {
+    const h = String(Math.floor(i / 2)).padStart(2, '0');
+    const m = i % 2 === 0 ? '00' : '30';
+    return `${h}:${m}`;
+  });
+
   return (
-    <Group wrap="nowrap">
+    <Flex direction={{ base: 'column', sm: 'row' }} gap="xs" w={{ base: '100%', sm: 'auto' }}>
       <Select
         placeholder="Inicio"
         data={timeOptions}
         value={startValue}
         onChange={onStartChange}
-        w={120}
+        w={{ base: '100%', sm: 120 }}
       />
 
       <Select
         placeholder="Fin"
-        data={timeOptions}
+        data={startValue ? timeOptions.filter((t) => t > startValue) : timeOptions}
         value={endValue}
         onChange={onEndChange}
-        w={120}
+        w={{ base: '100%', sm: 120 }}
       />
 
       {onRemove && (
-        <ActionIcon color="red" variant="light" onClick={onRemove} aria-label="Eliminar franja">
+        <ActionIcon
+          color="red"
+          variant="light"
+          size="lg"
+          onClick={onRemove}
+          aria-label="Eliminar franja"
+        >
           x
         </ActionIcon>
       )}
-    </Group>
+    </Flex>
   );
 }
