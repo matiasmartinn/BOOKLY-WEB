@@ -5,29 +5,31 @@ import {
   PasswordInput,
   Button,
   Stack,
-  Group,
-  Paper,
   Anchor,
 } from '@mantine/core';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { userSchema, type UserFormFields } from './schema';
 import { AuthCard } from 'shared/ui/components';
 import { PATHS } from 'app/router';
 import { Link } from 'react-router-dom';
+import { useRegister } from '../auth.hooks';
+import { registerUserSchema, type RegisterUserRequst } from './register-user.schema';
 
 export function RegisterForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<UserFormFields>({
-    resolver: zodResolver(userSchema),
+    formState: { errors },
+  } = useForm<RegisterUserRequst>({
+    resolver: zodResolver(registerUserSchema),
   });
 
-  const onSubmit: SubmitHandler<UserFormFields> = (data) => {
-    console.log(data);
+    const { mutate, isPending } = useRegister();
+
+  const onSubmit: SubmitHandler<RegisterUserRequst> = ({ confirmPassword, ...dto }) => {
+    mutate(dto);
   };
+
 
   return (
     <AuthCard onSubmit={handleSubmit(onSubmit)}>
@@ -67,6 +69,13 @@ export function RegisterForm() {
             withAsterisk
             {...register('password')}
             error={errors.password?.message}
+          />
+
+            <PasswordInput
+            label="Confirme Contraseña"
+            placeholder="********"
+            {...register('confirmPassword')}
+            error={errors.confirmPassword?.message}
           />
 
           <Stack gap="xs" align="center">

@@ -1,11 +1,28 @@
 import { Stack, Title, Text, TextInput, PasswordInput, Button, Anchor } from '@mantine/core';
 import { PATHS } from 'app/router';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { AuthCard } from 'shared/ui/components';
+import { loginSchema, type LoginRequest } from './login-form.schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useLogin } from '../auth.hooks';
 
 export function LoginForm() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginRequest>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const { mutate } = useLogin();
+
+  const onSubmit: SubmitHandler<LoginRequest> = (data: LoginRequest) => {
+    mutate(data);
+  };
   return (
-    <AuthCard onSubmit={() => {}}>
+    <AuthCard onSubmit={handleSubmit(onSubmit)}>
       <Stack gap="md" align="strech">
         <Stack gap={4} align="center">
           <Title order={3}>Iniciar Sesión</Title>
@@ -15,13 +32,19 @@ export function LoginForm() {
         </Stack>
 
         <Stack gap="md">
-          <TextInput label="Email" placeholder="Ingrese su Email..." error={undefined} />
+          <TextInput
+            label="Email"
+            placeholder="Ingrese su Email..."
+            {...register('email')}
+            error={errors.email?.message}
+          />
 
           <Stack gap="xs">
             <PasswordInput
               label="Contraseña"
               placeholder="Ingrese su contraseña"
-              error={undefined}
+              {...register('password')}
+              error={errors.password?.message}
             />
             <Text size="sm" c="dimmed">
               ¿Olvidaste tu contraseña?{' '}

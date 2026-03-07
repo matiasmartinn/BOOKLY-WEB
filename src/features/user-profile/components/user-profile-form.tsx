@@ -1,4 +1,4 @@
-import { Fieldset, Group, Paper, Stack, TextInput } from '@mantine/core';
+import { Fieldset, Group, Paper, TextInput } from '@mantine/core';
 
 export function UserProfileForm() {
   const onSubmit = () => {};

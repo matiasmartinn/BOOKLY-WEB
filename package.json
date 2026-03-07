@@ -1,5 +1,5 @@
 {
-  "name": "agendify",
+  "name": "bookly",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -20,6 +20,7 @@
     "@mantine/form": "^8.3.8",
     "@mantine/hooks": "^8.3.8",
     "@tailwindcss/vite": "^4.1.17",
+    "@tanstack/react-query": "^4.43.0",
     "axios": "^1.13.2",
     "dayjs": "^1.11.19",
     "react": "^19.2.0",

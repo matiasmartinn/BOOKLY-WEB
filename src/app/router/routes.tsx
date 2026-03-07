@@ -2,10 +2,10 @@ import type { RouteObject } from 'react-router-dom';
 import { RegisterForm } from 'features/auth/user-form/register-form';
 import { LoginPage } from 'app/pages/auth/login-page';
 import { RecoverAccountForm } from 'features/auth/recover-account-form/recover-account-form';
-import { SecretaryPasswordForm } from 'features/auth/secretary-password-form/secretary-password-form';
 import { AppLayout, AuthLayout, DashboardLayout } from 'app/layouts';
 import { SchedulesPage } from 'features/schedules/schedules-page';
 import { UserProfilePage } from 'features/user-profile/user-profile-page';
+import { SecretaryOnboardingForm } from 'features/auth/secretary-onboarding-form/secretary-onboarding-form';
 
 const Placeholder = () => <div style={{ padding: 24 }}>Pantalla</div>;
 
@@ -24,7 +24,7 @@ export const appRoutes: RouteObject[] = [
           { path: 'register', element: <RegisterForm /> },
           { path: 'login', element: <LoginPage /> },
           { path: 'forgot-password', element: <RecoverAccountForm /> },
-          { path: 'secretary-password-form', element: <SecretaryPasswordForm /> },
+          { path: 'secretary-password-form', element: <SecretaryOnboardingForm /> },
         ],
       },
     ],

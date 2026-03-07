@@ -2,12 +2,17 @@
 import { MantineProvider } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { appTheme } from 'shared/ui/theme/theme';
+import {  QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from 'app/axios';
 
 interface AppProviderProps {
   children: ReactNode;
 }
+
 export const AppProviders = ({ children }: AppProviderProps) => (
-  <MantineProvider theme={appTheme} defaultColorScheme="auto">
-    {children}
-  </MantineProvider>
+  <QueryClientProvider client={queryClient}>
+    <MantineProvider theme={appTheme} defaultColorScheme="auto">
+      {children}
+    </MantineProvider>
+  </QueryClientProvider>
 );
