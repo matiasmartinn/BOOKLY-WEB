@@ -1,4 +1,4 @@
-import { Button, Group, Stack, Switch, Box, ActionIcon } from '@mantine/core';
+import { Group, Stack, Switch, Box, ActionIcon } from '@mantine/core';
 import { useState } from 'react';
 import { SelectDayTimePicker } from 'shared/ui/components';
 

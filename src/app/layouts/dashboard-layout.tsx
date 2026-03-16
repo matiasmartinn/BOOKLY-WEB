@@ -1,18 +1,45 @@
 import { AppShell, Burger, Group, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Outlet } from 'react-router-dom';
-import { DashboardSidebar } from './dashboard-sidebar';
+import {
+  DashboardSidebar,
+  OWNER_PERMISSIONS,
+  type SidebarUser,
+} from './components/dashboard-sidebar';
+import { useAuthStore } from 'store/use-auth-store';
+import { useBusinessStore } from 'store/use-buisness-store';
+import { useEffect } from 'react';
 
 export function DashboardLayout() {
   const [mobileOpened, mobile] = useDisclosure(false);
   const [desktopCollapsed, desktop] = useDisclosure(false);
 
-  const handleSidebarNavigate = () => {
-    if (window.innerWidth < 992) {
-      mobile.close();
-      return;
+  const authUser = useAuthStore((s) => s.user);
+  const { services, selectedService, selectService, loadServices, isLoading } = useBusinessStore();
+
+  // Al refrescar, authUser viene rehidratado del localStorage (persist) pero los
+  // servicios son in-memory y se pierden. Este efecto los recarga automáticamente.
+  useEffect(() => {
+    if (authUser && services.length === 0 && !isLoading) {
+      loadServices(authUser.id);
     }
+  }, [authUser]);
+
+  const handleSidebarNavigate = () => {
+    if (window.innerWidth < 992) mobile.close();
   };
+
+  // El AppShell siempre se renderiza — nunca hacemos return null aquí
+  // para no romper la estructura del navbar de Mantine.
+  // Si authUser todavía no existe (rehidratación en curso), el sidebar
+  // recibe strings vacíos y se ve en blanco por un instante imperceptible.
+  const sidebarUser: SidebarUser = authUser
+    ? {
+        name: `${authUser.firstName} ${authUser.lastName}`,
+        initials: getInitials(authUser.firstName, authUser.lastName),
+        role: 'owner', // TODO: derivar de authUser.role cuando exista el módulo de seguridad
+      }
+    : { name: '', initials: '', role: 'owner' };
 
   return (
     <AppShell
@@ -46,6 +73,11 @@ export function DashboardLayout() {
           collapsed={desktopCollapsed}
           onToggleSidebar={desktop.toggle}
           onNavigate={handleSidebarNavigate}
+          user={sidebarUser}
+          permissions={OWNER_PERMISSIONS}
+          services={services.map((s) => ({ id: String(s.id), name: s.name }))}
+          activeServiceId={String(selectedService?.id ?? services[0]?.id ?? '')}
+          onServiceChange={(id) => selectService(Number(id))}
         />
       </AppShell.Navbar>
 
@@ -54,4 +86,10 @@ export function DashboardLayout() {
       </AppShell.Main>
     </AppShell>
   );
+}
+
+function getInitials(firstName: string, lastName: string): string {
+  const first = firstName?.[0]?.toUpperCase() ?? '';
+  const last = lastName?.[0]?.toUpperCase() ?? '';
+  return `${first}${last}`;
 }

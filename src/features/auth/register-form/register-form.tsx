@@ -1,12 +1,4 @@
-import {
-  Title,
-  Text,
-  TextInput,
-  PasswordInput,
-  Button,
-  Stack,
-  Anchor,
-} from '@mantine/core';
+import { Title, Text, TextInput, PasswordInput, Button, Stack, Anchor } from '@mantine/core';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AuthCard } from 'shared/ui/components';
@@ -24,12 +16,11 @@ export function RegisterForm() {
     resolver: zodResolver(registerUserSchema),
   });
 
-    const { mutate, isPending } = useRegister();
+  const { mutate, isPending } = useRegister();
 
   const onSubmit: SubmitHandler<RegisterUserRequst> = ({ confirmPassword, ...dto }) => {
     mutate(dto);
   };
-
 
   return (
     <AuthCard onSubmit={handleSubmit(onSubmit)}>
@@ -71,7 +62,7 @@ export function RegisterForm() {
             error={errors.password?.message}
           />
 
-            <PasswordInput
+          <PasswordInput
             label="Confirme Contraseña"
             placeholder="********"
             {...register('confirmPassword')}

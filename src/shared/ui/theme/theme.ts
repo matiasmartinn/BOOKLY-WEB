@@ -44,11 +44,5 @@ export const appTheme = createTheme({
         withBorder: true,
       },
     },
-    Text: {
-      defaultProps: {
-        size: 'sm',
-        c: 'dimmed',
-      },
-    },
   },
 });

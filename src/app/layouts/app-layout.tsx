@@ -1,5 +1,5 @@
 import { AppShell } from '@mantine/core';
-import { AppHeader } from 'app/pages/components';
+import { AppHeader } from 'app/layouts/components';
 import { Outlet } from 'react-router-dom';
 
 export function AppLayout() {

@@ -5,16 +5,21 @@ export const PATHS = {
     register: '/auth/register',
     forgotPassword: '/auth/forgot-password',
     secretarySetup: '/auth/secretary-setup',
+    auth: '/auth/create-business',
   },
   dashboard: {
-    overview:       '/dashboard',
-    appointments:   '/dashboard/appointments',
-    schedules:      '/dashboard/schedules',
-    service:        '/dashboard/service',
+    overview: '/dashboard',
+    appointments: '/dashboard/appointments',
+    schedules: '/dashboard/schedules',
+    service: '/dashboard/business',
     unavailability: '/dashboard/unavailability',
-    status:         '/dashboard/status',
-    team:           '/dashboard/team',
-    profile:        '/dashboard/profile',
-    settings:       '/dashboard/settings',
+    status: '/dashboard/status',
+    team: '/dashboard/team',
+    profile: '/dashboard/profile',
+    settings: '/dashboard/settings',
   },
-} ;
+
+  service: {
+    create: '/service/new',
+  },
+} as const;
