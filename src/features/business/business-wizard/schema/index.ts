@@ -1,1 +1,1 @@
-export * from './create-service.schema';
+export * from './create-business.schema';

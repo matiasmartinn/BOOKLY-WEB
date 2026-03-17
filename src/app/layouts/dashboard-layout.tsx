@@ -15,15 +15,16 @@ export function DashboardLayout() {
   const [desktopCollapsed, desktop] = useDisclosure(false);
 
   const authUser = useAuthStore((s) => s.user);
-  const { services, selectedService, selectService, loadServices, isLoading } = useBusinessStore();
+  const { services, selectedService, selectService, loadServices, isLoading, initialized } =
+    useBusinessStore();
 
   // Al refrescar, authUser viene rehidratado del localStorage (persist) pero los
   // servicios son in-memory y se pierden. Este efecto los recarga automáticamente.
   useEffect(() => {
-    if (authUser && services.length === 0 && !isLoading) {
+    if (authUser && !initialized && !isLoading) {
       loadServices(authUser.id);
     }
-  }, [authUser]);
+  }, [authUser, initialized, isLoading, loadServices]);
 
   const handleSidebarNavigate = () => {
     if (window.innerWidth < 992) mobile.close();

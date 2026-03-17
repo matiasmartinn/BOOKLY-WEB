@@ -3,14 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useBusinessStore } from 'store/use-buisness-store';
 import { useAuthStore } from 'store/use-auth-store';
 import { PATHS } from 'app/router/PATHS';
-import { BusinessWizard } from './components/business-wizard';
+import { BusinessWizard } from './business-wizard';
 
-/**
- * Página completa para el wizard de creación de servicio.
- * Sin sidebar, sin AppShell — experiencia enfocada.
- * Montada en /service/new dentro de AppLayout (solo provee el QueryClient
- * y el MantineProvider, nada visual).
- */
 export function BusinessWizardPage() {
   const navigate = useNavigate();
   const authUser = useAuthStore((s) => s.user);

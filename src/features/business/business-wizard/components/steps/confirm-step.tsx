@@ -2,7 +2,7 @@ import { Stack, Text, Group, Box, ThemeIcon, Divider } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStore, faClock } from '@fortawesome/free-solid-svg-icons';
 import { useFormContext } from 'react-hook-form';
-import type { CreateServiceFormValues } from '../schema';
+import type { CreateBusinessFormValues } from '../../schema';
 
 const SERVICE_TYPE_LABELS: Record<number, string> = {
   1: 'Peluquería & Barbería',
@@ -73,7 +73,7 @@ function SummaryCard({ icon, title, rows }: SummaryCardProps) {
 }
 
 export function ConfirmStep() {
-  const { watch } = useFormContext<CreateServiceFormValues>();
+  const { watch } = useFormContext<CreateBusinessFormValues>();
   const values = watch();
 
   return (

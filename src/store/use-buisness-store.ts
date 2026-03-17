@@ -1,13 +1,13 @@
 import { businessService } from 'features/business/business.service';
-import type { BusinessModel } from 'shared/models';
+import type { BusinessDto } from 'shared/models';
 import { create } from 'zustand';
 
 interface BusinessStore {
-  services: BusinessModel[];
-  selectedService: BusinessModel | null;
+  services: BusinessDto[];
+  selectedService: BusinessDto | null;
   isLoading: boolean;
   isLoadingDetail: boolean;
-
+  initialized: boolean;
   /**
    * Carga el listado liviano de servicios del owner.
    * Una vez que llega, pre-selecciona el primero automáticamente
@@ -25,7 +25,7 @@ interface BusinessStore {
   /**
    * Actualización local luego de un PUT — evita re-fetchear toda la lista.
    */
-  updateService: (updated: BusinessModel) => void;
+  updateService: (updated: BusinessDto) => void;
 
   clear: () => void;
 }
@@ -35,19 +35,19 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
   selectedService: null,
   isLoading: false,
   isLoadingDetail: false,
+  initialized: false,
 
   loadServices: async (ownerId) => {
     set({ isLoading: true });
     try {
       const services = await businessService.getByOwner(ownerId);
-      set({ services, isLoading: false });
+      set({ services, isLoading: false, initialized: true });
 
-      // Pre-selecciona el primero si existe
       if (services.length > 0) {
         await get().selectService(services[0].id);
       }
     } catch {
-      set({ isLoading: false });
+      set({ isLoading: false, initialized: true });
     }
   },
 

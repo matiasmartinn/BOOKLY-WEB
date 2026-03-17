@@ -1,17 +1,8 @@
 import { Stack, TextInput, Textarea, Select, Text, Box } from '@mantine/core';
 import { useFormContext } from 'react-hook-form';
-import type { CreateServiceFormValues } from '../schema';
-
-// Tipos de servicio hardcodeados por ahora.
-// Cuando tengas un endpoint GET /service-types, reemplazá con un useQuery.
-const SERVICE_TYPES = [
-  { value: '1', label: 'Peluquería & Barbería' },
-  { value: '2', label: 'Manicura & Pedicura' },
-  { value: '3', label: 'Centro de Estética' },
-  { value: '4', label: 'Profesional de la Salud' },
-  { value: '5', label: 'Psicología' },
-  { value: '6', label: 'Otro' },
-];
+import { useGetAllBusinessType } from 'shared/hooks/business-type.hook';
+import type { CreateBusinessFormValues } from '../../schema';
+import { useMemo } from 'react';
 
 function toSlug(value: string): string {
   return value
@@ -29,15 +20,26 @@ export function BasicInfoStep() {
     setValue,
     watch,
     formState: { errors },
-  } = useFormContext<CreateServiceFormValues>();
+  } = useFormContext<CreateBusinessFormValues>();
 
   const name = watch('name') ?? '';
+  const serviceTypeId = watch('serviceTypeId');
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setValue('name', value);
     setValue('slug', toSlug(value));
   };
+
+  const { data: businessTypesData, isLoading } = useGetAllBusinessType();
+  const businessTypeOptions = useMemo(
+    () =>
+      businessTypesData?.map((type) => ({
+        value: String(type.id),
+        label: type.name,
+      })) ?? [],
+    [businessTypesData],
+  );
 
   return (
     <Stack gap="lg">
@@ -54,11 +56,14 @@ export function BasicInfoStep() {
         label="Tipo de servicio"
         placeholder="Seleccioná un rubro"
         description="Ayuda a categorizar tu negocio."
-        data={SERVICE_TYPES}
+        data={businessTypeOptions}
+        value={serviceTypeId ? String(serviceTypeId) : null}
+        disabled={isLoading}
         error={errors.serviceTypeId?.message}
         onChange={(val) =>
-          setValue('serviceTypeId', val ? parseInt(val) : (undefined as unknown as number), {
+          setValue('serviceTypeId', val ? Number(val) : undefined!, {
             shouldValidate: true,
+            shouldDirty: true,
           })
         }
       />

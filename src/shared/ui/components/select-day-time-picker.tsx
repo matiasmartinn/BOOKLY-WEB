@@ -1,4 +1,5 @@
 import { ActionIcon, Flex, Select } from '@mantine/core';
+import { memo, useMemo } from 'react';
 
 type Props = {
   startValue: string | null;
@@ -8,35 +9,43 @@ type Props = {
   onRemove?: () => void;
 };
 
-export function SelectDayTimePicker({
+const TIME_OPTIONS_5 = Array.from({ length: 288 }, (_, i) => {
+  const totalMinutes = i * 5;
+  const h = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+  const m = String(totalMinutes % 60).padStart(2, '0');
+  return `${h}:${m}`;
+});
+
+export const SelectDayTimePicker = memo(function SelectDayTimePicker({
   startValue,
   endValue,
   onStartChange,
   onEndChange,
   onRemove,
 }: Props) {
-  const timeOptions = Array.from({ length: 24 * 2 }, (_, i) => {
-    const h = String(Math.floor(i / 2)).padStart(2, '0');
-    const m = i % 2 === 0 ? '00' : '30';
-    return `${h}:${m}`;
-  });
+  const endOptions = useMemo(
+    () => (startValue ? TIME_OPTIONS_5.filter((t) => t > startValue) : TIME_OPTIONS_5),
+    [startValue],
+  );
 
   return (
-    <Flex direction={{ base: 'column', sm: 'row' }} gap="xs" w={{ base: '100%', sm: 'auto' }}>
+    <Flex gap="xs" align="center" wrap="nowrap">
       <Select
         placeholder="Inicio"
-        data={timeOptions}
+        data={TIME_OPTIONS_5}
         value={startValue}
         onChange={onStartChange}
-        w={{ base: '100%', sm: 120 }}
+        w={110}
+        comboboxProps={{ width: 130 }}
       />
 
       <Select
         placeholder="Fin"
-        data={startValue ? timeOptions.filter((t) => t > startValue) : timeOptions}
+        data={endOptions}
         value={endValue}
         onChange={onEndChange}
-        w={{ base: '100%', sm: 120 }}
+        w={110}
+        comboboxProps={{ width: 130 }}
       />
 
       {onRemove && (
@@ -52,4 +61,4 @@ export function SelectDayTimePicker({
       )}
     </Flex>
   );
-}
+});

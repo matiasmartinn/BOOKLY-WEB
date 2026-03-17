@@ -19,6 +19,7 @@ export function WizardLeftPanel({
   return (
     <Box
       w={340}
+      visibleFrom="sm"
       style={{
         flexShrink: 0,
         height: '100%',

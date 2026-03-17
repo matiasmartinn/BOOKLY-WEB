@@ -1,6 +1,6 @@
 import { Button } from '@mantine/core';
 import { PageCard, PageShell } from 'shared/layout';
-import { UnavailabilityTable } from './unavailability-table';
+import { UnavailabilityTable } from './components/unavailability-table';
 
 export function UnavailabilitiesPage() {
   const openModal = () => {
@@ -14,7 +14,7 @@ export function UnavailabilitiesPage() {
       actions={<Button onClick={openModal}>Deshabilitar Fecha</Button>}
     >
       <PageCard>
-        <UnavailabilityTable serviceId={1} />
+        <UnavailabilityTable />
       </PageCard>
     </PageShell>
   );

@@ -1,5 +1,4 @@
-import { Badge, Box, Button, Group, ScrollArea, Stack, Text, ThemeIcon } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Badge, Box, Button, Group, Progress, ScrollArea, Stack, Text } from '@mantine/core';
 import type { WizardStep } from './components';
 
 interface WizardRightPanelProps {
@@ -38,6 +37,14 @@ export function WizardRightPanel({
       }}
     >
       <ScrollArea style={{ flex: 1 }}>
+        <Box hiddenFrom="sm">
+          <Progress
+            value={((stepIndex + 1) / totalSteps) * 100}
+            size="sm"
+            color="brand"
+            radius={0}
+          />
+        </Box>
         <Box
           maw={880}
           mx="auto"
@@ -67,37 +74,8 @@ export function WizardRightPanel({
               </Stack>
             </Stack>
 
-            {/* Contenido del paso — formulario real o placeholder */}
-            {children ?? (
-              <Box
-                style={{
-                  minHeight: 280,
-                  border: '1px dashed var(--mantine-color-default-border)',
-                  borderRadius: 20,
-                  background: 'rgba(79, 70, 229, 0.02)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 32,
-                }}
-              >
-                <Stack align="center" gap={8}>
-                  <ThemeIcon size={48} radius="xl" variant="light" color="brand">
-                    <FontAwesomeIcon icon={step.icon} style={{ fontSize: 18 }} />
-                  </ThemeIcon>
-                  <Text size="md" c="dimmed" ta="center">
-                    Formulario del paso{' '}
-                    <Text span fw={700} c="brand.6">
-                      {step.label}
-                    </Text>{' '}
-                    pendiente de implementación.
-                  </Text>
-                  <Text size="sm" c="dimmed" ta="center">
-                    Reemplazá este bloque por el componente real del paso.
-                  </Text>
-                </Stack>
-              </Box>
-            )}
+            {/* Contenido del paso */}
+            {children}
           </Stack>
         </Box>
       </ScrollArea>

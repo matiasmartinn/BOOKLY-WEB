@@ -1,10 +1,4 @@
-import {
-  faCalendarCheck,
-  faClock,
-  faFlag,
-  faStore,
-  type IconDefinition,
-} from '@fortawesome/free-solid-svg-icons';
+import { faClock, faFlag, faStore, type IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
 export interface WizardStep {
   id: string;
@@ -35,12 +29,6 @@ export const BUSINESS_WIZARD_STEPS: WizardStep[] = [
       { id: 'schedules.ranges', label: 'Rangos horarios' },
       { id: 'schedules.duration', label: 'Duración y anticipación' },
     ],
-  },
-  {
-    id: 'appointments',
-    label: 'Turnos',
-    description: 'Configuración de reservas',
-    icon: faCalendarCheck,
   },
   {
     id: 'confirm',

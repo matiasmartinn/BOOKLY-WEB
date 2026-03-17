@@ -6,9 +6,9 @@ import { AppLayout, AuthLayout, DashboardLayout } from 'app/layouts';
 import { SchedulesPage } from 'features/schedules/schedules-page';
 import { UserProfilePage } from 'features/user-profile/user-profile-page';
 import { SecretaryOnboardingForm } from 'features/auth/secretary-onboarding-form/secretary-onboarding-form';
-import { CreateBusinessStepper } from 'features/business/business-stepper/create-business-stepper';
 import { UnavailabilitiesPage } from 'features/unavailability/unavailabilities-page';
 import { BusinessWizardPage } from 'features/business/business-wizard/business-wizard-page';
+import { AppointmentPage } from 'features/appoiments/appointment-page';
 
 const Placeholder = () => <div style={{ padding: 24 }}>Pantalla</div>;
 
@@ -25,7 +25,6 @@ export const appRoutes: RouteObject[] = [
         element: <AuthLayout />,
         children: [
           { path: 'register', element: <RegisterForm /> },
-          { path: 'create-service', element: <CreateBusinessStepper /> },
           { path: 'login', element: <LoginPage /> },
           { path: 'forgot-password', element: <RecoverAccountForm /> },
           { path: 'secretary-password-form', element: <SecretaryOnboardingForm /> },
@@ -50,7 +49,7 @@ export const appRoutes: RouteObject[] = [
     children: [
       { index: true, element: <Placeholder /> },
       { path: 'overview', element: <Placeholder /> },
-      { path: 'appointments', element: <Placeholder /> },
+      { path: 'appointments', element: <AppointmentPage /> },
       { path: 'schedules', element: <SchedulesPage /> },
       { path: 'business', element: <Placeholder /> },
       { path: 'unavailability', element: <UnavailabilitiesPage /> },

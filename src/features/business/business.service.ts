@@ -2,7 +2,7 @@ import { apiClient } from 'app/api';
 import type { BusinessModel } from 'shared/models';
 import type { CreateBusinessFormValues } from './business-wizard/schema';
 
-interface CreateServicePayload extends CreateBusinessFormValues {
+interface CreateBusinessPayload extends CreateBusinessFormValues {
   ownerId: number;
 }
 
@@ -12,6 +12,6 @@ export const businessService = {
 
   getById: (id: number) => apiClient.get<BusinessModel>(`/services/${id}`).then((r) => r.data),
 
-  create: (payload: CreateServicePayload) =>
+  create: (payload: CreateBusinessPayload) =>
     apiClient.post<BusinessModel>('/services', payload).then((r) => r.data),
 };

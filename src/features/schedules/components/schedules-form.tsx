@@ -1,138 +1,116 @@
-import { Group, Stack, Switch, Box, ActionIcon } from '@mantine/core';
-import { useState } from 'react';
-import { SelectDayTimePicker } from 'shared/ui/components';
+import { Stack, Group, Button } from '@mantine/core';
+import { useState, useEffect } from 'react';
+import { useSchedules, useSaveSchedules } from '../hooks/schedules.hooks';
+import type { ScheduleModel } from 'shared/models';
+import { ScheduleDayRow } from './schedule-day-row';
 
-const dayArray = [
-  'Lunes',
-  'Martes',
-  'Miercoles',
-  'Jueves',
-  'Viernes',
-  'Sabado',
-  'Domingo',
-] as const;
+const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] as const;
+type Day = (typeof DAYS)[number];
+type Range = { start: string; end: string };
+type Schedule = { enabled: boolean; ranges: Range[] };
+type FormState = Record<Day, Schedule>;
 
-type Day = (typeof dayArray)[number];
-type Range = { start: string | null; end: string | null };
-type DaySchedule = { enabled: boolean; ranges: Range[] };
+const DAY_VALUE: Record<Day, number> = {
+  Domingo: 0,
+  Lunes: 1,
+  Martes: 2,
+  Miércoles: 3,
+  Jueves: 4,
+  Viernes: 5,
+  Sábado: 6,
+};
 
-const initialSchedules = dayArray.reduce(
-  (acc, day) => {
-    acc[day] = { enabled: false, ranges: [{ start: null, end: null }] };
-    return acc;
-  },
-  {} as Record<Day, DaySchedule>,
-);
+const buildFromApi = (data: ScheduleModel[]): FormState => {
+  const state = buildEmpty();
+  for (const s of data) {
+    const day = DAYS.find((d) => DAY_VALUE[d] === s.dayValue);
+    if (!day) continue;
+    if (!state[day].enabled) {
+      state[day] = { enabled: true, ranges: [] };
+    }
+    state[day].ranges.push({ start: s.startTime.slice(0, 5), end: s.endTime.slice(0, 5) });
+  }
+  return state;
+};
+const createDefaultRange = (): Range => ({ start: '09:00', end: '18:00' });
+
+const buildEmpty = (): FormState =>
+  Object.fromEntries(
+    DAYS.map((d) => [d, { enabled: false, ranges: [createDefaultRange()] }]),
+  ) as FormState;
 
 export function SchedulesForm() {
-  const [schedules, setSchedules] = useState<Record<Day, DaySchedule>>(initialSchedules);
+  const { data: schedulesData } = useSchedules();
+  const { mutate: setSchedule, isPending } = useSaveSchedules();
+  const [form, setForm] = useState<FormState>(buildEmpty);
 
-  const toggleDay = (day: Day, enabled: boolean) => {
-    setSchedules((prev) => ({
-      ...prev,
-      [day]: { ...prev[day], enabled },
-    }));
-  };
+  useEffect(() => {
+    if (schedulesData) setForm(buildFromApi(schedulesData));
+  }, [schedulesData]);
 
-  const updateRange = (day: Day, index: number, field: 'start' | 'end', value: string | null) => {
-    setSchedules((prev) => {
-      const nextRanges = [...prev[day].ranges];
-      nextRanges[index] = { ...nextRanges[index], [field]: value };
-
-      return {
-        ...prev,
-        [day]: { ...prev[day], ranges: nextRanges },
-      };
-    });
-  };
-
-  const addRange = (day: Day) => {
-    setSchedules((prev) => ({
-      ...prev,
+  const toggle = (day: Day, enabled: boolean) =>
+    setForm((p) => ({
+      ...p,
       [day]: {
-        ...prev[day],
-        ranges: [...prev[day].ranges, { start: null, end: null }],
+        ...p[day],
+        enabled,
+        ranges: enabled
+          ? p[day].ranges.length > 0
+            ? p[day].ranges
+            : [createDefaultRange()]
+          : p[day].ranges,
       },
     }));
-  };
 
-  const removeRange = (day: Day, index: number) => {
-    setSchedules((prev) => {
-      const nextRanges = prev[day].ranges.filter((_, i) => i !== index);
-
-      return {
-        ...prev,
-        [day]: {
-          ...prev[day],
-          ranges: nextRanges.length ? nextRanges : [{ start: null, end: null }],
-        },
-      };
+  const updateRange = (day: Day, i: number, field: keyof Range, value: string) =>
+    setForm((p) => {
+      const ranges = p[day].ranges.map((r, idx) => (idx === i ? { ...r, [field]: value } : r));
+      return { ...p, [day]: { ...p[day], ranges } };
     });
+
+  const addRange = (day: Day) =>
+    setForm((p) => ({
+      ...p,
+      [day]: { ...p[day], ranges: [...p[day].ranges, createDefaultRange()] },
+    }));
+
+  const removeRange = (day: Day, i: number) =>
+    setForm((p) => ({
+      ...p,
+      [day]: { ...p[day], ranges: p[day].ranges.filter((_, idx) => idx !== i) },
+    }));
+
+  const handleSave = () => {
+    const dto = DAYS.filter((d) => form[d].enabled).flatMap((d) =>
+      form[d].ranges.map((r) => ({
+        startTime: r.start,
+        endTime: r.end,
+        capacity: 1,
+        day: DAY_VALUE[d],
+      })),
+    );
+    setSchedule(dto);
   };
 
   return (
     <Stack gap="sm">
-      {dayArray.map((day) => {
-        const schedule = schedules[day];
-        const firstRange = schedule.ranges[0];
-        const extraRanges = schedule.ranges.slice(1);
+      {DAYS.map((day) => (
+        <ScheduleDayRow
+          key={day}
+          day={day}
+          schedule={form[day]}
+          onToggle={toggle}
+          onUpdateRange={updateRange}
+          onAddRange={addRange}
+          onRemoveRange={removeRange}
+        />
+      ))}
 
-        return (
-          <Stack key={day}>
-            <Group align="flex-start" wrap="nowrap">
-              <Box miw={120}>
-                <Switch
-                  label={day}
-                  checked={schedule.enabled}
-                  onChange={(event) => toggleDay(day, event.currentTarget.checked)}
-                />
-              </Box>
-
-              {schedule.enabled && (
-                <Stack gap={8} flex={1}>
-                  <Group align="flex-start" wrap="wrap">
-                    <SelectDayTimePicker
-                      startValue={firstRange.start}
-                      endValue={firstRange.end}
-                      onStartChange={(value) => updateRange(day, 0, 'start', value)}
-                      onEndChange={(value) => updateRange(day, 0, 'end', value)}
-                    />
-
-                    <ActionIcon
-                      variant="light"
-                      color="brand"
-                      size="lg"
-                      onClick={() => addRange(day)}
-                      aria-label="Agregar franja"
-                    >
-                      +
-                    </ActionIcon>
-                  </Group>
-
-                  {extraRanges.length > 0 && (
-                    <Stack gap={8}>
-                      {extraRanges.map((range, extraIndex) => {
-                        const realIndex = extraIndex + 1;
-
-                        return (
-                          <SelectDayTimePicker
-                            key={`${day}-${realIndex}`}
-                            startValue={range.start}
-                            endValue={range.end}
-                            onStartChange={(value) => updateRange(day, realIndex, 'start', value)}
-                            onEndChange={(value) => updateRange(day, realIndex, 'end', value)}
-                            onRemove={() => removeRange(day, realIndex)}
-                          />
-                        );
-                      })}
-                    </Stack>
-                  )}
-                </Stack>
-              )}
-            </Group>
-          </Stack>
-        );
-      })}
+      <Group justify="flex-end" mt="md">
+        <Button onClick={handleSave} loading={isPending}>
+          Guardar cambios
+        </Button>
+      </Group>
     </Stack>
   );
 }

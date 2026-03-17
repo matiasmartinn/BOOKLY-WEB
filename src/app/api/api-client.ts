@@ -21,7 +21,7 @@ const baseUrl = 'https://localhost:7176/api/';
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  timeout: 10000,
+  timeout: 100000,
   headers: { 'Content-Type': 'application/json' },
 });
 
