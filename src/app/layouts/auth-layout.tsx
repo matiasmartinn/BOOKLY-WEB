@@ -1,14 +1,10 @@
-// app/pages/auth/AuthLayout.tsx
-import { Center, Stack } from '@mantine/core';
 import { Outlet } from 'react-router-dom';
+import { AuthShell } from 'features/auth/components';
 
 export function AuthLayout() {
   return (
-    <Center mih="100dvh">
-      <Stack align="center" gap="lg">
-        {/* Logo acá cuando lo tengas */}
-        <Outlet />
-      </Stack>
-    </Center>
+    <AuthShell>
+      <Outlet />
+    </AuthShell>
   );
 }

@@ -4,6 +4,10 @@ export const appTheme = createTheme({
   primaryColor: 'brand',
   defaultRadius: 'md',
   fontFamily: 'Inter, sans-serif',
+  headings: {
+    fontFamily: 'Inter, sans-serif',
+    fontWeight: '700',
+  },
 
   colors: {
     brand: [
@@ -25,6 +29,11 @@ export const appTheme = createTheme({
         radius: 'md',
         size: 'md',
       },
+      styles: {
+        root: {
+          fontWeight: 600,
+        },
+      },
     },
     TextInput: {
       defaultProps: {
@@ -33,6 +42,18 @@ export const appTheme = createTheme({
       },
     },
     PasswordInput: {
+      defaultProps: {
+        radius: 'md',
+        size: 'md',
+      },
+    },
+    Textarea: {
+      defaultProps: {
+        radius: 'md',
+        size: 'md',
+      },
+    },
+    Select: {
       defaultProps: {
         radius: 'md',
         size: 'md',

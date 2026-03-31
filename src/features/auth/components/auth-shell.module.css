@@ -1,0 +1,200 @@
+.shell {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow-x: clip;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  background: #ffffff;
+}
+
+.surface {
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+}
+
+.aside {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  isolation: isolate;
+  padding: clamp(48px, 6vw, 76px);
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 32%),
+    radial-gradient(circle at bottom left, rgba(124, 92, 255, 0.18), transparent 38%),
+    linear-gradient(155deg, #1d2340 0%, #25315b 54%, #3f49a5 100%);
+  color: #f8fafc;
+  overflow: hidden;
+}
+
+.aside::after {
+  content: '';
+  position: absolute;
+  right: -10%;
+  bottom: 8%;
+  width: 300px;
+  height: 300px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  filter: blur(18px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.asideTop {
+  position: absolute;
+  top: clamp(48px, 6vw, 76px);
+  left: clamp(48px, 6vw, 76px);
+  z-index: 2;
+}
+
+.asideNarrative {
+  position: relative;
+  z-index: 3;
+  width: min(100%, 38rem);
+  margin-top: clamp(104px, 14vh, 188px);
+}
+
+.asideHeadlineFrame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: calc((clamp(4.2rem, 6.3vw, 7.1rem) * 1.72) + clamp(14px, 1.2vw, 20px));
+  z-index: 3;
+}
+
+.asideHeadline {
+  position: relative;
+  display: grid;
+  gap: clamp(14px, 1.2vw, 20px);
+  width: fit-content;
+  max-width: 100%;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transform-origin: left center;
+  transition:
+    opacity 180ms ease,
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+  z-index: 3;
+}
+
+.asideHeadlineEntered,
+.asideHeadlineEntering {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.asideHeadlineExiting {
+  opacity: 0;
+  transform: translateY(-6px);
+  visibility: visible;
+}
+
+.asideHeadlineHidden {
+  opacity: 0;
+  transform: translateY(16px);
+  visibility: hidden;
+}
+
+.asideHeadlineLine {
+  margin: 0;
+  white-space: nowrap;
+  font-size: clamp(4.2rem, 6.3vw, 7.1rem);
+  line-height: 0.84;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  color: #ffffff;
+  text-shadow: 0 22px 48px rgba(8, 11, 30, 0.24);
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(44px, 7vw, 104px) clamp(24px, 6vw, 88px);
+  background: #ffffff;
+}
+
+.contentInner {
+  width: min(100%, 720px);
+}
+
+.mobileBrand {
+  display: none;
+  margin-bottom: 36px;
+}
+
+.brandRoot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brandMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.brandMarkLight {
+  background: linear-gradient(
+    180deg,
+    var(--mantine-color-brand-5) 0%,
+    var(--mantine-color-brand-7) 100%
+  );
+  box-shadow: 0 20px 40px rgba(79, 70, 229, 0.18);
+}
+
+.brandName {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.brandNameLight {
+  color: var(--mantine-color-brand-7);
+}
+
+.brandCaption {
+  font-size: 0.78rem;
+  color: rgba(248, 250, 252, 0.7);
+}
+
+.brandCaptionLight {
+  color: var(--mantine-color-dimmed);
+}
+
+@media (max-width: 62em) {
+  .surface {
+    grid-template-columns: 1fr;
+  }
+
+  .aside {
+    display: none;
+  }
+
+  .content {
+    min-height: 100dvh;
+    padding: 28px 20px 36px;
+  }
+
+  .contentInner {
+    width: min(100%, 720px);
+  }
+
+  .mobileBrand {
+    display: block;
+  }
+}

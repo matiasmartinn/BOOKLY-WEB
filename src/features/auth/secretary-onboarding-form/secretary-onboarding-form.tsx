@@ -1,15 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Anchor, Button, PasswordInput, Stack, Text, Title } from '@mantine/core';
+import { Alert, Anchor, Button, PasswordInput, Stack, Text } from '@mantine/core';
 import { PATHS } from 'app/router';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { AuthCard } from 'shared/ui/components';
 import { useCompleteSecretaryInvitation } from '../auth.hooks';
 import { getAuthErrorMessage } from '../get-auth-error-message';
 import {
   secretaryOnboardingSchema,
   type SecretaryOnboardingValues,
 } from './secretary-onboarding.schema';
+import { AuthFormWrapper } from 'features/auth/components';
 
 export function SecretaryOnboardingForm() {
   const [searchParams] = useSearchParams();
@@ -48,29 +48,27 @@ export function SecretaryOnboardingForm() {
   };
 
   return (
-    <AuthCard onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap="md">
-        <Stack gap={4} align="center">
-          <Title order={3}>Crear contrasena</Title>
-          <Text size="sm" c="dimmed" ta="center">
-            Define tu contrasena inicial para activar la cuenta e ingresar a BOOKLY.
-          </Text>
-        </Stack>
-
-        {!token && (
-          <Text size="sm" c="red" ta="center">
+    <AuthFormWrapper onSubmit={handleSubmit(onSubmit)} title="Activa tu acceso">
+      <Stack gap="xl">
+        {!token ? (
+          <Alert color="red" variant="light">
             El enlace no es valido o no incluye el token requerido.
-          </Text>
-        )}
+          </Alert>
+        ) : null}
 
         {completeInvitation.isSuccess ? (
-          <Stack gap="xs" align="center">
-            <Text size="sm" c="green" ta="center">
+          <Stack gap="sm">
+            <Alert color="green" variant="light">
               La cuenta se activo correctamente. Ya puedes iniciar sesion.
+            </Alert>
+
+            <Text size="sm" c="dimmed">
+              Continua desde{' '}
+              <Anchor c="gray.7" component={Link} to={PATHS.auth.login}>
+                el login
+              </Anchor>
+              .
             </Text>
-            <Anchor c="brand" component={Link} to={PATHS.auth.login}>
-              Ir al login
-            </Anchor>
           </Stack>
         ) : (
           <>
@@ -79,6 +77,7 @@ export function SecretaryOnboardingForm() {
               placeholder="********"
               withAsterisk
               disabled={!token}
+              autoComplete="new-password"
               {...register('password')}
               error={errors.password?.message}
             />
@@ -88,22 +87,23 @@ export function SecretaryOnboardingForm() {
               placeholder="********"
               withAsterisk
               disabled={!token}
+              autoComplete="new-password"
               {...register('confirmPassword')}
               error={errors.confirmPassword?.message}
             />
 
-            {errors.root && (
-              <Text size="sm" c="red" ta="center">
+            {errors.root ? (
+              <Alert color="red" variant="light">
                 {errors.root.message}
-              </Text>
-            )}
+              </Alert>
+            ) : null}
 
-            <Button type="submit" loading={completeInvitation.isPending} disabled={!token}>
+            <Button type="submit" loading={completeInvitation.isPending} disabled={!token} fullWidth>
               Activar cuenta
             </Button>
           </>
         )}
       </Stack>
-    </AuthCard>
+    </AuthFormWrapper>
   );
 }

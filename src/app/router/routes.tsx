@@ -29,27 +29,19 @@ export const appRoutes: RouteObject[] = [
     children: [
       { index: true, element: <Placeholder /> },
       { path: 'pepito400', element: <Placeholder /> },
-
-      {
-        path: 'auth',
-        element: <AuthLayout />,
-        children: [
-          { path: 'register', element: <RegisterForm /> },
-          { path: 'login', element: <LoginPage /> },
-          { path: 'confirm-email', element: <ConfirmEmailPage /> },
-          { path: 'forgot-password', element: <RecoverAccountForm /> },
-          { path: 'reset-password', element: <ResetPasswordForm /> },
-          { path: 'secretary-invitation', element: <SecretaryOnboardingForm /> },
-          { path: 'secretary-password-form', element: <SecretaryOnboardingForm /> },
-        ],
-      },
-
-      // ── Wizard de creación de servicio ────────────────────────────────────
-      // Vive fuera del DashboardLayout a propósito — pantalla completa,
-      // sin sidebar, sin AppShell. Mismo patrón que auth/create-service.
-      // Accesible desde dos lugares:
-      //   1. ServiceSwitcher (owner sin servicios): navigate(PATHS.service.create)
-      //   2. Botón "Nuevo servicio" en Mi Servicio: navigate(PATHS.service.create)
+    ],
+  },
+  {
+    path: 'auth',
+    element: <AuthLayout />,
+    children: [
+      { path: 'register', element: <RegisterForm /> },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'confirm-email', element: <ConfirmEmailPage /> },
+      { path: 'forgot-password', element: <RecoverAccountForm /> },
+      { path: 'reset-password', element: <ResetPasswordForm /> },
+      { path: 'secretary-invitation', element: <SecretaryOnboardingForm /> },
+      { path: 'secretary-password-form', element: <SecretaryOnboardingForm /> },
     ],
   },
   {

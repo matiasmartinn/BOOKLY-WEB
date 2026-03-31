@@ -1,13 +1,21 @@
-import { Stack, Title, Text, TextInput, PasswordInput, Button, Anchor } from '@mantine/core';
+import {
+  Alert,
+  Anchor,
+  Button,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+} from '@mantine/core';
 import { isApiError } from 'app/api';
 import { PATHS } from 'app/router';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthCard } from 'shared/ui/components';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, type LoginRequest } from './login.schema';
 import { useState } from 'react';
 import { useAuthStore } from 'store/use-auth-store';
+import { AuthFormWrapper } from 'features/auth/components';
 
 function getLoginErrorMessage(error: unknown) {
   if (isApiError(error)) {
@@ -55,57 +63,50 @@ export function LoginForm() {
   };
 
   return (
-    <AuthCard onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap="md" align="stretch">
-        <Stack gap={4} align="center">
-          <Title order={3}>Iniciar Sesion</Title>
+    <AuthFormWrapper onSubmit={handleSubmit(onSubmit)} title="Inicia sesion">
+      <Stack gap="xl">
+        <TextInput
+          label="Email"
+          placeholder="usuario@correo.com"
+          autoComplete="email"
+          {...register('email')}
+          error={errors.email?.message}
+        />
+
+        <PasswordInput
+          label="Contrasena"
+          placeholder="Ingresa tu contrasena"
+          autoComplete="current-password"
+          {...register('password')}
+          error={errors.password?.message}
+        />
+
+        {errors.root ? (
+          <Alert color="red" variant="light">
+            {errors.root.message}
+          </Alert>
+        ) : null}
+
+        <Button type="submit" loading={isPending} fullWidth>
+          Ingresar
+        </Button>
+
+        <Stack gap={6}>
           <Text size="sm" c="dimmed">
-            Ingrese las credenciales de su cuenta.
+            Olvidaste tu contrasena?{' '}
+            <Anchor c="gray.7" component={Link} to={PATHS.auth.forgotPassword}>
+              Recuperala
+            </Anchor>
+          </Text>
+
+          <Text size="sm" c="dimmed">
+            No tenes cuenta?{' '}
+            <Anchor c="gray.7" component={Link} to={PATHS.auth.register}>
+              Registrate
+            </Anchor>
           </Text>
         </Stack>
-
-        <Stack gap="md">
-          <TextInput
-            label="Email"
-            placeholder="Ingrese su Email..."
-            {...register('email')}
-            error={errors.email?.message}
-          />
-
-          <Stack gap="xs">
-            <PasswordInput
-              label="Contrasena"
-              placeholder="Ingrese su contrasena"
-              {...register('password')}
-              error={errors.password?.message}
-            />
-            <Text size="sm" c="dimmed">
-              Olvidaste tu contrasena?{' '}
-              <Anchor c="brand" component={Link} to={PATHS.auth.forgotPassword}>
-                Recuperala
-              </Anchor>
-            </Text>
-          </Stack>
-
-          {errors.root && (
-            <Text size="sm" c="red" ta="center">
-              {errors.root.message}
-            </Text>
-          )}
-
-          <Stack gap="xs" align="center">
-            <Button type="submit" loading={isPending}>
-              Ingresar
-            </Button>
-            <Text size="sm" c="dimmed" ta="center">
-              No tenes cuenta?{' '}
-              <Anchor c="brand" component={Link} to={PATHS.auth.register}>
-                Registrate
-              </Anchor>
-            </Text>
-          </Stack>
-        </Stack>
       </Stack>
-    </AuthCard>
+    </AuthFormWrapper>
   );
 }

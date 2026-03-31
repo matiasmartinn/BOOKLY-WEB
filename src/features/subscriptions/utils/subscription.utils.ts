@@ -2,7 +2,6 @@ import type {
   SubscriptionDto,
   SubscriptionPlanLimitsDto,
   SubscriptionPlanDto,
-  SubscriptionPlanOptionDto,
 } from 'shared/models';
 
 const subscriptionDateFormatter = new Intl.DateTimeFormat('es-AR', {
@@ -168,18 +167,3 @@ export const getSubscriptionCtaLabel = (subscription: SubscriptionDto) => {
 
   return 'Gestionar plan';
 };
-
-export const buildPlanChangePayload = (
-  ownerId: number,
-  plan: SubscriptionPlanOptionDto,
-  period?: {
-    startDate?: string | null;
-    endDate?: string | null;
-  },
-) => ({
-  ownerId,
-  targetPlan: plan.key?.trim() || undefined,
-  planName: plan.code ?? plan.displayName ?? undefined,
-  startDate: period?.startDate ?? undefined,
-  endDate: period?.endDate ?? undefined,
-});

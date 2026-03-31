@@ -58,7 +58,8 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
               <Text fw={600}>Suscripcion y plan</Text>
               <Text size="sm" c="dimmed">
                 Revisa el plan actual, su vigencia y las acciones administrativas habilitadas por
-                el backend.
+                el backend. Los planes pagos se renuevan o cambian con vigencia mensual
+                automatica.
               </Text>
             </Stack>
 

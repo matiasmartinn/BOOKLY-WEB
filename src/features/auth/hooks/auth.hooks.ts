@@ -7,13 +7,15 @@ import {
   authService,
   type CompleteSecretaryInvitationDto,
   type ConfirmEmailDto,
+  type EmailDispatchResultDto,
+  type RegisterOwnerResultDto,
   type RequestPasswordResetDto,
   type ResendEmailConfirmationDto,
   type ResetPasswordDto,
 } from '../services';
 
 export const useRegister = () =>
-  useMutation<UserDto, ProblemDetails, Omit<RegisterUserRequst, 'confirmPassword'>>({
+  useMutation<RegisterOwnerResultDto, ProblemDetails, Omit<RegisterUserRequst, 'confirmPassword'>>({
     mutationFn: authService.register,
   });
 
@@ -28,7 +30,7 @@ export const useConfirmEmail = () =>
   });
 
 export const useResendConfirmation = () =>
-  useMutation<void, ProblemDetails, ResendEmailConfirmationDto>({
+  useMutation<EmailDispatchResultDto, ProblemDetails, ResendEmailConfirmationDto>({
     mutationFn: authService.resendConfirmation,
   });
 

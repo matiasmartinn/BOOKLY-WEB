@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Anchor, Button, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Alert, Anchor, Button, Stack, Text, TextInput } from '@mantine/core';
 import { PATHS } from 'app/router';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { AuthCard } from 'shared/ui/components';
 import { useRecoverAccount } from '../auth.hooks';
 import { getAuthErrorMessage } from '../get-auth-error-message';
 import { recoverAccountSchema, type RecoverAccountValues } from './recover-account.schema';
+import { AuthFormWrapper } from 'features/auth/components';
 
 export function RecoverAccountForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -44,47 +44,40 @@ export function RecoverAccountForm() {
   };
 
   return (
-    <AuthCard onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap="md">
-        <Stack gap={4} align="center">
-          <Title order={3}>Recuperar contrasena</Title>
-          <Text size="sm" c="dimmed" ta="center">
-            Ingresa el email de tu cuenta y te enviaremos un enlace para restablecerla.
-          </Text>
-        </Stack>
-
+    <AuthFormWrapper onSubmit={handleSubmit(onSubmit)} title="Recupera tu contrasena">
+      <Stack gap="xl">
         <TextInput
           label="Email"
           placeholder="usuario@correo.com"
           withAsterisk
+          autoComplete="email"
           {...register('email')}
           error={errors.email?.message}
         />
 
-        {successMessage && (
-          <Text size="sm" c="green" ta="center">
+        {successMessage ? (
+          <Alert color="green" variant="light">
             {successMessage}
-          </Text>
-        )}
+          </Alert>
+        ) : null}
 
-        {errors.root && (
-          <Text size="sm" c="red" ta="center">
+        {errors.root ? (
+          <Alert color="red" variant="light">
             {errors.root.message}
-          </Text>
-        )}
+          </Alert>
+        ) : null}
 
-        <Stack gap="xs" align="center">
-          <Button type="submit" loading={recoverAccount.isPending}>
-            Enviar enlace
-          </Button>
-          <Text size="sm" c="dimmed" ta="center">
-            Volver a{' '}
-            <Anchor c="brand" component={Link} to={PATHS.auth.login}>
-              iniciar sesion
-            </Anchor>
-          </Text>
-        </Stack>
+        <Button type="submit" loading={recoverAccount.isPending} fullWidth>
+          Enviar enlace
+        </Button>
+
+        <Text size="sm" c="dimmed">
+          Volver a{' '}
+          <Anchor c="gray.7" component={Link} to={PATHS.auth.login}>
+            iniciar sesion
+          </Anchor>
+        </Text>
       </Stack>
-    </AuthCard>
+    </AuthFormWrapper>
   );
 }

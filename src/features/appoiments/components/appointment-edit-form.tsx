@@ -1,6 +1,15 @@
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, Button, Group, SimpleGrid, Stack, Text, TextInput, Textarea } from '@mantine/core';
+import {
+  Alert,
+  Button,
+  Divider,
+  Group,
+  SimpleGrid,
+  Stack,
+  Textarea,
+  TextInput,
+} from '@mantine/core';
 import type { AppointmentViewModel } from '../viewmodel';
 import { updateAppointmentFormSchema, type UpdateAppointmentFormValues } from '../schema';
 import { useUpdateAppointment } from '../hooks';
@@ -63,26 +72,18 @@ export function AppointmentEditForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap="lg">
-        <Stack gap={4}>
-          <Text fw={600}>Editar datos del turno</Text>
-
-          <Text size="sm" c="dimmed">
-            Corrige la información cargada del cliente para este turno.
-          </Text>
-        </Stack>
-
-        {errors.root?.message && (
+      <Stack gap="xl">
+        {errors.root?.message ? (
           <Alert color="red" variant="light">
             {errors.root.message}
           </Alert>
-        )}
+        ) : null}
 
-        {isSubmitError && error && (
+        {isSubmitError && error ? (
           <Alert color="red" variant="light">
             {error.detail}
           </Alert>
-        )}
+        ) : null}
 
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
           <TextInput
@@ -113,7 +114,7 @@ export function AppointmentEditForm({
         />
 
         <Textarea
-          label="Notas"
+          label="Notas internas"
           placeholder="Observaciones del cliente"
           minRows={3}
           autosize
@@ -122,12 +123,14 @@ export function AppointmentEditForm({
           disabled={isPending}
         />
 
-        <Group justify="flex-end">
-          {onCancel && (
+        <Divider />
+
+        <Group justify="flex-end" wrap="wrap" gap="sm">
+          {onCancel ? (
             <Button type="button" variant="default" onClick={onCancel} disabled={isPending}>
               Cancelar
             </Button>
-          )}
+          ) : null}
 
           <Button type="submit" loading={isPending}>
             {submitLabel}

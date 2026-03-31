@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, Button, Group, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
-import { DatePickerInput } from '@mantine/dates';
+import { Alert, Button, Divider, Group, Stack } from '@mantine/core';
 import type { AppointmentViewModel } from '../viewmodel';
 import { rescheduleAppointmentFormSchema, type RescheduleAppointmentFormValues } from '../schema';
 import {
@@ -11,12 +10,8 @@ import {
   useRescheduleAppointment,
 } from '../hooks';
 import { useBusinessStore } from 'store/use-buisness-store';
-import {
-  extractDateOnly,
-  formatLocalDateTime,
-  formatTime,
-  normalizeLocalDateTime,
-} from 'shared/utils';
+import { extractDateOnly, normalizeLocalDateTime } from 'shared/utils';
+import { AppointmentScheduleSection } from './appointment-schedule-section';
 
 interface AppointmentRescheduleFormProps {
   appointment: AppointmentViewModel;
@@ -41,7 +36,6 @@ export function AppointmentRescheduleForm({
   const initialDate = extractDateOnly(appointment.startDateTime);
 
   const {
-    control,
     handleSubmit,
     watch,
     clearErrors,
@@ -88,8 +82,29 @@ export function AppointmentRescheduleForm({
     [availableDates],
   );
 
-  const shouldDisableDate = (date: string) => !availableDateSet.has(date.trim());
   const isFormDisabled = !selectedService;
+
+  const handleDateChange = (value: string | null) => {
+    setValue('date', value ?? null, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setCalendarDate(value ?? null);
+    setValue('slot', '', {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    clearErrors('slot');
+  };
+
+  const handleSlotChange = (value: string) => {
+    setValue('slot', value, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+  };
 
   const onSubmit: SubmitHandler<RescheduleAppointmentFormValues> = (values) => {
     if (!selectedService) {
@@ -111,163 +126,55 @@ export function AppointmentRescheduleForm({
     rescheduleAppointment(values, { onSuccess });
   };
 
-  const getDayProps = (date: string) => {
-    const isAvailable = availableDateSet.has(date.trim());
-
-    return {
-      style: isAvailable
-        ? {
-            fontWeight: 700,
-            border: '1px solid var(--mantine-color-green-6)',
-          }
-        : undefined,
-    };
-  };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap="lg">
-        <Stack gap={4}>
-          <Text fw={600}>Reprogramar turno</Text>
-
-          <Text size="sm" c="dimmed">
-            Cliente: {appointment.clientName}. Selecciona una nueva fecha y horario.
-          </Text>
-        </Stack>
-
-        {isAvailableDatesError && selectedService && (
-          <Alert color="red" variant="light">
-            No se pudieron cargar las fechas disponibles del servicio.
-          </Alert>
-        )}
-
-        {errors.root?.message && (
+      <Stack gap="xl">
+        {errors.root?.message ? (
           <Alert color="red" variant="light">
             {errors.root.message}
           </Alert>
-        )}
+        ) : null}
 
-        {isSubmitError && error && (
+        {isSubmitError && error ? (
           <Alert color="red" variant="light">
             {error.detail}
           </Alert>
-        )}
+        ) : null}
 
-        <Controller
-          control={control}
-          name="date"
-          render={({ field, fieldState }) => (
-            <DatePickerInput
-              label="Fecha"
-              placeholder="Selecciona una fecha"
-              withAsterisk
-              value={field.value ?? null}
-              date={calendarDate ?? undefined}
-              onDateChange={(value) => setCalendarDate(value ?? null)}
-              onChange={(value) => {
-                field.onChange(value ?? null);
-                setCalendarDate(value ?? null);
-                setValue('slot', '');
-                clearErrors('slot');
-              }}
-              getDayProps={getDayProps}
-              error={fieldState.error?.message}
-              clearable={false}
-              valueFormat="DD/MM/YYYY"
-              excludeDate={shouldDisableDate}
-              disabled={isFormDisabled || isPending || isLoadingAvailableDates}
-            />
-          )}
+        <AppointmentScheduleSection
+          availableDateSet={availableDateSet}
+          calendarDate={calendarDate}
+          dateError={errors.date?.message}
+          isAvailableDatesError={isAvailableDatesError && Boolean(selectedService)}
+          isFetchingSlots={isFetchingSlots}
+          isFormDisabled={isFormDisabled}
+          isLoadingAvailableDates={isLoadingAvailableDates}
+          isLoadingSlots={isLoadingSlots}
+          isPending={isPending}
+          isSlotsError={isSlotsError}
+          onCalendarDateChange={setCalendarDate}
+          onDateChange={handleDateChange}
+          onSlotChange={handleSlotChange}
+          selectedDate={selectedDate}
+          selectedSlot={selectedSlot}
+          slotError={errors.slot?.message}
+          slots={slots}
         />
 
-        <Stack gap="xs">
-          <Text fw={500}>Horarios disponibles</Text>
+        <Divider />
 
-          {!selectedDate && (
-            <Text size="sm" c="dimmed">
-              Primero selecciona una fecha para ver los horarios disponibles.
-            </Text>
-          )}
+        <Group justify="flex-end" align="center" wrap="wrap" gap="sm">
+          <Group gap="sm">
+            {onCancel ? (
+              <Button type="button" variant="default" onClick={onCancel} disabled={isPending}>
+                Cancelar
+              </Button>
+            ) : null}
 
-          {selectedDate && (isLoadingSlots || isFetchingSlots) && (
-            <Stack gap="xs">
-              <Skeleton h={36} radius="md" />
-              <Skeleton h={36} radius="md" />
-              <Skeleton h={36} radius="md" />
-            </Stack>
-          )}
-
-          {selectedDate && isSlotsError && (
-            <Alert color="red" variant="light">
-              No se pudieron cargar los horarios disponibles para la fecha seleccionada.
-            </Alert>
-          )}
-
-          {selectedDate &&
-            !isLoadingSlots &&
-            !isFetchingSlots &&
-            !isSlotsError &&
-            slots.length === 0 && (
-              <Alert color="yellow" variant="light">
-                No hay horarios disponibles para ese día.
-              </Alert>
-            )}
-
-          {selectedDate &&
-            !isLoadingSlots &&
-            !isFetchingSlots &&
-            !isSlotsError &&
-            slots.length > 0 && (
-              <Controller
-                control={control}
-                name="slot"
-                render={({ field, fieldState }) => (
-                  <Stack gap="xs">
-                    <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="xs">
-                      {slots.map((slot) => {
-                        const selected = field.value === slot;
-
-                        return (
-                          <Button
-                            key={slot}
-                            type="button"
-                            variant={selected ? 'filled' : 'default'}
-                            onClick={() => field.onChange(slot)}
-                            disabled={isPending}
-                          >
-                            {formatTime(slot)}
-                          </Button>
-                        );
-                      })}
-                    </SimpleGrid>
-
-                    {fieldState.error?.message && (
-                      <Text size="sm" c="red">
-                        {fieldState.error.message}
-                      </Text>
-                    )}
-                  </Stack>
-                )}
-              />
-            )}
-
-          {selectedSlot && (
-            <Text size="sm" c="dimmed">
-              Nuevo turno seleccionado: {formatLocalDateTime(selectedSlot)}
-            </Text>
-          )}
-        </Stack>
-
-        <Group justify="flex-end">
-          {onCancel && (
-            <Button type="button" variant="default" onClick={onCancel} disabled={isPending}>
-              Cancelar
+            <Button type="submit" loading={isPending} disabled={isFormDisabled}>
+              {submitLabel}
             </Button>
-          )}
-
-          <Button type="submit" loading={isPending} disabled={isFormDisabled}>
-            {submitLabel}
-          </Button>
+          </Group>
         </Group>
       </Stack>
     </form>

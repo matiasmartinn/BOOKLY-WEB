@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
-/* Puedes sumar overrides globales si querés */
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: Inter, sans-serif;
+  background: linear-gradient(180deg, var(--mantine-color-gray-0) 0%, #f5f7fb 100%);
+  color: var(--mantine-color-text);
+}
+
+#root {
+  min-height: 100vh;
 }

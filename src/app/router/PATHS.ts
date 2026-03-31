@@ -7,7 +7,7 @@ export const PATHS = {
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',
     secretaryInvitation: '/auth/secretary-invitation',
-    secretarySetup: '/auth/secretary-invitation',
+    secretarySetup: '/auth/secretary-password-form',
     auth: '/auth/create-business',
   },
   dashboard: {

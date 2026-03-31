@@ -1,0 +1,20 @@
+.content {
+  overflow: hidden;
+}
+
+.title {
+  flex: 1;
+  margin-inline-end: var(--mantine-spacing-md);
+}
+
+.body {
+  padding: var(--mantine-spacing-xl);
+}
+
+.plainTitle {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--mantine-color-text);
+}

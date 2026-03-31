@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Anchor, Button, PasswordInput, Stack, Text, Title } from '@mantine/core';
+import { Alert, Anchor, Button, PasswordInput, Stack, Text } from '@mantine/core';
 import { PATHS } from 'app/router';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { AuthCard } from 'shared/ui/components';
 import { useResetPassword } from '../auth.hooks';
 import { getAuthErrorMessage } from '../get-auth-error-message';
 import { resetPasswordSchema, type ResetPasswordValues } from './reset-password.schema';
+import { AuthFormWrapper } from 'features/auth/components';
 
 export function ResetPasswordForm() {
   const [searchParams] = useSearchParams();
@@ -45,29 +45,23 @@ export function ResetPasswordForm() {
   };
 
   return (
-    <AuthCard onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap="md">
-        <Stack gap={4} align="center">
-          <Title order={3}>Restablecer contrasena</Title>
-          <Text size="sm" c="dimmed" ta="center">
-            Define una nueva contrasena para recuperar el acceso a tu cuenta.
-          </Text>
-        </Stack>
-
-        {!token && (
-          <Text size="sm" c="red" ta="center">
+    <AuthFormWrapper onSubmit={handleSubmit(onSubmit)} title="Define una nueva contrasena">
+      <Stack gap="xl">
+        {!token ? (
+          <Alert color="red" variant="light">
             El enlace no es valido o no incluye el token requerido.
-          </Text>
-        )}
+          </Alert>
+        ) : null}
 
         {resetPassword.isSuccess ? (
-          <Stack gap="xs" align="center">
-            <Text size="sm" c="green" ta="center">
+          <Stack gap="sm">
+            <Alert color="green" variant="light">
               La contrasena se actualizo correctamente.
-            </Text>
-            <Text size="sm" c="dimmed" ta="center">
+            </Alert>
+
+            <Text size="sm" c="dimmed">
               Ya puedes volver a{' '}
-              <Anchor c="brand" component={Link} to={PATHS.auth.login}>
+              <Anchor c="gray.7" component={Link} to={PATHS.auth.login}>
                 iniciar sesion
               </Anchor>
               .
@@ -80,6 +74,7 @@ export function ResetPasswordForm() {
               placeholder="********"
               withAsterisk
               disabled={!token}
+              autoComplete="new-password"
               {...register('password')}
               error={errors.password?.message}
             />
@@ -89,30 +84,30 @@ export function ResetPasswordForm() {
               placeholder="********"
               withAsterisk
               disabled={!token}
+              autoComplete="new-password"
               {...register('confirmPassword')}
               error={errors.confirmPassword?.message}
             />
 
-            {errors.root && (
-              <Text size="sm" c="red" ta="center">
+            {errors.root ? (
+              <Alert color="red" variant="light">
                 {errors.root.message}
-              </Text>
-            )}
+              </Alert>
+            ) : null}
 
-            <Stack gap="xs" align="center">
-              <Button type="submit" loading={resetPassword.isPending} disabled={!token}>
-                Guardar contrasena
-              </Button>
-              <Text size="sm" c="dimmed" ta="center">
-                Necesitas otro enlace?{' '}
-                <Anchor c="brand" component={Link} to={PATHS.auth.forgotPassword}>
-                  Solicitalo nuevamente
-                </Anchor>
-              </Text>
-            </Stack>
+            <Button type="submit" loading={resetPassword.isPending} disabled={!token} fullWidth>
+              Guardar contrasena
+            </Button>
+
+            <Text size="sm" c="dimmed">
+              Necesitas otro enlace?{' '}
+              <Anchor c="gray.7" component={Link} to={PATHS.auth.forgotPassword}>
+                Solicitalo nuevamente
+              </Anchor>
+            </Text>
           </>
         )}
       </Stack>
-    </AuthCard>
+    </AuthFormWrapper>
   );
 }

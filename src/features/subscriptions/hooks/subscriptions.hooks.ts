@@ -1,7 +1,8 @@
 import { type QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { SubscriptionDto, SubscriptionPlanOptionDto } from 'shared/models';
-import { subscriptionsService, type ChangePlanDto, type RenewSubscriptionDto } from '../services';
+import type { ChangePlanDto, RenewSubscriptionDto } from '../schema';
+import { subscriptionsService } from '../services';
 
 const ownerSubscriptionQueryKey = (ownerId?: number) => ['subscriptions', 'owner', ownerId] as const;
 const ownerSubscriptionPlansQueryKey = (ownerId?: number) =>

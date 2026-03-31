@@ -1,13 +1,22 @@
-import { Title, Text, TextInput, PasswordInput, Button, Stack, Anchor } from '@mantine/core';
+import {
+  Alert,
+  Anchor,
+  Button,
+  PasswordInput,
+  SimpleGrid,
+  Stack,
+  Text,
+  TextInput,
+} from '@mantine/core';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isApiError } from 'app/api';
 import { PATHS } from 'app/router';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { AuthCard } from 'shared/ui/components';
 import { useRegister } from '../auth.hooks';
 import { registerUserSchema, type RegisterUserRequst } from './register-user.schema';
+import { AuthFormWrapper } from 'features/auth/components';
 
 function getRegisterErrorMessage(error: unknown) {
   if (isApiError(error)) {
@@ -22,7 +31,7 @@ function getRegisterErrorMessage(error: unknown) {
 }
 
 export function RegisterForm() {
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{ message: string; color: string } | null>(null);
 
   const {
     clearErrors,
@@ -38,45 +47,47 @@ export function RegisterForm() {
 
   const onSubmit: SubmitHandler<RegisterUserRequst> = async ({ confirmPassword, ...dto }) => {
     clearErrors('root');
-    setSuccessMessage(null);
+    setFeedback(null);
 
     try {
-      await mutateAsync(dto);
-      setSuccessMessage(
-        'La cuenta se creo correctamente. Revisa tu email para confirmar el acceso antes de iniciar sesion.',
-      );
+      const response = await mutateAsync(dto);
+      setFeedback({
+        message: response.emailDispatch.message,
+        color: response.emailDispatch.emailSent ? 'green' : 'orange',
+      });
     } catch (error) {
       setError('root', { message: getRegisterErrorMessage(error) });
     }
   };
 
   return (
-    <AuthCard onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap="md">
-        <Stack gap={3} align="center">
-          <Title order={3}>Crear usuario</Title>
-          <Text>Completa los datos para poder crear su cuenta.</Text>
-        </Stack>
-        <TextInput
-          label="Nombre"
-          placeholder="Juan"
-          withAsterisk
-          {...register('firstName')}
-          error={errors.firstName?.message}
-        />
+    <AuthFormWrapper onSubmit={handleSubmit(onSubmit)} title="Crea tu cuenta">
+      <Stack gap="xl">
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+          <TextInput
+            label="Nombre"
+            placeholder="Juan"
+            withAsterisk
+            autoComplete="given-name"
+            {...register('firstName')}
+            error={errors.firstName?.message}
+          />
 
-        <TextInput
-          label="Apellido"
-          placeholder="Perez"
-          withAsterisk
-          {...register('lastName')}
-          error={errors.lastName?.message}
-        />
+          <TextInput
+            label="Apellido"
+            placeholder="Perez"
+            withAsterisk
+            autoComplete="family-name"
+            {...register('lastName')}
+            error={errors.lastName?.message}
+          />
+        </SimpleGrid>
 
         <TextInput
           label="Email"
           placeholder="usuario@correo.com"
           withAsterisk
+          autoComplete="email"
           {...register('email')}
           error={errors.email?.message}
         />
@@ -85,47 +96,52 @@ export function RegisterForm() {
           label="Contrasena"
           placeholder="********"
           withAsterisk
+          autoComplete="new-password"
           {...register('password')}
           error={errors.password?.message}
         />
 
         <PasswordInput
-          label="Confirme contrasena"
+          label="Confirma contrasena"
           placeholder="********"
+          withAsterisk
+          autoComplete="new-password"
           {...register('confirmPassword')}
           error={errors.confirmPassword?.message}
         />
 
-        {successMessage && (
-          <Text size="sm" c="green" ta="center">
-            {successMessage}
-          </Text>
-        )}
+        {feedback ? (
+          <Alert color={feedback.color === 'green' ? 'green' : 'orange'} variant="light">
+            {feedback.message}
+          </Alert>
+        ) : null}
 
-        {errors.root && (
-          <Text size="sm" c="red" ta="center">
+        {errors.root ? (
+          <Alert color="red" variant="light">
             {errors.root.message}
-          </Text>
-        )}
+          </Alert>
+        ) : null}
 
-        <Stack gap="xs" align="center">
-          <Button type="submit" loading={isPending}>
-            Crear cuenta
-          </Button>
-          <Text size="sm" c="dimmed" ta="center">
+        <Button type="submit" loading={isPending} fullWidth>
+          Crear cuenta
+        </Button>
+
+        <Stack gap={6}>
+          <Text size="sm" c="dimmed">
             Ya tenes una cuenta?{' '}
-            <Anchor c="brand" component={Link} to={PATHS.auth.login}>
+            <Anchor c="gray.7" component={Link} to={PATHS.auth.login}>
               Ingresa
             </Anchor>
           </Text>
-          <Text size="sm" c="dimmed" ta="center">
+
+          <Text size="sm" c="dimmed">
             Necesitas otro email de confirmacion?{' '}
-            <Anchor c="brand" component={Link} to={PATHS.auth.confirmEmail}>
+            <Anchor c="gray.7" component={Link} to={PATHS.auth.confirmEmail}>
               Reenviarlo
             </Anchor>
           </Text>
         </Stack>
       </Stack>
-    </AuthCard>
+    </AuthFormWrapper>
   );
 }

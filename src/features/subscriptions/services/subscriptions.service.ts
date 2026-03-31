@@ -1,19 +1,11 @@
 import { apiClient } from 'app/api';
 import type { SubscriptionDto, SubscriptionPlanOptionDto } from 'shared/models';
-
-export interface RenewSubscriptionDto {
-  ownerId: number;
-  startDate?: string | null;
-  endDate?: string | null;
-}
-
-export interface ChangePlanDto {
-  ownerId: number;
-  targetPlan?: string | null;
-  planName?: string | number | null;
-  startDate?: string | null;
-  endDate?: string | null;
-}
+import {
+  mapSubscriptionPlanOptionsFromApi,
+  type SubscriptionPlanOptionApiDto,
+} from '../adapter';
+import type { ChangePlanDto, RenewSubscriptionDto } from '../schema';
+export type { ChangePlanDto, RenewSubscriptionDto } from '../schema';
 
 export const subscriptionsService = {
   getByOwnerId: (ownerId: number) =>
@@ -23,8 +15,10 @@ export const subscriptionsService = {
 
   getPlansByOwnerId: (ownerId: number) =>
     apiClient
-      .get<SubscriptionPlanOptionDto[]>(`/subscriptions/owner/${ownerId}/plans`)
-      .then((response) => (Array.isArray(response.data) ? response.data : [])),
+      .get<SubscriptionPlanOptionApiDto[]>(`/subscriptions/owner/${ownerId}/plans`)
+      .then((response) =>
+        Array.isArray(response.data) ? mapSubscriptionPlanOptionsFromApi(response.data) : [],
+      ),
 
   cancel: (ownerId: number) =>
     apiClient

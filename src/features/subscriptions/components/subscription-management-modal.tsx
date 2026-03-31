@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
-import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   Badge,
   Button,
-  Divider,
   Group,
   Loader,
   Paper,
@@ -13,9 +11,9 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-import { DatePickerInput, type DateValue } from '@mantine/dates';
 import { GenericModal } from 'shared/components';
 import type { SubscriptionPlanOptionDto } from 'shared/models';
+import { createChangePlanDto, createRenewSubscriptionDto } from '../adapter';
 import {
   useCancelSubscription,
   useChangePlan,
@@ -24,7 +22,6 @@ import {
   useRenewSubscription,
 } from '../hooks';
 import {
-  buildPlanChangePayload,
   formatPlanLimitsSummary,
   formatSubscriptionDate,
   formatSubscriptionLimitValue,
@@ -48,16 +45,8 @@ interface SubscriptionManagementModalProps {
 
 interface SubscriptionPlanCardProps {
   plan: SubscriptionPlanOptionDto;
-  isExpanded: boolean;
   isMutating: boolean;
-  periodStartDate: DateValue;
-  periodEndDate: DateValue;
-  onExpand: (plan: SubscriptionPlanOptionDto) => void;
-  onCollapse: () => void;
-  onStartDateChange: (value: DateValue) => void;
-  onEndDateChange: (value: DateValue) => void;
-  onSubmitDirect: (plan: SubscriptionPlanOptionDto) => void;
-  onSubmitWithPeriod: (plan: SubscriptionPlanOptionDto) => void;
+  onSubmit: (plan: SubscriptionPlanOptionDto) => void;
 }
 
 const getIntentHint = (intent: SubscriptionManagementModalIntent) => {
@@ -65,27 +54,17 @@ const getIntentHint = (intent: SubscriptionManagementModalIntent) => {
     case 'cancel':
       return 'Revisa el estado actual antes de confirmar la cancelacion o elegir otro plan.';
     case 'renew':
-      return 'Puedes renovar la suscripcion actual o cambiar de plan si el catalogo lo permite.';
+      return 'La renovacion manual reactiva el plan actual con un nuevo periodo mensual calculado por el backend.';
     case 'change':
-      return 'Elige una opcion del catalogo y completa un periodo solo cuando el backend lo requiera.';
+      return 'Elige el plan destino. Si es pago, el backend asigna automaticamente una vigencia mensual con hora Argentina.';
     default:
-      return 'Gestiona el plan actual y revisa el catalogo disponible para esta cuenta.';
+      return 'El frontend solo elige la accion o el plan. La vigencia de los planes pagos la calcula el backend.';
   }
 };
 
-function SubscriptionPlanCard({
-  plan,
-  isExpanded,
-  isMutating,
-  periodStartDate,
-  periodEndDate,
-  onExpand,
-  onCollapse,
-  onStartDateChange,
-  onEndDateChange,
-  onSubmitDirect,
-  onSubmitWithPeriod,
-}: SubscriptionPlanCardProps) {
+const isFreePlan = (plan: SubscriptionPlanOptionDto) => plan.key?.trim().toLowerCase() === 'free';
+
+function SubscriptionPlanCard({ plan, isMutating, onSubmit }: SubscriptionPlanCardProps) {
   const changeTypeLabel = getPlanChangeTypeLabel(plan.changeType);
   const planName = getSubscriptionPlanDisplayName(plan);
   const canSubmitPlanChange = plan.canChange && Boolean(plan.key?.trim() || plan.code != null);
@@ -96,11 +75,7 @@ function SubscriptionPlanCard({
       radius="md"
       p="md"
       style={{
-        borderColor: plan.isCurrent
-          ? 'var(--mantine-color-brand-4)'
-          : isExpanded
-            ? 'var(--mantine-color-brand-3)'
-            : undefined,
+        borderColor: plan.isCurrent ? 'var(--mantine-color-brand-4)' : undefined,
         backgroundColor: plan.isCurrent ? 'var(--mantine-color-brand-0)' : 'white',
       }}
     >
@@ -122,9 +97,9 @@ function SubscriptionPlanCard({
                 </Badge>
               )}
 
-              {plan.requiresPeriod && (
+              {!isFreePlan(plan) && (
                 <Badge color="grape" variant="light">
-                  Requiere periodo
+                  Mes automatico
                 </Badge>
               )}
             </Group>
@@ -148,61 +123,12 @@ function SubscriptionPlanCard({
             <Button variant="default" disabled>
               No disponible
             </Button>
-          ) : plan.requiresPeriod ? (
-            <Button
-              variant={isExpanded ? 'default' : 'light'}
-              onClick={() => (isExpanded ? onCollapse() : onExpand(plan))}
-              disabled={isMutating}
-            >
-              {isExpanded ? 'Ocultar periodo' : 'Elegir periodo'}
-            </Button>
           ) : (
-            <Button variant="light" onClick={() => onSubmitDirect(plan)} disabled={isMutating}>
+            <Button variant="light" onClick={() => onSubmit(plan)} disabled={isMutating}>
               Cambiar plan
             </Button>
           )}
         </Group>
-
-        {isExpanded && plan.canChange && plan.requiresPeriod && (
-          <Stack gap="sm">
-            <Divider />
-
-            <Text size="sm" c="dimmed">
-              Este cambio requiere un periodo explicito. Completa las fechas y confirma.
-            </Text>
-
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <DatePickerInput
-                label="Inicio"
-                placeholder="Selecciona una fecha"
-                value={periodStartDate}
-                onChange={onStartDateChange}
-                valueFormat="DD/MM/YYYY"
-                clearable={false}
-                disabled={isMutating}
-              />
-
-              <DatePickerInput
-                label="Fin"
-                placeholder="Selecciona una fecha"
-                value={periodEndDate}
-                onChange={onEndDateChange}
-                valueFormat="DD/MM/YYYY"
-                clearable={false}
-                disabled={isMutating}
-              />
-            </SimpleGrid>
-
-            <Group justify="flex-end">
-              <Button variant="default" onClick={onCollapse} disabled={isMutating}>
-                Cancelar
-              </Button>
-              <Button onClick={() => onSubmitWithPeriod(plan)} loading={isMutating}>
-                Confirmar cambio
-              </Button>
-            </Group>
-          </Stack>
-        )}
       </Stack>
     </Paper>
   );
@@ -215,9 +141,6 @@ export function SubscriptionManagementModal({
   onCompleted,
   initialIntent = 'manage',
 }: SubscriptionManagementModalProps) {
-  const [expandedPlanKey, setExpandedPlanKey] = useState<string | null>(null);
-  const [periodStartDate, setPeriodStartDate] = useState<DateValue>(null);
-  const [periodEndDate, setPeriodEndDate] = useState<DateValue>(null);
   const [localError, setLocalError] = useState<string | null>(null);
   const canManageSubscription = ownerId != null;
 
@@ -247,17 +170,10 @@ export function SubscriptionManagementModal({
 
   useEffect(() => {
     if (!opened) {
-      setExpandedPlanKey(null);
-      setPeriodStartDate(null);
-      setPeriodEndDate(null);
       setLocalError(null);
     }
   }, [opened]);
 
-  const activePlan = useMemo(
-    () => plans.find((plan) => plan.key === expandedPlanKey) ?? null,
-    [expandedPlanKey, plans],
-  );
   const currentPlanName = getSubscriptionPlanDisplayName(subscription?.currentPlan);
   const currentPlanLimits = getSubscriptionPlanLimits(subscription?.currentPlan?.limits);
   const visibleError =
@@ -302,68 +218,47 @@ export function SubscriptionManagementModal({
   const handleRenewSubscription = async () => {
     setLocalError(null);
 
-    const resolvedOwnerId = ownerId;
-
-    if (resolvedOwnerId == null) {
+    if (ownerId == null) {
       setLocalError('No se pudo resolver la cuenta para gestionar la suscripcion.');
       return;
     }
 
     try {
-      await renewMutation.mutateAsync({ ownerId: resolvedOwnerId });
-      handleSuccessfulCompletion('La suscripcion quedo renovada.');
-    } catch {
-      // El error visible se resuelve desde mutationError.
+      const payload = createRenewSubscriptionDto(ownerId);
+      await renewMutation.mutateAsync(payload);
+      handleSuccessfulCompletion('La suscripcion quedo renovada con un nuevo periodo mensual.');
+    } catch (error) {
+      setLocalError(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo preparar la renovacion de la suscripcion.',
+      );
     }
   };
 
-  const handleChangePlan = async (
-    plan: SubscriptionPlanOptionDto,
-    period?: {
-      startDate?: string | null;
-      endDate?: string | null;
-    },
-  ) => {
+  const handleChangePlan = async (plan: SubscriptionPlanOptionDto) => {
     setLocalError(null);
 
-    const resolvedOwnerId = ownerId;
-
-    if (resolvedOwnerId == null) {
+    if (ownerId == null) {
       setLocalError('No se pudo resolver la cuenta para gestionar la suscripcion.');
       return;
     }
 
-    if (!plan.key?.trim() && plan.code == null) {
-      setLocalError('El plan seleccionado no tiene un identificador valido.');
-      return;
-    }
-
     try {
-      await changePlanMutation.mutateAsync(buildPlanChangePayload(resolvedOwnerId, plan, period));
-      handleSuccessfulCompletion('El plan actual quedo actualizado.');
-    } catch {
-      // El error visible se resuelve desde mutationError.
+      const payload = createChangePlanDto(ownerId, plan);
+      await changePlanMutation.mutateAsync(payload);
+      handleSuccessfulCompletion(
+        isFreePlan(plan)
+          ? 'El plan actual quedo actualizado.'
+          : 'El plan actual quedo actualizado con un nuevo periodo mensual.',
+      );
+    } catch (error) {
+      setLocalError(
+        error instanceof Error
+          ? error.message
+          : 'No se pudo preparar el cambio de plan.',
+      );
     }
-  };
-
-  const handlePeriodPlanChange = (plan: SubscriptionPlanOptionDto) => {
-    if (!periodStartDate || !periodEndDate) {
-      setLocalError('Completa fecha de inicio y fin para este cambio de plan.');
-      return;
-    }
-
-    const startDate = dayjs(periodStartDate).format('YYYY-MM-DD');
-    const endDate = dayjs(periodEndDate).format('YYYY-MM-DD');
-
-    if (startDate > endDate) {
-      setLocalError('La fecha de inicio no puede ser mayor que la fecha de fin.');
-      return;
-    }
-
-    void handleChangePlan(plan, {
-      startDate,
-      endDate,
-    });
   };
 
   return (
@@ -441,6 +336,11 @@ export function SubscriptionManagementModal({
                 </Group>
               </Group>
 
+              <Alert color="blue" variant="light">
+                Los cambios y renovaciones de planes pagos generan un nuevo periodo mensual desde
+                hoy, calculado por el backend con hora Argentina.
+              </Alert>
+
               {!subscription.isPersisted && (
                 <Alert color="blue" variant="light">
                   La cuenta todavia no tiene una fila persistida, pero el backend ya expone el plan
@@ -457,8 +357,8 @@ export function SubscriptionManagementModal({
 
               {subscription.isExpired && (
                 <Alert color="red" variant="light">
-                  La suscripcion esta vencida. Si el backend habilita renovacion, podras retomarla
-                  desde aqui.
+                  La suscripcion esta vencida. Puedes renovarla o elegir un nuevo plan pago para
+                  generar una nueva vigencia mensual.
                 </Alert>
               )}
 
@@ -510,8 +410,8 @@ export function SubscriptionManagementModal({
             <Stack gap={2}>
               <Text fw={600}>Catalogo de planes</Text>
               <Text size="sm" c="dimmed">
-                El backend define que opciones pueden tomarse, si son upgrade o downgrade y si
-                requieren periodo explicito.
+                El frontend solo elige plan y accion. Si el destino es pago, el backend aplica la
+                vigencia mensual automaticamente.
               </Text>
             </Stack>
 
@@ -535,30 +435,12 @@ export function SubscriptionManagementModal({
             <Stack gap="sm">
               {plans.map((plan) => (
                 <SubscriptionPlanCard
-                  key={plan.key}
+                  key={plan.key || String(plan.code)}
                   plan={plan}
-                  isExpanded={activePlan?.key === plan.key}
                   isMutating={isMutating}
-                  periodStartDate={activePlan?.key === plan.key ? periodStartDate : null}
-                  periodEndDate={activePlan?.key === plan.key ? periodEndDate : null}
-                  onExpand={(selectedPlan) => {
-                    setExpandedPlanKey(selectedPlan.key);
-                    setPeriodStartDate(null);
-                    setPeriodEndDate(null);
-                    setLocalError(null);
-                  }}
-                  onCollapse={() => {
-                    setExpandedPlanKey(null);
-                    setPeriodStartDate(null);
-                    setPeriodEndDate(null);
-                    setLocalError(null);
-                  }}
-                  onStartDateChange={setPeriodStartDate}
-                  onEndDateChange={setPeriodEndDate}
-                  onSubmitDirect={(planToChange) => {
+                  onSubmit={(planToChange) => {
                     void handleChangePlan(planToChange);
                   }}
-                  onSubmitWithPeriod={handlePeriodPlanChange}
                 />
               ))}
             </Stack>

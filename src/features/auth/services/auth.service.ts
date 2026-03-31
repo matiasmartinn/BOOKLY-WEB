@@ -3,6 +3,16 @@ import type { UserDto } from 'shared/models';
 import type { LoginRequest } from '../login-form/login.schema';
 import type { RegisterUserRequst } from '../register-form/register-user.schema';
 
+export interface EmailDispatchResultDto {
+  emailSent: boolean;
+  message: string;
+}
+
+export interface RegisterOwnerResultDto {
+  user: UserDto;
+  emailDispatch: EmailDispatchResultDto;
+}
+
 export interface ConfirmEmailDto {
   token: string;
 }
@@ -26,7 +36,7 @@ export interface CompleteSecretaryInvitationDto {
 }
 
 const register = (dto: Omit<RegisterUserRequst, 'confirmPassword'>) =>
-  apiClient.post<UserDto>('/auth/register', dto).then((response) => response.data);
+  apiClient.post<RegisterOwnerResultDto>('/auth/register', dto).then((response) => response.data);
 
 const login = (dto: LoginRequest) =>
   apiClient.post<UserDto>('/auth/login', dto).then((response) => response.data);
@@ -35,7 +45,7 @@ const confirmEmail = (dto: ConfirmEmailDto) =>
   apiClient.post<void>('/auth/confirm-email', dto).then((response) => response.data);
 
 const resendConfirmation = (dto: ResendEmailConfirmationDto) =>
-  apiClient.post<void>('/auth/resend-confirmation', dto).then((response) => response.data);
+  apiClient.post<EmailDispatchResultDto>('/auth/resend-confirmation', dto).then((response) => response.data);
 
 const forgotPassword = (dto: RequestPasswordResetDto) =>
   apiClient.post<void>('/auth/forgot-password', dto).then((response) => response.data);
