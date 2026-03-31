@@ -1,2 +1,3 @@
-export const formatDateOnly = (value: string) =>
-  new Intl.DateTimeFormat('es-AR').format(new Date(`${value}T00:00:00`));
+import { formatLocalDateOnly } from './local-date-time';
+
+export const formatDateOnly = (value: string) => formatLocalDateOnly(value);

@@ -15,8 +15,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBars,
   faChartPie,
+  faRectangleList,
   faCalendarCheck,
   faClock,
+  faClockRotateLeft,
+  faChartColumn,
   faStore,
   faCalendarXmark,
   faToggleOn,
@@ -32,6 +35,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { PATHS } from 'app/router/PATHS';
+import { SubscriptionSidebarBanner } from 'features/subscriptions/components';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -89,11 +93,16 @@ interface NavSection {
   items: NavItem[];
 }
 
-const NAV_SECTIONS: NavSection[] = [
+const PRIMARY_NAV_SECTIONS: NavSection[] = [
   {
-    label: 'Gestión',
+    label: 'Panel',
     items: [
       { label: 'Resumen', icon: faChartPie, path: PATHS.dashboard.overview },
+    ],
+  },
+  {
+    label: 'Operación',
+    items: [
       {
         label: 'Turnos',
         icon: faCalendarCheck,
@@ -106,6 +115,20 @@ const NAV_SECTIONS: NavSection[] = [
         path: PATHS.dashboard.schedules,
         permission: 'viewSchedules',
       },
+      {
+        label: 'Excepciones',
+        icon: faCalendarXmark,
+        path: PATHS.dashboard.unavailability,
+        permission: 'viewUnavailability',
+      },
+    ],
+  },
+  {
+    label: 'Seguimiento',
+    items: [
+      { label: 'Eventos', icon: faRectangleList, path: PATHS.dashboard.events },
+      { label: 'Histórico', icon: faClockRotateLeft, path: PATHS.dashboard.history },
+      { label: 'Métricas', icon: faChartColumn, path: PATHS.dashboard.metrics },
     ],
   },
   {
@@ -118,12 +141,6 @@ const NAV_SECTIONS: NavSection[] = [
         permission: 'viewService',
       },
       {
-        label: 'Excepciones',
-        icon: faCalendarXmark,
-        path: PATHS.dashboard.unavailability,
-        permission: 'viewUnavailability',
-      },
-      {
         label: 'Estado',
         icon: faToggleOn,
         path: PATHS.dashboard.status,
@@ -132,7 +149,7 @@ const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    label: 'Cuenta',
+    label: 'Equipo',
     items: [
       {
         label: 'Equipo',
@@ -140,15 +157,25 @@ const NAV_SECTIONS: NavSection[] = [
         path: PATHS.dashboard.team,
         permission: 'viewTeam',
       },
-      { label: 'Perfil', icon: faUser, path: PATHS.dashboard.profile },
-      {
-        label: 'Configuración',
-        icon: faGear,
-        path: PATHS.dashboard.settings,
-        permission: 'viewSettings',
-      },
     ],
   },
+];
+
+const ACCOUNT_NAV_SECTION: NavSection = {
+  label: 'Cuenta',
+  items: [
+    { label: 'Perfil', icon: faUser, path: PATHS.dashboard.profile },
+    {
+      label: 'Configuración',
+      icon: faGear,
+      path: PATHS.dashboard.settings,
+      permission: 'viewSettings',
+    },
+  ],
+};
+
+const ACCOUNT_NAV_ITEMS: NavItem[] = [
+  { label: 'Cuenta', icon: faUser, path: PATHS.dashboard.account, permission: 'viewSettings' },
 ];
 
 // ─── ServiceSwitcher ──────────────────────────────────────────────────────────
@@ -610,6 +637,7 @@ interface DashboardSidebarProps {
   collapsed: boolean;
   onToggleSidebar: () => void;
   onNavigate?: () => void;
+  ownerId?: number;
 
   // User & role
   user: SidebarUser;
@@ -627,6 +655,7 @@ export function DashboardSidebar({
   collapsed,
   onToggleSidebar,
   onNavigate,
+  ownerId,
   user,
   permissions,
   services,
@@ -649,7 +678,8 @@ export function DashboardSidebar({
   };
 
   return (
-    <Stack gap="sm" p="sm" h="100%">
+    <Stack gap="sm" p="sm" h="100%" style={{ overflow: 'hidden' }}>
+      <Stack gap="sm" style={{ flex: 1, minHeight: 0 }}>
       {/* ── Brand + toggle ── */}
       <Stack gap={collapsed ? 8 : 0}>
         <Group
@@ -719,9 +749,11 @@ export function DashboardSidebar({
       <Divider />
 
       {/* ── Navigation ── */}
-      {NAV_SECTIONS.map((section, index) => (
-        <Stack key={section.label} gap={2}>
-          {index > 0 && <Divider my={4} />}
+      <Box style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden' }}>
+        <Stack gap="sm" pr={collapsed ? 0 : 4}>
+          {PRIMARY_NAV_SECTIONS.map((section, index) => (
+            <Stack key={section.label} gap={2}>
+              {index > 0 && <Divider my={4} />}
 
           {!collapsed && (
             <Text
@@ -747,15 +779,54 @@ export function DashboardSidebar({
             />
           ))}
         </Stack>
-      ))}
+          ))}
+            </Stack>
+      </Box>
+      </Stack>
+
+      <Stack gap="sm">
 
       {/* ── Spacer ── */}
-      <Box style={{ flex: 1 }} />
 
       <Divider />
 
       {/* ── User footer ── */}
+      <Stack gap={2}>
+        {!collapsed && (
+          <Text
+            size="xs"
+            fw={700}
+            c="dimmed"
+            tt="uppercase"
+            px="xs"
+            style={{ letterSpacing: '0.05em' }}
+          >
+            {ACCOUNT_NAV_SECTION.label}
+          </Text>
+        )}
+
+        {ACCOUNT_NAV_ITEMS.map((item) => (
+          <NavItemButton
+            key={item.path}
+            item={item}
+            isActive={pathname === item.path}
+            hasPermission={hasPermission(item)}
+            collapsed={collapsed}
+            onClick={() => handleNavigate(item.path)}
+          />
+        ))}
+      </Stack>
+
+      {isOwner && ownerId != null && (
+        <>
+          <Divider />
+          <SubscriptionSidebarBanner ownerId={ownerId} collapsed={collapsed} />
+        </>
+      )}
+
+      <Divider />
       <UserFooter user={user} collapsed={collapsed} />
+      </Stack>
     </Stack>
   );
 }

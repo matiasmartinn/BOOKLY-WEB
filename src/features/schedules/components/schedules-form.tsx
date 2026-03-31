@@ -1,8 +1,8 @@
 import { Stack, Group, Button } from '@mantine/core';
 import { useState, useEffect } from 'react';
-import { useSchedules, useSaveSchedules } from '../hooks/schedules.hooks';
-import type { ScheduleModel } from 'shared/models';
+import { useSelectedServiceSchedules, useSaveSchedules } from '../hooks';
 import { ScheduleDayRow } from './schedule-day-row';
+import type { ScheduleDto } from 'shared/models';
 
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] as const;
 type Day = (typeof DAYS)[number];
@@ -20,7 +20,7 @@ const DAY_VALUE: Record<Day, number> = {
   Sábado: 6,
 };
 
-const buildFromApi = (data: ScheduleModel[]): FormState => {
+const buildFromApi = (data: ScheduleDto[]): FormState => {
   const state = buildEmpty();
   for (const s of data) {
     const day = DAYS.find((d) => DAY_VALUE[d] === s.dayValue);
@@ -40,7 +40,7 @@ const buildEmpty = (): FormState =>
   ) as FormState;
 
 export function SchedulesForm() {
-  const { data: schedulesData } = useSchedules();
+  const { data: schedulesData } = useSelectedServiceSchedules();
   const { mutate: setSchedule, isPending } = useSaveSchedules();
   const [form, setForm] = useState<FormState>(buildEmpty);
 

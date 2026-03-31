@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBusinessStore } from 'store/use-buisness-store';
 import { useAuthStore } from 'store/use-auth-store';
 import { PATHS } from 'app/router/PATHS';
-import { BusinessWizard } from './business-wizard';
+import { BusinessWizardContainer } from './container';
 
 export function BusinessWizardPage() {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ export function BusinessWizardPage() {
         display: 'flex',
       }}
     >
-      <BusinessWizard onComplete={handleComplete} onCancel={handleCancel} />
+      <BusinessWizardContainer onComplete={handleComplete} onCancel={handleCancel} />
     </Box>
   );
 }

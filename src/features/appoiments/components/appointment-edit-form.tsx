@@ -1,0 +1,139 @@
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Alert, Button, Group, SimpleGrid, Stack, Text, TextInput, Textarea } from '@mantine/core';
+import type { AppointmentViewModel } from '../viewmodel';
+import { updateAppointmentFormSchema, type UpdateAppointmentFormValues } from '../schema';
+import { useUpdateAppointment } from '../hooks';
+
+interface AppointmentEditFormProps {
+  appointment: AppointmentViewModel;
+  onCancel?: () => void;
+  onSuccess?: () => void;
+  submitLabel?: string;
+}
+
+const defaultValues: UpdateAppointmentFormValues = {
+  clientName: '',
+  clientPhone: '',
+  clientEmail: '',
+  clientNotes: '',
+};
+
+export function AppointmentEditForm({
+  appointment,
+  onCancel,
+  onSuccess,
+  submitLabel = 'Guardar cambios',
+}: AppointmentEditFormProps) {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<UpdateAppointmentFormValues>({
+    resolver: zodResolver(updateAppointmentFormSchema),
+    mode: 'onTouched',
+    defaultValues: {
+      ...defaultValues,
+      clientName: appointment.clientName ?? '',
+      clientPhone: appointment.clientPhone ?? '',
+      clientEmail: appointment.clientEmail ?? '',
+      clientNotes: appointment.clientNotes ?? '',
+    },
+  });
+
+  const {
+    mutate: updateAppointment,
+    isPending,
+    isError: isSubmitError,
+    error,
+  } = useUpdateAppointment(appointment.id);
+
+  const onSubmit: SubmitHandler<UpdateAppointmentFormValues> = (values) => {
+    if (!appointment.id) {
+      setError('root', {
+        type: 'manual',
+        message: 'No se pudo identificar el turno a editar.',
+      });
+      return;
+    }
+
+    updateAppointment(values, { onSuccess });
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Stack gap="lg">
+        <Stack gap={4}>
+          <Text fw={600}>Editar datos del turno</Text>
+
+          <Text size="sm" c="dimmed">
+            Corrige la información cargada del cliente para este turno.
+          </Text>
+        </Stack>
+
+        {errors.root?.message && (
+          <Alert color="red" variant="light">
+            {errors.root.message}
+          </Alert>
+        )}
+
+        {isSubmitError && error && (
+          <Alert color="red" variant="light">
+            {error.detail}
+          </Alert>
+        )}
+
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+          <TextInput
+            label="Cliente"
+            placeholder="Juan Perez"
+            withAsterisk
+            {...register('clientName')}
+            error={errors.clientName?.message}
+            disabled={isPending}
+          />
+
+          <TextInput
+            label="Telefono"
+            placeholder="3364..."
+            withAsterisk
+            {...register('clientPhone')}
+            error={errors.clientPhone?.message}
+            disabled={isPending}
+          />
+        </SimpleGrid>
+
+        <TextInput
+          label="Email"
+          placeholder="cliente@correo.com"
+          {...register('clientEmail')}
+          error={errors.clientEmail?.message}
+          disabled={isPending}
+        />
+
+        <Textarea
+          label="Notas"
+          placeholder="Observaciones del cliente"
+          minRows={3}
+          autosize
+          {...register('clientNotes')}
+          error={errors.clientNotes?.message}
+          disabled={isPending}
+        />
+
+        <Group justify="flex-end">
+          {onCancel && (
+            <Button type="button" variant="default" onClick={onCancel} disabled={isPending}>
+              Cancelar
+            </Button>
+          )}
+
+          <Button type="submit" loading={isPending}>
+            {submitLabel}
+          </Button>
+        </Group>
+      </Stack>
+    </form>
+  );
+}

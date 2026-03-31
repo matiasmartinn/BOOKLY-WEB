@@ -1,4 +1,4 @@
-import { businessService } from 'features/business/business.service';
+import { businessService } from 'features/business/services/business.service';
 import type { BusinessDto } from 'shared/models';
 import { create } from 'zustand';
 

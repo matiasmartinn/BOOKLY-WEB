@@ -1,8 +1,10 @@
-import type { AppointmentDto } from 'shared/models/appointment-dto';
+import type { AppointmentDto, AppointmentListItemDto } from 'shared/models/appointment-dto';
 import type { AppointmentViewModel } from '../viewmodel';
 import { formatDateTime, formatTime } from 'shared/utils';
 
-const mapAppointmentToViewModel = (item: AppointmentDto): AppointmentViewModel => {
+type AppointmentLike = AppointmentDto | AppointmentListItemDto;
+
+const mapAppointmentToViewModel = (item: AppointmentLike): AppointmentViewModel => {
   return {
     id: item.id,
     clientName: item.clientName,
@@ -19,5 +21,5 @@ const mapAppointmentToViewModel = (item: AppointmentDto): AppointmentViewModel =
   };
 };
 
-export const mapAppointmentListToViewModel = (items: AppointmentDto[]): AppointmentViewModel[] =>
+export const mapAppointmentListToViewModel = (items: AppointmentLike[]): AppointmentViewModel[] =>
   items.map(mapAppointmentToViewModel);

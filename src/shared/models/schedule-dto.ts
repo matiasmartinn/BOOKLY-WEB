@@ -6,3 +6,5 @@ export interface ScheduleDto {
   day: string;
   dayValue: number;
 }
+
+export type ScheduleModel = ScheduleDto;

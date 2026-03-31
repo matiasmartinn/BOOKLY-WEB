@@ -7,6 +7,7 @@ type Props = {
   onStartChange: (value: string | null) => void;
   onEndChange: (value: string | null) => void;
   onRemove?: () => void;
+  disabled?: boolean;
 };
 
 const TIME_OPTIONS_5 = Array.from({ length: 288 }, (_, i) => {
@@ -22,6 +23,7 @@ export const SelectDayTimePicker = memo(function SelectDayTimePicker({
   onStartChange,
   onEndChange,
   onRemove,
+  disabled = false,
 }: Props) {
   const endOptions = useMemo(
     () => (startValue ? TIME_OPTIONS_5.filter((t) => t > startValue) : TIME_OPTIONS_5),
@@ -35,6 +37,7 @@ export const SelectDayTimePicker = memo(function SelectDayTimePicker({
         data={TIME_OPTIONS_5}
         value={startValue}
         onChange={onStartChange}
+        disabled={disabled}
         w={110}
         comboboxProps={{ width: 130 }}
       />
@@ -44,6 +47,7 @@ export const SelectDayTimePicker = memo(function SelectDayTimePicker({
         data={endOptions}
         value={endValue}
         onChange={onEndChange}
+        disabled={disabled}
         w={110}
         comboboxProps={{ width: 130 }}
       />
@@ -55,6 +59,7 @@ export const SelectDayTimePicker = memo(function SelectDayTimePicker({
           size="lg"
           onClick={onRemove}
           aria-label="Eliminar franja"
+          disabled={disabled}
         >
           x
         </ActionIcon>

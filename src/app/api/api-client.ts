@@ -17,8 +17,6 @@ export function isApiError(error: unknown): error is ProblemDetails {
   );
 }
 
-const baseUrl = 'https://localhost:7176/api/';
-
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 100000,

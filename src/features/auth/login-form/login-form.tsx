@@ -1,4 +1,5 @@
 import { Stack, Title, Text, TextInput, PasswordInput, Button, Anchor } from '@mantine/core';
+import { isApiError } from 'app/api';
 import { PATHS } from 'app/router';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,12 +9,29 @@ import { loginSchema, type LoginRequest } from './login.schema';
 import { useState } from 'react';
 import { useAuthStore } from 'store/use-auth-store';
 
+function getLoginErrorMessage(error: unknown) {
+  if (isApiError(error)) {
+    if (error.status === 0) {
+      return 'No pudimos conectar con el servidor. Verifica tu conexion e intenta nuevamente.';
+    }
+
+    if (error.status === 401) {
+      return 'Credenciales incorrectas. Revisa tu email y contrasena.';
+    }
+
+    return error.detail || 'No pudimos iniciar sesion en este momento. Intenta nuevamente.';
+  }
+
+  return 'No pudimos iniciar sesion en este momento. Intenta nuevamente.';
+}
+
 export function LoginForm() {
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
   const [isPending, setIsPending] = useState(false);
 
   const {
+    clearErrors,
     register,
     handleSubmit,
     formState: { errors },
@@ -24,14 +42,13 @@ export function LoginForm() {
 
   const onSubmit: SubmitHandler<LoginRequest> = async (data) => {
     setIsPending(true);
+    clearErrors('root');
+
     try {
-      // login() → autentica, setea user, loadServices() → fetchea lista
-      // y pre-selecciona el primer servicio con su detalle completo.
-      // Cuando navigate() corre, el store ya tiene todo listo.
       await login(data);
       navigate(PATHS.dashboard.overview);
-    } catch {
-      setError('root', { message: 'Credenciales incorrectas. Revisá tu email y contraseña.' });
+    } catch (error) {
+      setError('root', { message: getLoginErrorMessage(error) });
     } finally {
       setIsPending(false);
     }
@@ -41,7 +58,7 @@ export function LoginForm() {
     <AuthCard onSubmit={handleSubmit(onSubmit)}>
       <Stack gap="md" align="stretch">
         <Stack gap={4} align="center">
-          <Title order={3}>Iniciar Sesión</Title>
+          <Title order={3}>Iniciar Sesion</Title>
           <Text size="sm" c="dimmed">
             Ingrese las credenciales de su cuenta.
           </Text>
@@ -57,13 +74,13 @@ export function LoginForm() {
 
           <Stack gap="xs">
             <PasswordInput
-              label="Contraseña"
-              placeholder="Ingrese su contraseña"
+              label="Contrasena"
+              placeholder="Ingrese su contrasena"
               {...register('password')}
               error={errors.password?.message}
             />
             <Text size="sm" c="dimmed">
-              ¿Olvidaste tu contraseña?{' '}
+              Olvidaste tu contrasena?{' '}
               <Anchor c="brand" component={Link} to={PATHS.auth.forgotPassword}>
                 Recuperala
               </Anchor>
@@ -81,7 +98,7 @@ export function LoginForm() {
               Ingresar
             </Button>
             <Text size="sm" c="dimmed" ta="center">
-              ¿No tenes cuenta?{' '}
+              No tenes cuenta?{' '}
               <Anchor c="brand" component={Link} to={PATHS.auth.register}>
                 Registrate
               </Anchor>

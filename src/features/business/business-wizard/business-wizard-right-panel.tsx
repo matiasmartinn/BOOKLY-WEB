@@ -10,7 +10,6 @@ interface WizardRightPanelProps {
   onBack: () => void;
   onNext: () => void;
   onCancel: () => void;
-  /** El formulario o contenido del paso activo */
   children?: React.ReactNode;
 }
 

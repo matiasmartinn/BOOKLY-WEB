@@ -1,5 +1,5 @@
 import { AppShell, Burger, Group, Text } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { Outlet } from 'react-router-dom';
 import {
   DashboardSidebar,
@@ -13,6 +13,9 @@ import { useEffect } from 'react';
 export function DashboardLayout() {
   const [mobileOpened, mobile] = useDisclosure(false);
   const [desktopCollapsed, desktop] = useDisclosure(false);
+
+  const isMobile = useMediaQuery('(max-width: 48em)');
+  const isCollapsed = isMobile ? false : desktopCollapsed;
 
   const authUser = useAuthStore((s) => s.user);
   const { services, selectedService, selectService, loadServices, isLoading, initialized } =
@@ -71,9 +74,10 @@ export function DashboardLayout() {
 
       <AppShell.Navbar>
         <DashboardSidebar
-          collapsed={desktopCollapsed}
+          collapsed={isCollapsed}
           onToggleSidebar={desktop.toggle}
           onNavigate={handleSidebarNavigate}
+          ownerId={authUser?.id}
           user={sidebarUser}
           permissions={OWNER_PERMISSIONS}
           services={services.map((s) => ({ id: String(s.id), name: s.name }))}

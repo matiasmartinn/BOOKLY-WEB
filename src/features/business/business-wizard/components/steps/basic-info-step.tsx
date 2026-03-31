@@ -1,6 +1,6 @@
 import { Stack, TextInput, Textarea, Select, Text, Box } from '@mantine/core';
 import { useFormContext } from 'react-hook-form';
-import { useGetAllBusinessType } from 'shared/hooks/business-type.hook';
+import { useServiceTypes } from 'features/service-types/hooks';
 import type { CreateBusinessFormValues } from '../../schema';
 import { useMemo } from 'react';
 
@@ -31,7 +31,7 @@ export function BasicInfoStep() {
     setValue('slug', toSlug(value));
   };
 
-  const { data: businessTypesData, isLoading } = useGetAllBusinessType();
+  const { data: businessTypesData, isLoading } = useServiceTypes();
   const businessTypeOptions = useMemo(
     () =>
       businessTypesData?.map((type) => ({

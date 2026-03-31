@@ -10,6 +10,7 @@ interface AuthStore {
   isAuthenticated: boolean;
   login: (dto: LoginRequest) => Promise<void>;
   logout: () => void;
+  setUser: (user: UserModel | null) => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -30,6 +31,13 @@ export const useAuthStore = create<AuthStore>()(
       logout: () => {
         useBusinessStore.getState().clear();
         set({ user: null, isAuthenticated: false });
+      },
+
+      setUser: (user) => {
+        set((state) => ({
+          user,
+          isAuthenticated: user ? state.isAuthenticated : false,
+        }));
       },
     }),
     {
