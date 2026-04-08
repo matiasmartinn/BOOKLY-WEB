@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Button, Group, Loader, Stack, Text, TextInput } from '@mantine/core';
 import { isApiError } from 'app/api';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import { formatLocalDateTime } from 'shared/utils';
 import { useUpdateUser, useUser } from '../hooks';
 import { updateUserProfileSchema, type UpdateUserProfileFormValues } from '../schema';
 
@@ -56,7 +57,9 @@ export function EditSecretaryProfileForm({
         lastName: values.lastName.trim(),
         email: values.email.trim(),
       },
-      { onSuccess },
+      {
+        onSuccess,
+      },
     );
   };
 
@@ -119,7 +122,7 @@ export function EditSecretaryProfileForm({
 
         {data?.createdAt && (
           <Text size="xs" c="dimmed">
-            Alta registrada: {new Date(data.createdAt).toLocaleString('es-AR')}
+            Alta registrada: {formatLocalDateTime(data.createdAt)}
           </Text>
         )}
 

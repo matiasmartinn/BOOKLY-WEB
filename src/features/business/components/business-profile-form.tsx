@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
   Button,
+  Divider,
   Group,
   Select,
   SimpleGrid,
@@ -12,9 +13,11 @@ import {
   Textarea,
 } from '@mantine/core';
 import { isApiError } from 'app/api';
+import { PublicBookingSharePanel } from 'features/public-booking/components';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useServiceTypes } from 'features/service-types/hooks';
-import type { BusinessDto } from 'shared/models';
+import type { BusinessDto, ServicePublicBookingDto } from 'shared/models';
+import { useAppToast } from 'shared/ui/toast';
 import { useBusinessStore } from 'store/use-buisness-store';
 import { useUpdateBusiness } from '../hooks';
 import {
@@ -25,11 +28,6 @@ import {
 interface BusinessProfileFormProps {
   service: BusinessDto;
 }
-
-type Feedback = {
-  color: 'green' | 'red';
-  message: string;
-};
 
 const mapBusinessToFormValues = (service: BusinessDto): UpdateBusinessProfileFormValues => ({
   name: service.name,
@@ -43,7 +41,7 @@ const mapBusinessToFormValues = (service: BusinessDto): UpdateBusinessProfileFor
 
 export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
   const updateService = useBusinessStore((state) => state.updateService);
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const toast = useAppToast();
 
   const { data: serviceTypes = [], isLoading: isLoadingServiceTypes } = useServiceTypes();
   const { mutateAsync, isPending, isError, error } = useUpdateBusiness(service.id, service.ownerId);
@@ -63,7 +61,6 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
 
   useEffect(() => {
     reset(mapBusinessToFormValues(service));
-    setFeedback(null);
   }, [service.id, reset]);
 
   const serviceTypeOptions = useMemo(() => {
@@ -82,12 +79,19 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
     return options.sort((a, b) => a.label.localeCompare(b.label, 'es-AR'));
   }, [service.serviceTypeId, serviceTypes]);
 
-  const slug = watch('slug') ?? '';
   const serviceTypeId = watch('serviceTypeId');
 
-  const onSubmit: SubmitHandler<UpdateBusinessProfileFormValues> = async (values) => {
-    setFeedback(null);
+  const handlePublicBookingUpdated = (publicBooking: ServicePublicBookingDto) => {
+    updateService({
+      ...service,
+      slug: publicBooking.slug,
+      isPublicBookingEnabled: publicBooking.isEnabled,
+      publicBookingToken: publicBooking.publicBookingToken,
+      publicBookingTokenUpdateAt: publicBooking.publicBookingTokenUpdatedAt ?? null,
+    });
+  };
 
+  const onSubmit: SubmitHandler<UpdateBusinessProfileFormValues> = async (values) => {
     try {
       const updatedService = await mutateAsync({
         name: values.name.trim(),
@@ -101,21 +105,15 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
 
       updateService(updatedService);
       reset(mapBusinessToFormValues(updatedService));
-      setFeedback({ color: 'green', message: 'Los datos base del servicio se guardaron.' });
+      toast.success('Los datos base del servicio se guardaron.');
     } catch {
-      setFeedback(null);
+      // El error se refleja inline desde el estado del mutation.
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap="lg">
-        {feedback && (
-          <Alert color={feedback.color} variant="light">
-            {feedback.message}
-          </Alert>
-        )}
-
         {isError && error && (
           <Alert color="red" variant="light">
             {isApiError(error) ? error.detail : 'No se pudo guardar la configuracion del servicio.'}
@@ -141,10 +139,6 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
               error={errors.slug?.message}
               disabled={isPending}
             />
-
-            <Text size="xs" c="dimmed">
-              URL publica: {slug ? `bookly.app/${slug}` : 'Sin slug definido'}
-            </Text>
 
             <Select
               label="Tipo de servicio"
@@ -203,6 +197,18 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
           </Stack>
         </SimpleGrid>
 
+        <Divider />
+
+        <PublicBookingSharePanel
+          serviceId={service.id}
+          ownerId={service.ownerId}
+          slug={service.slug}
+          token={service.publicBookingToken}
+          tokenUpdatedAt={service.publicBookingTokenUpdateAt}
+          isEnabled={service.isPublicBookingEnabled}
+          onPublicBookingUpdated={handlePublicBookingUpdated}
+        />
+
         <Group justify="space-between" align="center" wrap="wrap" gap="sm">
           <Text size="sm" c="dimmed">
             {isDirty ? 'Hay cambios pendientes de guardado.' : 'Sin cambios pendientes.'}
@@ -214,7 +220,6 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
               variant="default"
               onClick={() => {
                 reset(mapBusinessToFormValues(service));
-                setFeedback(null);
               }}
               disabled={!isDirty || isPending}
             >

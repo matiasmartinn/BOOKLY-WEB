@@ -1,4 +1,8 @@
 export const PATHS = {
+  public: {
+    home: '/',
+    booking: '/book/:slug/:token',
+  },
   auth: {
     root: '/auth',
     login: '/auth/login',
@@ -6,12 +10,16 @@ export const PATHS = {
     confirmEmail: '/auth/confirm-email',
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',
+    adminInvitation: '/auth/admin-invitation',
     secretaryInvitation: '/auth/secretary-invitation',
     secretarySetup: '/auth/secretary-password-form',
     auth: '/auth/create-business',
   },
   dashboard: {
     overview: '/dashboard',
+    adminOverview: '/dashboard/admin',
+    adminOwners: '/dashboard/admin/owners',
+    adminServices: '/dashboard/admin/services',
     events: '/dashboard/events',
     activity: '/dashboard/activity',
     appointments: '/dashboard/appointments',

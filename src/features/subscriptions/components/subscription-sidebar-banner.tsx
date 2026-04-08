@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { Badge, Box, Button, Loader, Stack, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useAppToast } from 'shared/ui/toast';
 import { useOwnerSubscription } from '../hooks';
 import {
   getSubscriptionCtaLabel,
@@ -23,9 +23,9 @@ export function SubscriptionSidebarBanner({
   collapsed,
 }: SubscriptionSidebarBannerProps) {
   const [opened, { open, close }] = useDisclosure(false);
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const modalIntent: SubscriptionManagementModalIntent = 'manage';
   const canManageSubscription = ownerId != null;
+  const toast = useAppToast();
 
   const { data: subscription, isLoading, isError } = useOwnerSubscription(ownerId);
   const planName = getSubscriptionPlanDisplayName(subscription?.currentPlan);
@@ -36,7 +36,6 @@ export function SubscriptionSidebarBanner({
   }
 
   const handleOpen = () => {
-    setFeedbackMessage(null);
     open();
   };
 
@@ -119,12 +118,6 @@ export function SubscriptionSidebarBanner({
       <Button size="xs" variant="light" onClick={handleOpen}>
         {ctaLabel}
       </Button>
-
-      {feedbackMessage && (
-        <Text size="xs" c="green.7">
-          {feedbackMessage}
-        </Text>
-      )}
     </Stack>
   );
 
@@ -138,7 +131,7 @@ export function SubscriptionSidebarBanner({
         onClose={close}
         initialIntent={modalIntent}
         onCompleted={(message) => {
-          setFeedbackMessage(message);
+          toast.success(message);
           close();
         }}
       />

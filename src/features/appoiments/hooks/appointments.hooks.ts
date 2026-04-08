@@ -42,10 +42,3 @@ export const useAppointmentHistoryByService = (serviceId?: number) =>
     queryFn: () => appointmentService.getHistoryByService(serviceId!),
     enabled: serviceId != null,
   });
-
-export const useAppointmentHistory = (appointmentId?: number) =>
-  useQuery<AppointmentStatusHistoryDto[], ProblemDetails>({
-    queryKey: ['appointments', 'history', appointmentId],
-    queryFn: () => appointmentService.getHistory(appointmentId!),
-    enabled: appointmentId != null,
-  });

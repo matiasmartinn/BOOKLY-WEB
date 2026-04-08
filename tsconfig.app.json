@@ -8,12 +8,11 @@
     "types": ["vite/client"],
     "skipLibCheck": true,
 
-    "baseUrl": ".",
     "paths": {
-      "app/*": ["src/app/*"],
-      "features/*": ["src/features/*"],
-      "shared/*": ["src/shared/*"],
-      "store/*": ["src/store/*"]
+      "app/*": ["./src/app/*"],
+      "features/*": ["./src/features/*"],
+      "shared/*": ["./src/shared/*"],
+      "store/*": ["./src/store/*"]
     },
 
     /* Bundler mode */

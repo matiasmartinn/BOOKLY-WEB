@@ -35,6 +35,11 @@ export interface CompleteSecretaryInvitationDto {
   password: string;
 }
 
+export interface CompleteAdminInvitationDto {
+  token: string;
+  password: string;
+}
+
 const register = (dto: Omit<RegisterUserRequst, 'confirmPassword'>) =>
   apiClient.post<RegisterOwnerResultDto>('/auth/register', dto).then((response) => response.data);
 
@@ -58,6 +63,9 @@ const completeSecretaryInvitation = (dto: CompleteSecretaryInvitationDto) =>
     .post<UserDto>('/auth/secretary-invitations/complete', dto)
     .then((response) => response.data);
 
+const completeAdminInvitation = (dto: CompleteAdminInvitationDto) =>
+  apiClient.post<UserDto>('/admins/complete-invitation', dto).then((response) => response.data);
+
 export const authService = {
   create: register,
   register,
@@ -68,4 +76,5 @@ export const authService = {
   recoverAccount: (email: string) => forgotPassword({ email }),
   resetPassword,
   completeSecretaryInvitation,
+  completeAdminInvitation,
 };

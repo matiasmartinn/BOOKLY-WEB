@@ -6,6 +6,7 @@ export type AuthViewId =
   | 'confirm-email'
   | 'forgot-password'
   | 'reset-password'
+  | 'admin-invitation'
   | 'secretary-invitation'
   | 'secretary-password-form';
 
@@ -35,6 +36,10 @@ const AUTH_VIEW_CONTENT: Record<AuthViewId, AuthViewContent> = {
     id: 'reset-password',
     asideLines: ['Cambia tu clave.', 'Entra otra vez.'],
   },
+  'admin-invitation': {
+    id: 'admin-invitation',
+    asideLines: ['Activa tu acceso.', 'Entra al panel.'],
+  },
   'secretary-invitation': {
     id: 'secretary-invitation',
     asideLines: ['Activa tu acceso.', 'Entra al equipo.'],
@@ -55,6 +60,8 @@ export function resolveAuthViewContent(pathname: string): AuthViewContent {
       return AUTH_VIEW_CONTENT['forgot-password'];
     case PATHS.auth.resetPassword:
       return AUTH_VIEW_CONTENT['reset-password'];
+    case PATHS.auth.adminInvitation:
+      return AUTH_VIEW_CONTENT['admin-invitation'];
     case PATHS.auth.secretaryInvitation:
       return AUTH_VIEW_CONTENT['secretary-invitation'];
     case PATHS.auth.secretarySetup:

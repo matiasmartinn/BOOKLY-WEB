@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 
 export function AppLayout() {
   return (
-    <AppShell header={{ height: '8dvh' }}>
+    <AppShell header={{ height: 76 }} padding={0}>
       <AppShell.Header>
         <AppHeader />
       </AppShell.Header>

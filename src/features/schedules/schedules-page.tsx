@@ -1,15 +1,13 @@
-import { SchedulesForm } from 'features/schedules/components/schedules-form';
-import { PageCard, PageShell } from 'shared/layout';
+import { Page } from 'shared/layout';
+import { SchedulesPageContainer } from './container';
 
 export function SchedulesPage() {
   return (
-    <PageShell
+    <Page
       title="Horarios"
-      description="Definí los días y franjas horarias en los que tu servicio estará disponible para reservas."
+      description="Define los dias y franjas horarias en los que tu servicio estara disponible para reservas."
     >
-      <PageCard>
-        <SchedulesForm />
-      </PageCard>
-    </PageShell>
+      <SchedulesPageContainer />
+    </Page>
   );
 }

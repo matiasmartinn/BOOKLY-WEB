@@ -1,20 +1,7 @@
-import { Stack } from '@mantine/core';
-import type { ReactNode } from 'react';
-import { PageHeader } from './page-header';
+import { Page, type PageProps } from './page';
 
-interface PageShellProps {
-  title: string;
-  description?: string;
-  actions?: ReactNode;
-  children: ReactNode;
-}
+export type PageShellProps = PageProps;
 
-export function PageShell({ title, description, actions, children }: PageShellProps) {
-  return (
-    <Stack gap="lg">
-      <PageHeader title={title} description={description} actions={actions} />
-
-      {children}
-    </Stack>
-  );
+export function PageShell(props: PageShellProps) {
+  return <Page {...props} />;
 }

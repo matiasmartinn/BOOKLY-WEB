@@ -1,4 +1,5 @@
 const BUSINESS_TIME_ZONE = 'America/Argentina/Buenos_Aires';
+const UI_DATE_LOCALE = 'es-AR';
 
 const DATE_ONLY_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
 const LOCAL_DATE_TIME_REGEX = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/;
@@ -13,6 +14,15 @@ const businessNowFormatter = new Intl.DateTimeFormat('en-CA', {
   minute: '2-digit',
   second: '2-digit',
   hourCycle: 'h23',
+});
+const shortLocalDateFormatter = new Intl.DateTimeFormat(UI_DATE_LOCALE, {
+  day: '2-digit',
+  month: 'short',
+});
+const longLocalDateFormatter = new Intl.DateTimeFormat(UI_DATE_LOCALE, {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
 });
 
 interface DateOnlyParts {
@@ -34,6 +44,8 @@ const pad2 = (value: number) => String(value).padStart(2, '0');
 const buildDateOnly = ({ year, month, day }: DateOnlyParts) =>
   `${year}-${pad2(month)}-${pad2(day)}`;
 
+const buildNativeDate = ({ year, month, day }: DateOnlyParts) => new Date(year, month - 1, day);
+
 const buildTimeOnly = (
   { hour, minute, second }: TimeOnlyParts,
   includeSeconds = true,
@@ -46,7 +58,7 @@ const buildLocalDateTime = (parts: DateTimeParts) =>
   `${buildDateOnly(parts)}T${buildTimeOnly(parts)}`;
 
 const isValidDateOnlyParts = ({ year, month, day }: DateOnlyParts) => {
-  const candidate = new Date(year, month - 1, day);
+  const candidate = buildNativeDate({ year, month, day });
 
   return (
     candidate.getFullYear() === year &&
@@ -152,6 +164,11 @@ export const normalizeDateOnly = (value?: string | null) => {
   return parts ? buildDateOnly(parts) : null;
 };
 
+export const toDateOnlyDate = (value?: string | null) => {
+  const parts = parseDateOnlyParts(value) ?? parseLocalDateTimeParts(value);
+  return parts ? buildNativeDate(parts) : null;
+};
+
 export const normalizeLocalDateTime = (value?: string | null) => {
   const parts = parseLocalDateTimeParts(value);
   return parts ? buildLocalDateTime(parts) : null;
@@ -201,6 +218,41 @@ export const getMonthDateOnlyRange = (visibleDate: string | null) => {
   };
 };
 
+export const addDaysToDateOnly = (value?: string | null, days = 0) => {
+  const date = toDateOnlyDate(value);
+
+  if (!date) {
+    return null;
+  }
+
+  date.setDate(date.getDate() + days);
+
+  return buildDateOnly({
+    year: date.getFullYear(),
+    month: date.getMonth() + 1,
+    day: date.getDate(),
+  });
+};
+
+export const compareDateOnly = (left?: string | null, right?: string | null) => {
+  const normalizedLeft = normalizeDateOnly(left);
+  const normalizedRight = normalizeDateOnly(right);
+
+  if (!normalizedLeft && !normalizedRight) {
+    return 0;
+  }
+
+  if (!normalizedLeft) {
+    return -1;
+  }
+
+  if (!normalizedRight) {
+    return 1;
+  }
+
+  return normalizedLeft.localeCompare(normalizedRight);
+};
+
 export const compareLocalDateTime = (left?: string | null, right?: string | null) => {
   const normalizedLeft = normalizeLocalDateTime(left);
   const normalizedRight = normalizeLocalDateTime(right);
@@ -228,6 +280,39 @@ export const formatLocalDateOnly = (value?: string | null) => {
   }
 
   return `${pad2(parts.day)}/${pad2(parts.month)}/${parts.year}`;
+};
+
+export const formatShortLocalDateOnly = (value?: string | null) => {
+  const date = toDateOnlyDate(value);
+  return date ? shortLocalDateFormatter.format(date) : value ?? '';
+};
+
+export const formatLongLocalDateOnly = (value?: string | null) => {
+  const date = toDateOnlyDate(value);
+  return date ? longLocalDateFormatter.format(date) : value ?? '';
+};
+
+export const formatLocalDateOnlyRange = (
+  start?: string | null,
+  end?: string | null,
+  options?: { separator?: string; collapseSameDay?: boolean },
+) => {
+  const startLabel = formatLocalDateOnly(start);
+  const endLabel = formatLocalDateOnly(end);
+
+  if (!startLabel) {
+    return endLabel;
+  }
+
+  if (!endLabel) {
+    return startLabel;
+  }
+
+  if ((options?.collapseSameDay ?? true) && compareDateOnly(start, end) === 0) {
+    return startLabel;
+  }
+
+  return `${startLabel}${options?.separator ?? ' al '}${endLabel}`;
 };
 
 export const formatLocalDate = (value?: string | null) => formatLocalDateOnly(value);

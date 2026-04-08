@@ -2,7 +2,7 @@ import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { GenericTable } from 'shared/components/generic-table';
-import { unavailabilityColumns } from '../defaults/unavailability.columns';
+import { unavailabilityColumns } from '../defaults';
 import type { UnavailabilityViewModel } from '../viewmodel';
 import { useScheduleUnavailability } from '../hooks';
 

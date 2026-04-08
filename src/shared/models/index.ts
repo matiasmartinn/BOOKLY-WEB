@@ -3,6 +3,7 @@ export * from './appointment-metrics-dto';
 export * from './business-dto';
 export * from './client-dto';
 export * from './schedule-dto';
+export * from './service-public-booking-dto';
 export * from './service-dto';
 export * from './service-type-dto';
 export * from './subscription-dto';

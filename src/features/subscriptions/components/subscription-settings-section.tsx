@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Alert, Badge, Button, Group, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
+import { Alert, Badge, Button, Grid, Group, Skeleton, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { PageCard } from 'shared/layout';
+import { useAppToast } from 'shared/ui/toast';
 import { useOwnerSubscription } from '../hooks';
 import {
-  formatSubscriptionDate,
   formatSubscriptionLimitValue,
   formatSubscriptionValidity,
   getSubscriptionPlanDisplayName,
@@ -22,10 +22,13 @@ interface SubscriptionSettingsSectionProps {
 }
 
 export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSectionProps) {
+  if (ownerId == null) {
+    return null;
+  }
+
   const [opened, { open, close }] = useDisclosure(false);
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const [modalIntent, setModalIntent] = useState<SubscriptionManagementModalIntent>('manage');
-  const canManageSubscription = ownerId != null;
+  const toast = useAppToast();
 
   const {
     data: subscription,
@@ -39,12 +42,6 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
   const currentPlanLimits = getSubscriptionPlanLimits(subscription?.currentPlan?.limits);
 
   const openModal = (intent: SubscriptionManagementModalIntent) => {
-    if (!canManageSubscription) {
-      setFeedbackMessage('No se pudo resolver la cuenta para gestionar la suscripcion.');
-      return;
-    }
-
-    setFeedbackMessage(null);
     setModalIntent(intent);
     open();
   };
@@ -56,11 +53,6 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
           <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
             <Stack gap={4}>
               <Text fw={600}>Suscripcion y plan</Text>
-              <Text size="sm" c="dimmed">
-                Revisa el plan actual, su vigencia y las acciones administrativas habilitadas por
-                el backend. Los planes pagos se renuevan o cambian con vigencia mensual
-                automatica.
-              </Text>
             </Stack>
 
             {isFetching && !isLoading && (
@@ -69,12 +61,6 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
               </Badge>
             )}
           </Group>
-
-          {feedbackMessage && (
-            <Alert color={canManageSubscription ? 'green' : 'yellow'} variant="light">
-              {feedbackMessage}
-            </Alert>
-          )}
 
           {isError && (
             <Alert color="red" variant="light">
@@ -88,7 +74,7 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
               <Skeleton h={92} radius="md" />
             </Stack>
           ) : subscription ? (
-            <>
+            <Stack gap="lg">
               {!subscription.isPersisted && (
                 <Alert color="blue" variant="light">
                   El owner ya tiene un plan efectivo disponible aunque todavia no exista una fila de
@@ -96,36 +82,56 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
                 </Alert>
               )}
 
-              <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
-                <Stack gap={4}>
-                  <Group gap="xs" wrap="wrap">
-                    <Text size="lg" fw={700}>
-                      {currentPlanName}
-                    </Text>
-                    <Badge color={getSubscriptionStatusColor(subscription)} variant="light">
-                      {getSubscriptionStatusLabel(subscription)}
-                    </Badge>
-                  </Group>
+              <Grid gutter="xl" align="flex-start">
+                <Grid.Col span={{ base: 12, md: 7 }}>
+                  <Stack gap="md">
+                    <Stack gap={4}>
+                      <Group gap="xs" wrap="wrap">
+                        <Text size="lg" fw={700}>
+                          {currentPlanName}
+                        </Text>
+                        <Badge color={getSubscriptionStatusColor(subscription)} variant="light">
+                          {getSubscriptionStatusLabel(subscription)}
+                        </Badge>
+                      </Group>
 
-                  <Text size="sm" c="dimmed">
-                    Vigencia: {formatSubscriptionValidity(subscription)}
-                  </Text>
-                </Stack>
+                      <Text size="sm" c="dimmed">
+                        Vigencia: {formatSubscriptionValidity(subscription)}
+                      </Text>
+                    </Stack>
 
-                <Group gap="xs">
-                  <Button variant="light" onClick={() => openModal('change')}>
-                    Cambiar plan
-                  </Button>
-                  {subscription.canCancel && (
-                    <Button color="red" variant="light" onClick={() => openModal('cancel')}>
-                      Cancelar suscripcion
-                    </Button>
-                  )}
-                  {subscription.canRenew && (
-                    <Button onClick={() => openModal('renew')}>Renovar</Button>
-                  )}
-                </Group>
-              </Group>
+                    <Stack gap={6}>
+                      <Text size="sm">
+                        Servicios maximos:{' '}
+                        {formatSubscriptionLimitValue(currentPlanLimits.maxServices)}
+                      </Text>
+                      <Text size="sm">
+                        Secretarios maximos:{' '}
+                        {formatSubscriptionLimitValue(currentPlanLimits.maxSecretaries)}
+                      </Text>
+                      <Text size="sm">
+                        Campos extra: {currentPlanLimits.allowsExtraFields ? 'Si' : 'No'}
+                      </Text>
+                    </Stack>
+                  </Stack>
+                </Grid.Col>
+
+                <Grid.Col span={{ base: 12, md: 5 }}>
+                  <Stack align="flex-end" gap="sm">
+                    <Group gap="xs" justify="flex-end" wrap="wrap">
+                      <Button variant="light" onClick={() => openModal('change')}>
+                        Cambiar plan
+                      </Button>
+                      {subscription.canCancel && (
+                        <Button color="red" variant="light" onClick={() => openModal('cancel')}>
+                          Cancelar suscripcion
+                        </Button>
+                      )}
+                      {subscription.canRenew && <Button onClick={() => openModal('renew')}>Renovar</Button>}
+                    </Group>
+                  </Stack>
+                </Grid.Col>
+              </Grid>
 
               {subscription.pendingCancellation && subscription.endDate && (
                 <Alert color="yellow" variant="light">
@@ -138,42 +144,7 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
                   La suscripcion se encuentra vencida.
                 </Alert>
               )}
-
-              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
-                <Stack gap={4}>
-                  <Text size="sm">Estado visible: {subscription.status}</Text>
-                  <Text size="sm">
-                    Inicio:{' '}
-                    {subscription.startDate
-                      ? formatSubscriptionDate(subscription.startDate)
-                      : 'Sin fecha informada'}
-                  </Text>
-                  <Text size="sm">
-                    Fin:{' '}
-                    {subscription.isOpenEnded
-                      ? 'Sin vencimiento'
-                      : subscription.endDate
-                        ? formatSubscriptionDate(subscription.endDate)
-                        : 'Sin fecha informada'}
-                  </Text>
-                  <Text size="sm">Persistida: {subscription.isPersisted ? 'Si' : 'No'}</Text>
-                </Stack>
-
-                <Stack gap={4}>
-                  <Text size="sm">
-                    Servicios maximos:{' '}
-                    {formatSubscriptionLimitValue(currentPlanLimits.maxServices)}
-                  </Text>
-                  <Text size="sm">
-                    Secretarios maximos:{' '}
-                    {formatSubscriptionLimitValue(currentPlanLimits.maxSecretaries)}
-                  </Text>
-                  <Text size="sm">
-                    Campos extra: {currentPlanLimits.allowsExtraFields ? 'Si' : 'No'}
-                  </Text>
-                </Stack>
-              </SimpleGrid>
-            </>
+            </Stack>
           ) : (
             <Stack gap="sm">
               <Alert color="yellow" variant="light">
@@ -181,11 +152,7 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
               </Alert>
 
               <Group justify="flex-end">
-                <Button
-                  variant="light"
-                  onClick={() => openModal('manage')}
-                  disabled={!canManageSubscription}
-                >
+                <Button variant="light" onClick={() => openModal('manage')}>
                   Gestionar plan
                 </Button>
               </Group>
@@ -200,7 +167,7 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
         onClose={close}
         initialIntent={modalIntent}
         onCompleted={(message) => {
-          setFeedbackMessage(message);
+          toast.success(message);
           close();
         }}
       />

@@ -56,9 +56,7 @@ export const getSubscriptionPlanLimits = (
       : DEFAULT_SUBSCRIPTION_PLAN_LIMITS.allowsExtraFields,
 });
 
-export const getSubscriptionPlanDisplayName = (
-  plan?: Partial<SubscriptionPlanDto> | null,
-) => {
+export const getSubscriptionPlanDisplayName = (plan?: Partial<SubscriptionPlanDto> | null) => {
   const displayName = plan?.displayName?.trim();
   if (displayName) {
     return displayName;
@@ -105,15 +103,15 @@ export const getSubscriptionStatusLabel = (subscription: SubscriptionDto) => {
 
 export const getSubscriptionStatusColor = (subscription: SubscriptionDto) => {
   if (subscription.isExpired) {
-    return 'red';
+    return 'error';
   }
 
   if (subscription.pendingCancellation) {
-    return 'yellow';
+    return 'warning';
   }
 
   if (subscription.isActive) {
-    return 'green';
+    return 'success';
   }
 
   return 'gray';

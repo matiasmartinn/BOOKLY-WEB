@@ -68,7 +68,9 @@ export const appointmentService = {
     apiClient.get<AppointmentDto[]>('/appointments', { params: { serviceId } }).then((r) => r.data),
 
   getByServiceAndDate: (serviceId: number, date: string) =>
-    apiClient.get<AppointmentSummaryDto[]>('/appointments/summary', { params: { serviceId, date } }).then((r) => r.data),
+    apiClient
+      .get<AppointmentSummaryDto[]>('/appointments/summary', { params: { serviceId, date } })
+      .then((r) => r.data),
 
   getByDay: (query: AppointmentDayQueryDto) =>
     apiClient.get<AppointmentListItemDto[]>('/appointments/day', { params: query }).then((r) => r.data),
@@ -79,11 +81,6 @@ export const appointmentService = {
   getHistoryByService: (serviceId: number) =>
     apiClient
       .get<AppointmentStatusHistoryDto[]>('/appointments/history', { params: { serviceId } })
-      .then((r) => r.data),
-
-  getHistory: (appointmentId: number) =>
-    apiClient
-      .get<AppointmentStatusHistoryDto[]>(`/appointments/${appointmentId}/history`)
       .then((r) => r.data),
 
   getAvailableDates: (serviceId: number, from: string, to: string) =>

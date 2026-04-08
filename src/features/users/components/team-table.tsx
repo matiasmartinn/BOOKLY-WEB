@@ -1,8 +1,9 @@
-import { ActionIcon, Badge, Button, Group, Tooltip } from '@mantine/core';
+import { ActionIcon, Button, Group, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBan, faCheck, faLock, faPlus, faUser } from '@fortawesome/free-solid-svg-icons';
-import { GenericTable, type TableColumn } from 'shared/components';
+import { GenericTable } from 'shared/components';
 import type { SecretaryDto } from 'shared/models';
+import { teamColumns } from '../defaults';
 
 interface TeamTableProps {
   secretaries: SecretaryDto[];
@@ -17,63 +18,6 @@ interface TeamTableProps {
   onManageStatus: (secretary: SecretaryDto) => void;
   canCreate: boolean;
 }
-
-const columns = (selectedServiceId?: number): TableColumn<SecretaryDto>[] => [
-  {
-    key: 'fullName',
-    title: 'Nombre',
-    accessor: 'fullName',
-    sortable: true,
-  },
-  {
-    key: 'email',
-    title: 'Email',
-    accessor: 'email',
-    sortable: true,
-  },
-  {
-    key: 'isActive',
-    title: 'Estado',
-    accessor: 'isActive',
-    sortable: true,
-    render: (row) => (
-      <Badge color={row.isActive ? 'green' : 'gray'} variant="light">
-        {row.isActive ? 'Activo' : 'Dado de baja'}
-      </Badge>
-    ),
-  },
-  {
-    key: 'type',
-    title: 'Tipo',
-    render: () => (
-      <Badge color="blue" variant="light">
-        Secretario/a
-      </Badge>
-    ),
-  },
-  {
-    key: 'currentServiceAccess',
-    title: 'Servicio actual',
-    render: (row) => {
-      if (!selectedServiceId) {
-        return 'Selecciona un servicio';
-      }
-
-      const hasAccess = row.serviceIds.includes(selectedServiceId);
-
-      return (
-        <Badge color={hasAccess ? 'green' : 'gray'} variant="light">
-          {hasAccess ? 'Con acceso' : 'Sin acceso'}
-        </Badge>
-      );
-    },
-  },
-  {
-    key: 'serviceIds',
-    title: 'Servicios asignados',
-    render: (row) => String(row.serviceIds.length),
-  },
-];
 
 export function TeamTable({
   secretaries,
@@ -91,7 +35,7 @@ export function TeamTable({
   return (
     <GenericTable
       data={secretaries}
-      columns={columns(selectedServiceId)}
+      columns={teamColumns(selectedServiceId)}
       rowKey="id"
       loading={isLoading}
       fetching={isFetching}

@@ -1,18 +1,8 @@
-import { useEffect, useState } from 'react';
-import {
-  Alert,
-  Badge,
-  Button,
-  Group,
-  Loader,
-  Paper,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Text,
-} from '@mantine/core';
+import { Alert, Badge, Button, Group, Loader, Paper, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
+import { isApiError } from 'app/api';
 import { GenericModal } from 'shared/components';
 import type { SubscriptionPlanOptionDto } from 'shared/models';
+import { useAppToast } from 'shared/ui/toast';
 import { createChangePlanDto, createRenewSubscriptionDto } from '../adapter';
 import {
   useCancelSubscription,
@@ -22,16 +12,15 @@ import {
   useRenewSubscription,
 } from '../hooks';
 import {
-  formatPlanLimitsSummary,
   formatSubscriptionDate,
   formatSubscriptionLimitValue,
   formatSubscriptionValidity,
-  getPlanChangeTypeLabel,
   getSubscriptionPlanDisplayName,
   getSubscriptionPlanLimits,
   getSubscriptionStatusColor,
   getSubscriptionStatusLabel,
 } from '../utils/subscription.utils';
+import { SubscriptionPlanCard } from './subscription-plan-card';
 
 export type SubscriptionManagementModalIntent = 'manage' | 'change' | 'cancel' | 'renew';
 
@@ -43,96 +32,7 @@ interface SubscriptionManagementModalProps {
   initialIntent?: SubscriptionManagementModalIntent;
 }
 
-interface SubscriptionPlanCardProps {
-  plan: SubscriptionPlanOptionDto;
-  isMutating: boolean;
-  onSubmit: (plan: SubscriptionPlanOptionDto) => void;
-}
-
-const getIntentHint = (intent: SubscriptionManagementModalIntent) => {
-  switch (intent) {
-    case 'cancel':
-      return 'Revisa el estado actual antes de confirmar la cancelacion o elegir otro plan.';
-    case 'renew':
-      return 'La renovacion manual reactiva el plan actual con un nuevo periodo mensual calculado por el backend.';
-    case 'change':
-      return 'Elige el plan destino. Si es pago, el backend asigna automaticamente una vigencia mensual con hora Argentina.';
-    default:
-      return 'El frontend solo elige la accion o el plan. La vigencia de los planes pagos la calcula el backend.';
-  }
-};
-
 const isFreePlan = (plan: SubscriptionPlanOptionDto) => plan.key?.trim().toLowerCase() === 'free';
-
-function SubscriptionPlanCard({ plan, isMutating, onSubmit }: SubscriptionPlanCardProps) {
-  const changeTypeLabel = getPlanChangeTypeLabel(plan.changeType);
-  const planName = getSubscriptionPlanDisplayName(plan);
-  const canSubmitPlanChange = plan.canChange && Boolean(plan.key?.trim() || plan.code != null);
-
-  return (
-    <Paper
-      withBorder
-      radius="md"
-      p="md"
-      style={{
-        borderColor: plan.isCurrent ? 'var(--mantine-color-brand-4)' : undefined,
-        backgroundColor: plan.isCurrent ? 'var(--mantine-color-brand-0)' : 'white',
-      }}
-    >
-      <Stack gap="sm">
-        <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
-          <Stack gap={4} flex={1}>
-            <Group gap="xs" wrap="wrap">
-              <Text fw={600}>{planName}</Text>
-
-              {plan.isCurrent && (
-                <Badge color="brand" variant="light">
-                  Actual
-                </Badge>
-              )}
-
-              {changeTypeLabel && !plan.isCurrent && (
-                <Badge color="blue" variant="light">
-                  {changeTypeLabel}
-                </Badge>
-              )}
-
-              {!isFreePlan(plan) && (
-                <Badge color="grape" variant="light">
-                  Mes automatico
-                </Badge>
-              )}
-            </Group>
-
-            <Text size="sm" c="dimmed">
-              {formatPlanLimitsSummary(plan.limits)}
-            </Text>
-
-            {!canSubmitPlanChange && (
-              <Text size="sm" c="red">
-                {plan.unavailableReason || 'Este plan no se puede seleccionar en este momento.'}
-              </Text>
-            )}
-          </Stack>
-
-          {plan.isCurrent ? (
-            <Button variant="default" disabled>
-              Plan actual
-            </Button>
-          ) : !canSubmitPlanChange ? (
-            <Button variant="default" disabled>
-              No disponible
-            </Button>
-          ) : (
-            <Button variant="light" onClick={() => onSubmit(plan)} disabled={isMutating}>
-              Cambiar plan
-            </Button>
-          )}
-        </Group>
-      </Stack>
-    </Paper>
-  );
-}
 
 export function SubscriptionManagementModal({
   ownerId,
@@ -141,8 +41,8 @@ export function SubscriptionManagementModal({
   onCompleted,
   initialIntent = 'manage',
 }: SubscriptionManagementModalProps) {
-  const [localError, setLocalError] = useState<string | null>(null);
   const canManageSubscription = ownerId != null;
+  const toast = useAppToast();
 
   const {
     data: subscription,
@@ -162,23 +62,12 @@ export function SubscriptionManagementModal({
   const renewMutation = useRenewSubscription();
   const changePlanMutation = useChangePlan();
 
-  const mutationError =
-    changePlanMutation.error?.detail || renewMutation.error?.detail || cancelMutation.error?.detail;
-
   const isMutating =
     cancelMutation.isPending || renewMutation.isPending || changePlanMutation.isPending;
-
-  useEffect(() => {
-    if (!opened) {
-      setLocalError(null);
-    }
-  }, [opened]);
 
   const currentPlanName = getSubscriptionPlanDisplayName(subscription?.currentPlan);
   const currentPlanLimits = getSubscriptionPlanLimits(subscription?.currentPlan?.limits);
   const visibleError =
-    localError ||
-    mutationError ||
     (!canManageSubscription
       ? 'No se pudo resolver la cuenta para gestionar la suscripcion.'
       : undefined) ||
@@ -192,14 +81,13 @@ export function SubscriptionManagementModal({
       return;
     }
 
+    toast.success(message);
     onClose();
   };
 
   const handleCancelSubscription = async () => {
-    setLocalError(null);
-
     if (!canManageSubscription) {
-      setLocalError('No se pudo resolver la cuenta para gestionar la suscripcion.');
+      toast.error('No se pudo resolver la cuenta para gestionar la suscripcion.');
       return;
     }
 
@@ -210,16 +98,16 @@ export function SubscriptionManagementModal({
           ? 'La cancelacion quedo programada sobre la suscripcion actual.'
           : 'La suscripcion quedo cancelada.',
       );
-    } catch {
-      // El error visible se resuelve desde mutationError.
+    } catch (error) {
+      toast.error(
+        isApiError(error) ? error.detail : 'No se pudo completar la cancelacion de la suscripcion.',
+      );
     }
   };
 
   const handleRenewSubscription = async () => {
-    setLocalError(null);
-
     if (ownerId == null) {
-      setLocalError('No se pudo resolver la cuenta para gestionar la suscripcion.');
+      toast.error('No se pudo resolver la cuenta para gestionar la suscripcion.');
       return;
     }
 
@@ -228,19 +116,19 @@ export function SubscriptionManagementModal({
       await renewMutation.mutateAsync(payload);
       handleSuccessfulCompletion('La suscripcion quedo renovada con un nuevo periodo mensual.');
     } catch (error) {
-      setLocalError(
-        error instanceof Error
-          ? error.message
-          : 'No se pudo preparar la renovacion de la suscripcion.',
+      toast.error(
+        isApiError(error)
+          ? error.detail
+          : error instanceof Error
+            ? error.message
+            : 'No se pudo preparar la renovacion de la suscripcion.',
       );
     }
   };
 
   const handleChangePlan = async (plan: SubscriptionPlanOptionDto) => {
-    setLocalError(null);
-
     if (ownerId == null) {
-      setLocalError('No se pudo resolver la cuenta para gestionar la suscripcion.');
+      toast.error('No se pudo resolver la cuenta para gestionar la suscripcion.');
       return;
     }
 
@@ -253,10 +141,12 @@ export function SubscriptionManagementModal({
           : 'El plan actual quedo actualizado con un nuevo periodo mensual.',
       );
     } catch (error) {
-      setLocalError(
-        error instanceof Error
-          ? error.message
-          : 'No se pudo preparar el cambio de plan.',
+      toast.error(
+        isApiError(error)
+          ? error.detail
+          : error instanceof Error
+            ? error.message
+            : 'No se pudo preparar el cambio de plan.',
       );
     }
   };
@@ -270,10 +160,6 @@ export function SubscriptionManagementModal({
       loading={isMutating}
     >
       <Stack gap="lg">
-        <Text size="sm" c="dimmed">
-          {getIntentHint(initialIntent)}
-        </Text>
-
         {visibleError && (
           <Alert color="red" variant="light">
             {visibleError || 'No se pudo completar la gestion de la suscripcion.'}
@@ -318,7 +204,10 @@ export function SubscriptionManagementModal({
 
                 <Group gap="xs">
                   {subscription.canRenew && (
-                    <Button onClick={() => void handleRenewSubscription()} loading={renewMutation.isPending}>
+                    <Button
+                      onClick={() => void handleRenewSubscription()}
+                      loading={renewMutation.isPending}
+                    >
                       Renovar
                     </Button>
                   )}
@@ -336,18 +225,6 @@ export function SubscriptionManagementModal({
                 </Group>
               </Group>
 
-              <Alert color="blue" variant="light">
-                Los cambios y renovaciones de planes pagos generan un nuevo periodo mensual desde
-                hoy, calculado por el backend con hora Argentina.
-              </Alert>
-
-              {!subscription.isPersisted && (
-                <Alert color="blue" variant="light">
-                  La cuenta todavia no tiene una fila persistida, pero el backend ya expone el plan
-                  efectivo para operar desde el frontend.
-                </Alert>
-              )}
-
               {subscription.pendingCancellation && subscription.endDate && (
                 <Alert color="yellow" variant="light">
                   La suscripcion quedara cancelada al cierre del periodo actual:{' '}
@@ -364,7 +241,6 @@ export function SubscriptionManagementModal({
 
               <SimpleGrid cols={{ base: 1, sm: 2 }}>
                 <Stack gap={4}>
-                  <Text size="sm">Estado backend: {subscription.status}</Text>
                   <Text size="sm">
                     Inicio:{' '}
                     {subscription.startDate
@@ -409,10 +285,6 @@ export function SubscriptionManagementModal({
           <Group justify="space-between" align="center" wrap="wrap" gap="sm">
             <Stack gap={2}>
               <Text fw={600}>Catalogo de planes</Text>
-              <Text size="sm" c="dimmed">
-                El frontend solo elige plan y accion. Si el destino es pago, el backend aplica la
-                vigencia mensual automaticamente.
-              </Text>
             </Stack>
 
             {canManageSubscription && isFetchingPlans && !isLoadingPlans && <Loader size="sm" />}

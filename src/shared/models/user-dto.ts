@@ -9,6 +9,7 @@ export interface UserDto {
   emailConfirmed: boolean;
   createdAt: string;
   lastLoginAt?: string | null;
+  serviceIds: number[];
 }
 
 export interface SecretaryDto {

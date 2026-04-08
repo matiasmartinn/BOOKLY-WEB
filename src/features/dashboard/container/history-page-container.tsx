@@ -8,47 +8,24 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  TextInput,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
-import { useDebouncedValue } from '@mantine/hooks';
 import { useSearchAppointments } from 'features/appoiments/hooks';
 import { useOwnerBusinesses } from 'features/business/hooks';
 import { useOwnerSecretaries } from 'features/users/hooks';
-import { PageCard, PageShell } from 'shared/layout';
-import { getCurrentBusinessDateOnly } from 'shared/utils';
+import { compareDateOnly, getCurrentBusinessDateOnly } from 'shared/utils';
 import { useAuthStore } from 'store/use-auth-store';
-import { HistoryTable } from '../components';
+import { CompactHistoryStat, HistoryTable } from '../components';
 import { appointmentStatusIncludes, getAppointmentStatusLabel } from '../utils';
 import type { HistoryAppointmentViewModel } from '../viewmodel/history-appointment-view-model';
 
-interface CompactHistoryStatProps {
-  label: string;
-  value: string;
-}
-
-function CompactHistoryStat({ label, value }: CompactHistoryStatProps) {
-  return (
-    <Paper
-      withBorder
-      radius="md"
-      px="sm"
-      py={8}
-      style={{
-        flex: '1 1 160px',
-      }}
-    >
-      <Group justify="space-between" align="baseline" gap="xs" wrap="nowrap">
-        <Text size="lg" fw={700}>
-          {value}
-        </Text>
-        <Text size="xs" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-          {label}
-        </Text>
-      </Group>
-    </Paper>
-  );
-}
+const compactFieldStyles = {
+  label: {
+    color: 'var(--mantine-color-dimmed)',
+    fontSize: 'var(--mantine-font-size-xs)',
+    marginBottom: 4,
+  },
+} as const;
 
 export function HistoryPageContainer() {
   const authUser = useAuthStore((s) => s.user);
@@ -59,14 +36,11 @@ export function HistoryPageContainer() {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [selectedSecretaryId, setSelectedSecretaryId] = useState<string | null>(null);
-  const [clientSearch, setClientSearch] = useState('');
-
-  const [debouncedClientSearch] = useDebouncedValue(clientSearch, 300);
 
   const { data: services = [] } = useOwnerBusinesses(authUser?.id);
   const { data: secretaries = [] } = useOwnerSecretaries(authUser?.id);
 
-  const hasInvalidRange = Boolean(fromDate && toDate && fromDate > toDate);
+  const hasInvalidRange = Boolean(fromDate && toDate && compareDateOnly(fromDate, toDate) > 0);
 
   const searchQuery = useMemo(() => {
     if (!authUser || hasInvalidRange) {
@@ -79,17 +53,8 @@ export function HistoryPageContainer() {
       from: fromDate ?? undefined,
       to: toDate ?? undefined,
       status: selectedStatus ?? undefined,
-      clientSearch: debouncedClientSearch.trim() || undefined,
     };
-  }, [
-    authUser,
-    debouncedClientSearch,
-    fromDate,
-    hasInvalidRange,
-    selectedServiceId,
-    selectedStatus,
-    toDate,
-  ]);
+  }, [authUser, fromDate, hasInvalidRange, selectedServiceId, selectedStatus, toDate]);
 
   const {
     data: appointments = [],
@@ -194,92 +159,115 @@ export function HistoryPageContainer() {
     setSelectedStatus(null);
     setSelectedServiceId(null);
     setSelectedSecretaryId(null);
-    setClientSearch('');
   };
 
   return (
-    <PageShell
-      title="Historico"
-      description="Consulta Historica de turnos del negocio con filtros."
-    >
-      <Stack gap="md">
-        {!authUser && (
-          <Alert color="red" variant="light">
-            No se pudo identificar la cuenta para consultar el historico.
-          </Alert>
-        )}
+    <Stack gap="sm">
+      {!authUser && (
+        <Alert color="red" variant="light">
+          No se pudo identificar la cuenta para consultar el historico.
+        </Alert>
+      )}
 
-        {authUser && (
-          <Stack gap="xs">
-            <Group gap="xs" wrap="wrap">
-              <CompactHistoryStat
-                label="Registros"
-                value={isLoading ? '...' : String(totalResults)}
-              />
-              <CompactHistoryStat
-                label="Cancelado"
-                value={isLoading ? '...' : String(cancellations)}
-              />
-              <CompactHistoryStat label="No asistio" value={isLoading ? '...' : String(noShow)} />
-              <CompactHistoryStat
-                label="Servicios"
-                value={isLoading ? '...' : String(servicesInvolved)}
-              />
-            </Group>
-          </Stack>
-        )}
+      {authUser && (
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="sm">
+          <CompactHistoryStat
+            label="Registros"
+            value={isLoading ? '...' : String(totalResults)}
+            accentColor="var(--mantine-color-gray-4)"
+            backgroundColor="var(--mantine-color-gray-0)"
+          />
+          <CompactHistoryStat
+            label="Cancelado"
+            value={isLoading ? '...' : String(cancellations)}
+            accentColor="var(--mantine-color-orange-5)"
+            backgroundColor="var(--mantine-color-orange-0)"
+          />
+          <CompactHistoryStat
+            label="No asistio"
+            value={isLoading ? '...' : String(noShow)}
+            accentColor="var(--mantine-color-red-5)"
+            backgroundColor="var(--mantine-color-red-0)"
+          />
+          <CompactHistoryStat
+            label="Servicios"
+            value={isLoading ? '...' : String(servicesInvolved)}
+            accentColor="var(--mantine-color-blue-5)"
+            backgroundColor="var(--mantine-color-blue-0)"
+          />
+        </SimpleGrid>
+      )}
 
-        <PageCard>
-          <Stack gap="md">
-            <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
-              <Stack gap={4}>
-                <Text fw={600}>Filtros de consulta</Text>
-              </Stack>
+      <Paper
+        radius="lg"
+        p="sm"
+        withBorder
+        style={{
+          background: 'white',
+        }}
+      >
+        <Stack gap="xs">
+          <Group justify="space-between" align="center" wrap="wrap" gap="xs">
+            <Text size="sm" fw={600}>
+              Filtros
+            </Text>
 
-              <Button variant="default" onClick={resetFilters}>
-                Limpiar filtros
-              </Button>
-            </Group>
+            <Button variant="default" size="xs" onClick={resetFilters}>
+              Limpiar filtros
+            </Button>
+          </Group>
 
-            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
-              <DatePickerInput
-                label="Desde"
-                placeholder="Fecha inicial"
-                value={fromDate}
-                onChange={setFromDate}
-                valueFormat="DD/MM/YYYY"
-                clearable
-              />
+          <SimpleGrid
+            cols={{ base: 1, md: 2, lg: secretaryOptions.length > 0 ? 5 : 4 }}
+            spacing="xs"
+          >
+            <DatePickerInput
+              label="Desde"
+              placeholder="Fecha inicial"
+              value={fromDate}
+              onChange={setFromDate}
+              valueFormat="DD/MM/YYYY"
+              clearable
+              size="sm"
+              styles={compactFieldStyles}
+            />
 
-              <DatePickerInput
-                label="Hasta"
-                placeholder="Fecha final"
-                value={toDate}
-                onChange={setToDate}
-                valueFormat="DD/MM/YYYY"
-                clearable
-              />
+            <DatePickerInput
+              label="Hasta"
+              placeholder="Fecha final"
+              value={toDate}
+              onChange={setToDate}
+              valueFormat="DD/MM/YYYY"
+              clearable
+              size="sm"
+              styles={compactFieldStyles}
+            />
 
-              <Select
-                label="Estado"
-                placeholder="Todos los estados"
-                data={statusOptions}
-                value={selectedStatus}
-                onChange={setSelectedStatus}
-                clearable
-                searchable
-              />
+            <Select
+              label="Servicio"
+              placeholder="Todos los servicios"
+              data={serviceOptions}
+              value={selectedServiceId}
+              onChange={setSelectedServiceId}
+              clearable
+              searchable
+              size="sm"
+              styles={compactFieldStyles}
+            />
 
-              <Select
-                label="Servicio"
-                placeholder="Todos los servicios"
-                data={serviceOptions}
-                value={selectedServiceId}
-                onChange={setSelectedServiceId}
-                clearable
-                searchable
-              />
+            <Select
+              label="Estado"
+              placeholder="Todos los estados"
+              data={statusOptions}
+              value={selectedStatus}
+              onChange={setSelectedStatus}
+              clearable
+              searchable
+              size="sm"
+              styles={compactFieldStyles}
+            />
 
+            {secretaryOptions.length > 0 && (
               <Select
                 label="Secretario/a"
                 placeholder="Todo el equipo"
@@ -288,28 +276,30 @@ export function HistoryPageContainer() {
                 onChange={setSelectedSecretaryId}
                 clearable
                 searchable
+                size="sm"
+                styles={compactFieldStyles}
               />
+            )}
+          </SimpleGrid>
+        </Stack>
+      </Paper>
 
-              <TextInput
-                label="Cliente"
-                placeholder="Buscar por nombre, telefono o email"
-                value={clientSearch}
-                onChange={(event) => setClientSearch(event.currentTarget.value)}
-              />
-            </SimpleGrid>
-          </Stack>
-        </PageCard>
-
-        <PageCard>
-          <HistoryTable
-            data={historyRows}
-            loading={isLoading}
-            fetching={isFetching}
-            isError={isError}
-            onRefetch={refetch}
-          />
-        </PageCard>
-      </Stack>
-    </PageShell>
+      <Paper
+        radius="lg"
+        p="sm"
+        withBorder
+        style={{
+          background: 'white',
+        }}
+      >
+        <HistoryTable
+          data={historyRows}
+          loading={isLoading}
+          fetching={isFetching}
+          isError={isError}
+          onRefetch={refetch}
+        />
+      </Paper>
+    </Stack>
   );
 }

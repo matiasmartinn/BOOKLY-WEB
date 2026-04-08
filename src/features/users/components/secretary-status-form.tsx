@@ -1,6 +1,7 @@
 import { Alert, Button, Group, Stack, Text } from '@mantine/core';
 import { isApiError } from 'app/api';
 import type { SecretaryDto } from 'shared/models';
+import { useAppToast } from 'shared/ui/toast';
 import { useActivateSecretary, useDeactivateSecretary } from '../hooks';
 
 interface SecretaryStatusFormProps {
@@ -14,6 +15,7 @@ export function SecretaryStatusForm({
   onCancel,
   onSuccess,
 }: SecretaryStatusFormProps) {
+  const toast = useAppToast();
   const activateMutation = useActivateSecretary(secretary.id);
   const deactivateMutation = useDeactivateSecretary(secretary.id);
 
@@ -24,8 +26,10 @@ export function SecretaryStatusForm({
     try {
       await mutation.mutateAsync();
       onSuccess();
-    } catch {
-      // El error se muestra desde el hook
+    } catch (error) {
+      toast.error(
+        isApiError(error) ? error.detail : 'No se pudo actualizar el estado del secretario/a.',
+      );
     }
   };
 
@@ -45,14 +49,6 @@ export function SecretaryStatusForm({
           ? `${secretary.fullName} quedara inactivo/a hasta una reactivacion posterior.`
           : `${secretary.fullName} volvera a quedar activo/a.`}
       </Alert>
-
-      {mutation.isError && mutation.error && (
-        <Alert color="red" variant="light">
-          {isApiError(mutation.error)
-            ? mutation.error.detail
-            : 'No se pudo actualizar el estado del secretario/a.'}
-        </Alert>
-      )}
 
       <Group justify="flex-end">
         <Button type="button" variant="default" onClick={onCancel} disabled={mutation.isPending}>

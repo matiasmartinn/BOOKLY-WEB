@@ -1,6 +1,6 @@
 import type { UnavailabilityDto } from 'shared/models';
 import type { UnavailabilityViewModel } from '../viewmodel';
-import { formatDateOnly, getDateOnlyRangeDays, isSameDateOnly } from 'shared/utils';
+import { formatLocalDateOnlyRange, getDateOnlyRangeDays, isSameDateOnly } from 'shared/utils';
 
 export const mapUnavailabilityToViewModel = (item: UnavailabilityDto): UnavailabilityViewModel => {
   const sameDay = isSameDateOnly(item.startDate, item.endDate);
@@ -14,8 +14,8 @@ export const mapUnavailabilityToViewModel = (item: UnavailabilityDto): Unavailab
     reason: item.reason,
     isFullDay: item.isFullDay,
     dateLabel: sameDay
-      ? formatDateOnly(item.startDate)
-      : `${formatDateOnly(item.startDate)} - ${formatDateOnly(item.endDate)}`,
+      ? formatLocalDateOnlyRange(item.startDate, item.endDate)
+      : formatLocalDateOnlyRange(item.startDate, item.endDate, { separator: ' - ' }),
     timeLabel: item.isFullDay
       ? 'Todo el día'
       : `${item.startTime ?? '--:--'} - ${item.endTime ?? '--:--'}`,

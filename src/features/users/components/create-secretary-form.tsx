@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, Button, Group, Stack, Text, TextInput } from '@mantine/core';
+import { Alert, Button, Group, Stack, TextInput } from '@mantine/core';
 import { isApiError } from 'app/api';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useCreateSecretary } from '../hooks';
@@ -8,7 +8,6 @@ import { createSecretarySchema, type CreateSecretaryFormValues } from '../schema
 interface CreateSecretaryFormProps {
   ownerId: number;
   serviceId: number;
-  serviceName: string;
   onCancel: () => void;
   onSuccess: () => void;
 }
@@ -22,7 +21,6 @@ const defaultValues: CreateSecretaryFormValues = {
 export function CreateSecretaryForm({
   ownerId,
   serviceId,
-  serviceName,
   onCancel,
   onSuccess,
 }: CreateSecretaryFormProps) {
@@ -46,20 +44,15 @@ export function CreateSecretaryForm({
         email: values.email.trim(),
         serviceId,
       },
-      { onSuccess },
+      {
+        onSuccess,
+      },
     );
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap="lg">
-        <Stack gap={4}>
-          <Text fw={600}>Nuevo secretario/a</Text>
-          <Text size="sm" c="dimmed">
-            Se registrara para el servicio: {serviceName}.
-          </Text>
-        </Stack>
-
         {isError && error && (
           <Alert color="red" variant="light">
             {isApiError(error) ? error.detail : 'No se pudo crear el secretario/a.'}

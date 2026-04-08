@@ -1,20 +1,50 @@
-import { Group, Button, Text } from '@mantine/core';
+import { Box, Button, Container, Group, Text } from '@mantine/core';
+import { PATHS } from 'app/router/PATHS';
+import { Link } from 'react-router-dom';
 
 export function AppHeader() {
   return (
-    <Group h="100%" px="md" justify="space-between" align="center">
-      <Text size="lg" fw={800} c="brand.6">
-        Bookly
-      </Text>
+    <Container size="lg" h="100%">
+      <Group h="100%" justify="space-between" align="center" wrap="nowrap">
+        <Group gap="xs" wrap="nowrap">
+          <Box
+            style={{
+              display: 'grid',
+              placeItems: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: 12,
+              color: 'white',
+              fontWeight: 800,
+              backgroundColor: 'var(--mantine-color-brand-6)',
+              flexShrink: 0,
+            }}
+          >
+            B
+          </Box>
 
-      <Group gap="xs">
-        <Button variant="subtle" color="brand" component="a" href="/auth/register">
-          Registrarme
-        </Button>
-        <Button color="brand" component="a" href="/auth/login">
-          Iniciar sesión
-        </Button>
+          <Text
+            component={Link}
+            to="/"
+            td="none"
+            size="md"
+            fw={800}
+            c="brand.6"
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            Bookly
+          </Text>
+        </Group>
+
+        <Group gap={6} wrap="nowrap">
+          <Button variant="subtle" color="brand" component={Link} to={PATHS.auth.login} size="xs">
+            Iniciar sesion
+          </Button>
+          <Button color="brand" component={Link} to={PATHS.auth.register} size="xs">
+            Registrarse
+          </Button>
+        </Group>
       </Group>
-    </Group>
+    </Container>
   );
 }

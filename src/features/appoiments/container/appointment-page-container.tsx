@@ -3,6 +3,7 @@ import { Alert, Button, Group, Select, SimpleGrid, Stack, Text } from '@mantine/
 import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import { PageCard, PageShell } from 'shared/layout';
+import { useAppToast } from 'shared/ui/toast';
 import { formatDateOnly, getCurrentBusinessDateOnly } from 'shared/utils';
 import { useBusinessStore } from 'store/use-buisness-store';
 import { AppointmentTable } from '../components/appointment-table';
@@ -65,8 +66,8 @@ export function AppointmentPageContainer() {
   const totalAppointments = appointmentData.length;
   const dayLabel = selectedDate ? formatDateOnly(selectedDate) : 'sin fecha';
 
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentViewModel | null>(null);
+  const toast = useAppToast();
 
   const [createOpened, createHandlers] = useDisclosure(false);
   const [editOpened, editHandlers] = useDisclosure(false);
@@ -80,35 +81,30 @@ export function AppointmentPageContainer() {
   const handleCreateSuccess = () => {
     createHandlers.close();
     void refetch();
-    setSuccessMessage('Turno creado correctamente.');
+    toast.success('Turno creado correctamente.');
   };
 
   const handleEdit = (row: AppointmentViewModel) => {
-    setSuccessMessage(null);
     setSelectedAppointment(row);
     editHandlers.open();
   };
 
   const handleReschedule = (row: AppointmentViewModel) => {
-    setSuccessMessage(null);
     setSelectedAppointment(row);
     rescheduleHandlers.open();
   };
 
   const handleCancel = (row: AppointmentViewModel) => {
-    setSuccessMessage(null);
     setSelectedAppointment(row);
     cancelHandlers.open();
   };
 
   const handleAttended = (row: AppointmentViewModel) => {
-    setSuccessMessage(null);
     setSelectedAppointment(row);
     attendedHandlers.open();
   };
 
   const handleNoShow = (row: AppointmentViewModel) => {
-    setSuccessMessage(null);
     setSelectedAppointment(row);
     noShowHandlers.open();
   };
@@ -117,35 +113,35 @@ export function AppointmentPageContainer() {
     editHandlers.close();
     clearSelection();
     void refetch();
-    setSuccessMessage('Turno actualizado correctamente.');
+    toast.success('Turno actualizado correctamente.');
   };
 
   const handleRescheduleSuccess = () => {
     rescheduleHandlers.close();
     clearSelection();
     void refetch();
-    setSuccessMessage('Turno reprogramado correctamente.');
+    toast.success('Turno reprogramado correctamente.');
   };
 
   const handleCancelSuccess = () => {
     cancelHandlers.close();
     clearSelection();
     void refetch();
-    setSuccessMessage('Turno cancelado correctamente.');
+    toast.success('Turno cancelado correctamente.');
   };
 
   const handleAttendedSuccess = () => {
     attendedHandlers.close();
     clearSelection();
     void refetch();
-    setSuccessMessage('Turno marcado como asistido.');
+    toast.success('Turno marcado como asistido.');
   };
 
   const handleNoShowSuccess = () => {
     noShowHandlers.close();
     clearSelection();
     void refetch();
-    setSuccessMessage('Turno marcado como no asistido.');
+    toast.success('Turno marcado como no asistido.');
   };
 
   const handleCloseEdit = () => {
@@ -181,7 +177,6 @@ export function AppointmentPageContainer() {
         actions={
           <Button
             onClick={() => {
-              setSuccessMessage(null);
               createHandlers.open();
             }}
             disabled={!selectedService || !selectedDate}
@@ -194,12 +189,6 @@ export function AppointmentPageContainer() {
           {!selectedService && (
             <Alert color="yellow" variant="light">
               Selecciona un servicio desde el sidebar para operar turnos del dia.
-            </Alert>
-          )}
-
-          {successMessage && (
-            <Alert color="green" variant="light">
-              {successMessage}
             </Alert>
           )}
 

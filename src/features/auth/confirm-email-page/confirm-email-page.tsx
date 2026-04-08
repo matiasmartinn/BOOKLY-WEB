@@ -4,16 +4,10 @@ import { PATHS } from 'app/router';
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { z } from 'zod';
 import { useConfirmEmail, useResendConfirmation } from '../auth.hooks';
 import { getAuthErrorMessage } from '../get-auth-error-message';
 import { AuthFormWrapper } from 'features/auth/components';
-
-const resendConfirmationSchema = z.object({
-  email: z.string().trim().email('Ingresa un email valido.'),
-});
-
-type ResendConfirmationValues = z.infer<typeof resendConfirmationSchema>;
+import { resendConfirmationSchema, type ResendConfirmationValues } from './schema';
 
 export function ConfirmEmailPage() {
   const [searchParams] = useSearchParams();
@@ -21,7 +15,9 @@ export function ConfirmEmailPage() {
 
   const [confirmationSucceeded, setConfirmationSucceeded] = useState(false);
   const [confirmationAttempted, setConfirmationAttempted] = useState(false);
-  const [resendFeedback, setResendFeedback] = useState<{ message: string; color: string } | null>(null);
+  const [resendFeedback, setResendFeedback] = useState<{ message: string; color: string } | null>(
+    null,
+  );
 
   const confirmEmail = useConfirmEmail();
   const resendConfirmation = useResendConfirmation();
@@ -106,17 +102,11 @@ export function ConfirmEmailPage() {
           </Alert>
         ) : (
           <>
-            {token ? (
-              confirmationAttempted && !confirmEmail.isPending ? (
-                <Alert color="red" variant="light">
-                  {confirmationErrorMessage}
-                </Alert>
-              ) : null
-            ) : (
+            {token && confirmationAttempted && !confirmEmail.isPending ? (
               <Alert color="red" variant="light">
-                El enlace no incluye un token de confirmacion. Puedes solicitar un nuevo email.
+                {confirmationErrorMessage}
               </Alert>
-            )}
+            ) : null}
 
             <TextInput
               label="Email"
@@ -134,10 +124,7 @@ export function ConfirmEmailPage() {
             ) : null}
 
             {resendFeedback ? (
-              <Alert
-                color={resendFeedback.color === 'green' ? 'green' : 'orange'}
-                variant="light"
-              >
+              <Alert color={resendFeedback.color === 'green' ? 'green' : 'orange'} variant="light">
                 {resendFeedback.message}
               </Alert>
             ) : null}

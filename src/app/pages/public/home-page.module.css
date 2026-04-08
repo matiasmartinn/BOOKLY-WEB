@@ -1,0 +1,519 @@
+.page {
+  background:
+    radial-gradient(circle at top left, var(--app-color-brand-soft) 0%, transparent 24%),
+    radial-gradient(circle at 82% 8%, var(--app-color-violet-soft) 0%, transparent 18%),
+    linear-gradient(180deg, var(--app-color-background-alt) 0%, var(--app-color-background) 52%);
+  color: var(--app-color-text-primary);
+}
+
+.heroSection {
+  position: relative;
+  padding: clamp(48px, 8vw, 96px) 0 72px;
+  overflow: hidden;
+}
+
+.heroSection::after {
+  content: '';
+  position: absolute;
+  inset: auto auto -100px -80px;
+  width: 240px;
+  height: 240px;
+  border-radius: 999px;
+  background: var(--app-color-violet-soft);
+  filter: blur(18px);
+  pointer-events: none;
+}
+
+.heroCopy {
+  position: relative;
+  z-index: 1;
+}
+
+.heroBadge,
+.sectionBadge {
+  width: fit-content;
+  border: 1px solid var(--app-color-brand-outline);
+  background: var(--app-color-brand-soft);
+}
+
+.heroTitle {
+  max-width: 10ch;
+  font-size: clamp(2.9rem, 6vw, 4.8rem);
+  line-height: 0.94;
+  letter-spacing: -0.06em;
+}
+
+.heroDescription {
+  max-width: 42rem;
+}
+
+.heroActions {
+  align-items: center;
+}
+
+.signalCard {
+  border-color: var(--app-color-border);
+  background: var(--app-color-surface);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--app-shadow-panel);
+}
+
+.mockFrame {
+  position: relative;
+  padding: 14px;
+  border-radius: 32px;
+  border: 1px solid var(--app-color-brand-outline);
+  background:
+    linear-gradient(
+      160deg,
+      var(--app-color-background-alt) 0%,
+      var(--app-color-surface) 52%,
+      var(--app-color-surface-soft) 100%
+    );
+  box-shadow: var(--app-shadow-floating);
+}
+
+.mockFrame::after {
+  content: '';
+  position: absolute;
+  right: 5%;
+  bottom: -10%;
+  width: 140px;
+  height: 140px;
+  border-radius: 999px;
+  background: var(--app-color-brand-soft);
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+.mockWindowBar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+.mockWindowDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--app-color-text-muted);
+}
+
+.mockShell {
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr);
+  min-height: 560px;
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--app-color-surface);
+  border: 1px solid var(--app-color-border);
+}
+
+.mockSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 18px 14px;
+  background: linear-gradient(
+    180deg,
+    var(--app-color-background-alt) 0%,
+    var(--app-color-surface) 100%
+  );
+  border-right: 1px solid var(--app-color-border-soft);
+}
+
+.mockBrand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  background: var(--app-gradient-brand);
+  box-shadow: var(--app-shadow-panel);
+}
+
+.mockMenu {
+  display: grid;
+  gap: 8px;
+}
+
+.mockMenuItem,
+.mockMenuItemActive {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px;
+  border-radius: 14px;
+  font-size: 0.82rem;
+  color: var(--app-color-text-muted);
+}
+
+.mockMenuItemActive {
+  background: var(--app-color-surface);
+  color: var(--app-color-text-primary);
+  border: 1px solid var(--app-color-border);
+}
+
+.mockContent {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  background: linear-gradient(
+    180deg,
+    var(--app-color-background) 0%,
+    var(--app-color-background-alt) 100%
+  );
+}
+
+.mockToolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mockToolbarPill {
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--mantine-color-brand-4);
+  background: var(--app-color-brand-soft);
+}
+
+.mockKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mockKpiCard,
+.mockMiniCard,
+.mockPanel {
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid var(--app-color-border);
+  background: var(--app-color-surface);
+}
+
+.mockPanel {
+  display: grid;
+  gap: 12px;
+}
+
+.mockPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mockTag {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--mantine-color-success-4);
+  background: var(--app-color-success-soft);
+}
+
+.mockAppointments {
+  display: grid;
+  gap: 8px;
+}
+
+.mockAppointmentRow {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  background: var(--app-color-surface-soft);
+}
+
+.mockAppointmentClient {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mockStatus {
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--mantine-color-brand-4);
+  background: var(--app-color-brand-soft);
+}
+
+.mockBottomGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.mockScheduleBars {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.mockScheduleBars span,
+.inlinePreviewRows span {
+  display: block;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--app-color-brand-soft-hover),
+    var(--mantine-color-brand-5)
+  );
+}
+
+.mockChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.mockChips span {
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--mantine-color-brand-4);
+  background: var(--app-color-brand-soft);
+}
+
+.section,
+.sectionMuted {
+  padding: 72px 0;
+}
+
+.sectionMuted {
+  background: linear-gradient(
+    180deg,
+    var(--app-color-background-alt) 0%,
+    var(--app-color-background) 100%
+  );
+  border-top: 1px solid var(--app-color-border-soft);
+  border-bottom: 1px solid var(--app-color-border-soft);
+}
+
+.sectionTitle {
+  font-size: clamp(2rem, 3.2vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.sectionDescription {
+  max-width: 44rem;
+}
+
+.featureSurface,
+.stepCard,
+.detailCard {
+  height: 100%;
+  border-color: var(--app-color-border);
+  background: var(--app-color-surface);
+  box-shadow: var(--app-shadow-panel);
+}
+
+.stepCard {
+  background: linear-gradient(
+    180deg,
+    var(--app-color-surface) 0%,
+    var(--app-color-surface-soft) 100%
+  );
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--mantine-color-brand-4);
+  background: var(--app-color-brand-soft);
+}
+
+.featurePoint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.inlinePreview {
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(
+    180deg,
+    var(--app-color-surface-soft) 0%,
+    var(--app-color-surface) 100%
+  );
+  border: 1px solid var(--app-color-border-soft);
+}
+
+.inlinePreviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.inlinePreviewAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: var(--mantine-color-brand-4);
+  background: var(--app-color-brand-soft);
+}
+
+.inlinePreviewRows {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.inlinePreviewRows span:nth-child(1) {
+  width: 92%;
+}
+
+.inlinePreviewRows span:nth-child(2) {
+  width: 76%;
+}
+
+.inlinePreviewRows span:nth-child(3) {
+  width: 84%;
+}
+
+.finalCta {
+  border: 1px solid var(--app-color-brand-outline);
+  color: var(--app-color-text-primary);
+  background:
+    radial-gradient(circle at top right, var(--app-color-violet-soft) 0%, transparent 24%),
+    linear-gradient(
+      145deg,
+      var(--app-color-background-alt) 0%,
+      var(--app-color-surface) 54%,
+      var(--app-color-surface-soft) 100%
+    );
+  box-shadow: var(--app-shadow-floating);
+}
+
+.finalBadge {
+  width: fit-content;
+  border: 1px solid var(--app-color-brand-outline);
+}
+
+.finalTitle {
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--app-color-text-primary);
+}
+
+.finalText {
+  max-width: 34rem;
+  color: var(--app-color-text-secondary);
+}
+
+.finalActions {
+  justify-self: end;
+}
+
+@media (max-width: 75em) {
+  .heroTitle {
+    max-width: 12ch;
+  }
+
+  .mockShell {
+    min-height: 520px;
+  }
+}
+
+@media (max-width: 62em) {
+  .heroSection,
+  .section,
+  .sectionMuted {
+    padding: 56px 0;
+  }
+
+  .mockShell {
+    grid-template-columns: 92px minmax(0, 1fr);
+  }
+
+  .mockMenuItem span,
+  .mockMenuItemActive span {
+    display: none;
+  }
+
+  .finalActions {
+    justify-self: stretch;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 48em) {
+  .heroTitle,
+  .sectionTitle,
+  .finalTitle {
+    max-width: none;
+  }
+
+  .mockShell {
+    grid-template-columns: 1fr;
+  }
+
+  .mockSidebar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border-right: 0;
+    border-bottom: 1px solid var(--app-color-border-soft);
+  }
+
+  .mockMenu {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    overflow: auto;
+  }
+
+  .mockMenuItem span,
+  .mockMenuItemActive span {
+    display: inline;
+  }
+}
+
+@media (max-width: 36em) {
+  .mockKpiGrid,
+  .mockBottomGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mockAppointmentRow {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .heroActions {
+    width: 100%;
+  }
+
+  .heroActions :global(.mantine-Button-root) {
+    flex: 1 1 0;
+  }
+}

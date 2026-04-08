@@ -5,6 +5,7 @@ import type { LoginRequest } from '../login-form/login.schema';
 import type { RegisterUserRequst } from '../register-form/register-user.schema';
 import {
   authService,
+  type CompleteAdminInvitationDto,
   type CompleteSecretaryInvitationDto,
   type ConfirmEmailDto,
   type EmailDispatchResultDto,
@@ -52,4 +53,9 @@ export const useResetPassword = () =>
 export const useCompleteSecretaryInvitation = () =>
   useMutation<UserDto, ProblemDetails, CompleteSecretaryInvitationDto>({
     mutationFn: authService.completeSecretaryInvitation,
+  });
+
+export const useCompleteAdminInvitation = () =>
+  useMutation<UserDto, ProblemDetails, CompleteAdminInvitationDto>({
+    mutationFn: authService.completeAdminInvitation,
   });

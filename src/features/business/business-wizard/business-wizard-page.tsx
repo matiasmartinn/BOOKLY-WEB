@@ -14,7 +14,7 @@ export function BusinessWizardPage() {
     // Recarga la lista de servicios para que el switcher
     // muestre el recién creado sin necesidad de re-login.
     if (authUser) {
-      await loadServices(authUser.id);
+      await loadServices(authUser);
     }
     navigate(PATHS.dashboard.service, { replace: true });
   };

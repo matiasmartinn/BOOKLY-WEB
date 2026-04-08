@@ -1,5 +1,5 @@
 import { apiClient } from 'app/api';
-import type { BusinessDto } from 'shared/models';
+import type { BusinessDto, ServicePublicBookingDto } from 'shared/models';
 import type { CreateServiceScheduleDto } from 'features/schedules/services/schedules.service';
 
 export interface CreateBusinessDto {
@@ -46,6 +46,18 @@ export const businessService = {
 
   update: (id: number, payload: UpdateBusinessDto) =>
     apiClient.put<BusinessDto>(`/services/${id}`, payload).then((r) => r.data),
+
+  getPublicBooking: (id: number) =>
+    apiClient.get<ServicePublicBookingDto>(`/services/${id}/public-booking`).then((r) => r.data),
+
+  enablePublicBooking: (id: number) =>
+    apiClient.post<ServicePublicBookingDto>(`/services/${id}/public-booking/enable`).then((r) => r.data),
+
+  disablePublicBooking: (id: number) =>
+    apiClient.post<ServicePublicBookingDto>(`/services/${id}/public-booking/disable`).then((r) => r.data),
+
+  regeneratePublicBooking: (id: number) =>
+    apiClient.post<ServicePublicBookingDto>(`/services/${id}/public-booking/regenerate`).then((r) => r.data),
 
   delete: (id: number) => apiClient.delete<void>(`/services/${id}`).then((r) => r.data),
 

@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Anchor, Button, PasswordInput, Stack, Text } from '@mantine/core';
 import { PATHS } from 'app/router';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { useCompleteSecretaryInvitation } from '../auth.hooks';
+import { useCompleteAdminInvitation, useCompleteSecretaryInvitation } from '../auth.hooks';
 import { getAuthErrorMessage } from '../get-auth-error-message';
 import {
   secretaryOnboardingSchema,
@@ -12,8 +12,10 @@ import {
 import { AuthFormWrapper } from 'features/auth/components';
 
 export function SecretaryOnboardingForm() {
+  const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token')?.trim() ?? '';
+  const isAdminInvitation = pathname === PATHS.auth.adminInvitation;
 
   const {
     clearErrors,
@@ -25,7 +27,11 @@ export function SecretaryOnboardingForm() {
     resolver: zodResolver(secretaryOnboardingSchema),
   });
 
-  const completeInvitation = useCompleteSecretaryInvitation();
+  const completeSecretaryInvitation = useCompleteSecretaryInvitation();
+  const completeAdminInvitation = useCompleteAdminInvitation();
+  const completeInvitation = isAdminInvitation
+    ? completeAdminInvitation
+    : completeSecretaryInvitation;
 
   const onSubmit: SubmitHandler<SecretaryOnboardingValues> = async ({ password }) => {
     clearErrors('root');

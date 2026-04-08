@@ -1,62 +1,48 @@
-import { Badge, Paper, Stack, Text } from '@mantine/core';
-
-type TrendTone = 'positive' | 'negative' | 'neutral' | 'muted';
+import { Paper, Stack, Text } from '@mantine/core';
+import { appColorVars } from 'shared/ui/theme/theme';
 
 interface MetricsKpiCardProps {
   label: string;
   value: string;
-  caption: string;
-  trendLabel?: string;
-  trendTone?: TrendTone;
+  meta: string;
+  accentColor?: string;
+  accentBackground?: string;
 }
-
-const trendColorByTone: Record<TrendTone, string> = {
-  positive: 'green',
-  negative: 'red',
-  neutral: 'gray',
-  muted: 'blue',
-};
 
 export function MetricsKpiCard({
   label,
   value,
-  caption,
-  trendLabel,
-  trendTone = 'neutral',
+  meta,
+  accentColor = 'var(--mantine-color-gray-3)',
+  accentBackground = 'var(--mantine-color-gray-0)',
 }: MetricsKpiCardProps) {
   return (
     <Paper
       radius="lg"
       p="md"
       withBorder
+      shadow="xs"
       style={{
         height: '100%',
-        background:
-          'linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(248,249,255,1) 100%)',
+        backgroundColor: accentBackground,
+        borderLeft: `4px solid ${accentColor}`,
+        borderColor: appColorVars.border,
       }}
     >
-      <Stack gap="xs" justify="space-between" h="100%">
-        <Stack gap={6}>
-          <Text size="xs" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
+      <Stack gap="sm" justify="space-between" h="100%">
+        <Stack gap={4}>
+          <Text size="xs" fw={700} c={appColorVars.textSecondary} tt="uppercase">
             {label}
           </Text>
 
-          <Text size="2rem" fw={700} lh={1}>
+          <Text fz={30} fw={800} lh={1.05}>
             {value}
           </Text>
         </Stack>
 
-        <Stack gap={8}>
-          {trendLabel && (
-            <Badge color={trendColorByTone[trendTone]} variant="light" radius="sm" w="fit-content">
-              {trendLabel}
-            </Badge>
-          )}
-
-          <Text size="sm" c="dimmed">
-            {caption}
-          </Text>
-        </Stack>
+        <Text size="sm" c={appColorVars.textSecondary} lh={1.3} lineClamp={2}>
+          {meta}
+        </Text>
       </Stack>
     </Paper>
   );

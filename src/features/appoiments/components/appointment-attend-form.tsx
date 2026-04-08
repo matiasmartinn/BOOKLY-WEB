@@ -1,7 +1,8 @@
-import { Alert, Button, Group, Stack, Text } from '@mantine/core';
-import type { AppointmentViewModel } from '../viewmodel';
-import { useMarkAppointmentAsAttended } from '../hooks';
+import { Button, Group, Stack, Text } from '@mantine/core';
+import { useAppToast } from 'shared/ui/toast';
 import { formatLocalDateTime } from 'shared/utils';
+import { useMarkAppointmentAsAttended } from '../hooks';
+import type { AppointmentViewModel } from '../viewmodel';
 
 interface AppointmentAttendedFormProps {
   appointment: AppointmentViewModel;
@@ -14,35 +15,30 @@ export function AppointmentAttendedForm({
   appointment,
   onCancel,
   onSuccess,
-  submitLabel = 'Marcar asistió',
+  submitLabel = 'Marcar asistio',
 }: AppointmentAttendedFormProps) {
-  const {
-    mutate: markAsAttended,
-    isPending,
-    isError: isSubmitError,
-    error,
-  } = useMarkAppointmentAsAttended(appointment.id);
+  const toast = useAppToast();
+  const { mutate: markAsAttended, isPending } = useMarkAppointmentAsAttended(appointment.id);
 
   const handleSubmit = () => {
-    markAsAttended(undefined, { onSuccess });
+    markAsAttended(undefined, {
+      onSuccess,
+      onError: (error) => {
+        toast.error(error.detail);
+      },
+    });
   };
 
   return (
     <Stack gap="lg">
       <Stack gap={4}>
-        <Text fw={600}>Marcar asistencia</Text>
-
-        <Text size="sm" c="dimmed">
-          Se marcará como asistido el turno de {appointment.clientName} del{' '}
-          {formatLocalDateTime(appointment.startDateTime)}.
+        <Text c="dimmed">
+          Se marcara como asistido el turno de{' '}
+          <Text span fw={600} c="dark">
+            {appointment.clientName} del {formatLocalDateTime(appointment.startDateTime)}.
+          </Text>{' '}
         </Text>
       </Stack>
-
-      {isSubmitError && error && (
-        <Alert color="red" variant="light">
-          {error.detail}
-        </Alert>
-      )}
 
       <Group justify="flex-end">
         {onCancel && (

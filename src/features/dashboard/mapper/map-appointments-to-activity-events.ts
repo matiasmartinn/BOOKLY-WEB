@@ -1,5 +1,6 @@
 import type { AppointmentStatusHistoryDto } from 'shared/models';
 import type { AppointmentViewModel } from 'features/appoiments/viewmodel';
+import { compareLocalDateTime } from 'shared/utils';
 import { appointmentStatusIncludes } from '../utils';
 import type { ActivityEventViewModel } from '../viewmodel/activity-event-view-model';
 
@@ -15,7 +16,7 @@ const resolveActorLabel = (
     return `Usuario #${userId}`;
   }
 
-  return 'Sin usuario del sistema';
+  return 'Sin actor registrado';
 };
 
 const isCreationHistoryEvent = (item: AppointmentStatusHistoryDto) => item.oldStatus == null;
@@ -36,7 +37,7 @@ const createdEvent = (
   eventDateTime: creationHistory?.occurredOn ?? appointment.createdOn,
   appointmentDateLabel: appointment.dateLabel,
   appointmentTimeLabel: appointment.timeLabel,
-  status: 'CREATED',
+  status: creationHistory?.newStatus ?? 'Pending',
 });
 
 const mapHistoryEventType = (
@@ -51,15 +52,11 @@ const mapHistoryEventType = (
   }
 
   if (appointmentStatusIncludes(item.newStatus, 'NO_SHOW', 'NOSHOW')) {
-    return { label: 'Turno no asistio', color: 'orange' };
+    return { label: 'Turno no asistido', color: 'orange' };
   }
 
   if (appointmentStatusIncludes(item.newStatus, 'ATTEND', 'CONFIRM')) {
-    return { label: 'Turno asistio', color: 'green' };
-  }
-
-  if (appointmentStatusIncludes(item.newStatus, 'RESCHEDULE', 'REPROGRAM')) {
-    return { label: 'Turno reprogramado', color: 'grape' };
+    return { label: 'Turno asistido', color: 'green' };
   }
 
   return null;
@@ -94,14 +91,14 @@ const historyEvent = (
 
 export const mapAppointmentsToActivityEvents = (
   appointments: AppointmentViewModel[],
-  history: AppointmentStatusHistoryDto[],
+  history: AppointmentStatusHistoryDto[] = [],
 ): ActivityEventViewModel[] => {
   const appointmentById = new Map(appointments.map((appointment) => [appointment.id, appointment]));
   const creationHistoryByAppointmentId = new Map<number, AppointmentStatusHistoryDto>();
 
   history
     .filter(isCreationHistoryEvent)
-    .sort((a, b) => new Date(a.occurredOn).getTime() - new Date(b.occurredOn).getTime())
+    .sort((a, b) => compareLocalDateTime(a.occurredOn, b.occurredOn))
     .forEach((item) => {
       if (!creationHistoryByAppointmentId.has(item.appointmentId)) {
         creationHistoryByAppointmentId.set(item.appointmentId, item);
@@ -114,7 +111,7 @@ export const mapAppointmentsToActivityEvents = (
     .map((item) => historyEvent(item, appointmentById.get(item.appointmentId)))
     .filter((item): item is ActivityEventViewModel => item != null);
 
-  return [...createdEvents, ...statusEvents].sort(
-    (a, b) => new Date(b.eventDateTime).getTime() - new Date(a.eventDateTime).getTime(),
+  return [...createdEvents, ...statusEvents].sort((a, b) =>
+    compareLocalDateTime(b.eventDateTime, a.eventDateTime),
   );
 };

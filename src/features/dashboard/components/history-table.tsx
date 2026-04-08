@@ -1,7 +1,7 @@
-import { Badge, Stack, Text } from '@mantine/core';
-import { GenericTable, type SortState, type TableColumn } from 'shared/components/generic-table';
-import { compareLocalDateTime, formatDateTime, formatTime } from 'shared/utils';
-import { getAppointmentStatusColor, getAppointmentStatusLabel } from '../utils';
+import { GenericTable, type SortState } from 'shared/components/generic-table';
+import { compareLocalDateTime } from 'shared/utils';
+import { getAppointmentStatusLabel } from '../utils';
+import { historyColumns } from '../defaults';
 import type { HistoryAppointmentViewModel } from '../viewmodel/history-appointment-view-model';
 
 interface HistoryTableProps {
@@ -11,68 +11,6 @@ interface HistoryTableProps {
   isError?: boolean;
   onRefetch?: () => void;
 }
-
-const columns: TableColumn<HistoryAppointmentViewModel>[] = [
-  {
-    key: 'startDateTime',
-    title: 'Fecha',
-    accessor: 'startDateTime',
-    sortable: true,
-    noWrap: true,
-    render: (row) => formatDateTime(row.startDateTime),
-  },
-  {
-    key: 'timeRange',
-    title: 'Horario',
-    render: (row) => `${formatTime(row.startDateTime)} - ${formatTime(row.endDateTime)}`,
-    noWrap: true,
-  },
-  {
-    key: 'clientName',
-    title: 'Cliente',
-    accessor: 'clientName',
-    sortable: true,
-    render: (row) => (
-      <Stack gap={2}>
-        <Text size="sm">{row.clientName}</Text>
-        <Text size="xs" c="dimmed">
-          {row.clientPhone}
-          {row.clientEmail ? ` | ${row.clientEmail}` : ''}
-        </Text>
-      </Stack>
-    ),
-  },
-  {
-    key: 'serviceName',
-    title: 'Servicio',
-    accessor: 'serviceName',
-    sortable: true,
-  },
-  {
-    key: 'secretaryName',
-    title: 'Secretario/a',
-    accessor: 'secretaryName',
-    sortable: true,
-  },
-  {
-    key: 'status',
-    title: 'Estado',
-    accessor: 'status',
-    sortable: true,
-    noWrap: true,
-    render: (row) => (
-      <Badge color={getAppointmentStatusColor(row.status)} variant="light">
-        {getAppointmentStatusLabel(row.status)}
-      </Badge>
-    ),
-  },
-  {
-    key: 'detail',
-    title: 'Detalle',
-    accessor: 'detail',
-    render: (row) => row.detail,
-  },
-];
 
 const historySortFn = (
   a: HistoryAppointmentViewModel,
@@ -109,6 +47,14 @@ const historySortFn = (
   return sort.direction === 'asc' ? cmp : -cmp;
 };
 
+const historySearchFn = (row: HistoryAppointmentViewModel, query: string) => {
+  const value = query.trim().toLowerCase();
+
+  return [row.clientName, row.clientPhone, row.clientEmail ?? ''].some((field) =>
+    field.toLowerCase().includes(value),
+  );
+};
+
 export function HistoryTable({
   data,
   loading = false,
@@ -119,7 +65,7 @@ export function HistoryTable({
   return (
     <GenericTable
       data={data}
-      columns={columns}
+      columns={historyColumns}
       rowKey="id"
       loading={loading}
       fetching={fetching}
@@ -128,6 +74,9 @@ export function HistoryTable({
       titleRefetchMessage="No se pudo cargar el historico de turnos."
       defaultSort={{ columnKey: 'startDateTime', direction: 'desc' }}
       sortFn={historySortFn}
+      showSearch
+      searchPlaceholder="Buscar por nombre, telefono o email"
+      searchFn={historySearchFn}
       showPaginator
       pageSize={10}
       minWidth={1180}

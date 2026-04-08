@@ -1,10 +1,11 @@
 import { ConfirmEmailPage } from 'features/auth/confirm-email-page/confirm-email-page';
 import { Navigate, type RouteObject } from 'react-router-dom';
 import { RegisterForm } from 'features/auth/register-form/register-form';
-import { LoginPage } from 'app/pages/auth/login-page';
+import { HomePage } from 'app/pages/public/home-page';
+import { NotFoundPage } from 'app/pages/public/not-found-page';
 import { RecoverAccountForm } from 'features/auth/recover-account-form/recover-account-form';
 import { ResetPasswordForm } from 'features/auth/reset-password-form/reset-password-form';
-import { AppLayout, AuthLayout, DashboardLayout } from 'app/layouts';
+import { AppLayout, AuthLayout, DashboardLayout, PublicBookingLayout } from 'app/layouts';
 import { SchedulesPage } from 'features/schedules/schedules-page';
 import { SecretaryOnboardingForm } from 'features/auth/secretary-onboarding-form/secretary-onboarding-form';
 import { UnavailabilitiesPage } from 'features/unavailability/unavailabilities-page';
@@ -18,28 +19,38 @@ import { BusinessPage } from 'features/business/business-page';
 import { BusinessStatusPage } from 'features/business/business-status-page';
 import { TeamPage } from 'features/users/team-page';
 import { SettingsPage } from 'features/settings/settings-page';
+import { AdminDashboardPage, AdminOwnersPage, AdminServicesPage } from 'features/admin';
+import { PublicBookingPage } from 'features/public-booking';
 import { PATHS } from 'app/router/PATHS';
+import { LoginForm } from 'features/auth/login-form/login-form';
 
 const Placeholder = () => <div style={{ padding: 24 }}>Pantalla</div>;
 
 export const appRoutes: RouteObject[] = [
   {
-    path: '/',
+    path: PATHS.public.home,
     element: <AppLayout />,
     children: [
-      { index: true, element: <Placeholder /> },
+      { index: true, element: <HomePage /> },
       { path: 'pepito400', element: <Placeholder /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
+  },
+  {
+    path: PATHS.public.booking,
+    element: <PublicBookingLayout />,
+    children: [{ index: true, element: <PublicBookingPage /> }],
   },
   {
     path: 'auth',
     element: <AuthLayout />,
     children: [
       { path: 'register', element: <RegisterForm /> },
-      { path: 'login', element: <LoginPage /> },
+      { path: 'login', element: <LoginForm /> },
       { path: 'confirm-email', element: <ConfirmEmailPage /> },
       { path: 'forgot-password', element: <RecoverAccountForm /> },
       { path: 'reset-password', element: <ResetPasswordForm /> },
+      { path: 'admin-invitation', element: <SecretaryOnboardingForm /> },
       { path: 'secretary-invitation', element: <SecretaryOnboardingForm /> },
       { path: 'secretary-password-form', element: <SecretaryOnboardingForm /> },
     ],
@@ -54,6 +65,9 @@ export const appRoutes: RouteObject[] = [
     children: [
       { index: true, element: <OverviewPage /> },
       { path: 'overview', element: <Navigate to={PATHS.dashboard.overview} replace /> },
+      { path: 'admin', element: <AdminDashboardPage /> },
+      { path: 'admin/owners', element: <AdminOwnersPage /> },
+      { path: 'admin/services', element: <AdminServicesPage /> },
       { path: 'activity', element: <Navigate to={PATHS.dashboard.events} replace /> },
       { path: 'events', element: <EventsPage /> },
       { path: 'appointments', element: <AppointmentPage /> },

@@ -25,7 +25,7 @@ export const useAuthStore = create<AuthStore>()(
       login: async (dto) => {
         const user = await authService.login(dto);
         set({ user, isAuthenticated: true });
-        await useBusinessStore.getState().loadServices(user.id);
+        await useBusinessStore.getState().loadServices(user);
       },
 
       logout: () => {

@@ -57,11 +57,11 @@ export function AppointmentCancelForm({
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap="lg">
         <Stack gap={4}>
-          <Text fw={600}>Cancelar turno</Text>
-
-          <Text size="sm" c="dimmed">
-            Se cancelará el turno de {appointment.clientName} del{' '}
-            {formatLocalDateTime(appointment.startDateTime)}.
+          <Text c="dimmed">
+            Se cancelara el turno de{' '}
+            <Text span fw={600} c="dark">
+              {appointment.clientName} del {formatLocalDateTime(appointment.startDateTime)}.
+            </Text>{' '}
           </Text>
         </Stack>
 
@@ -79,7 +79,7 @@ export function AppointmentCancelForm({
 
         <Textarea
           label="Motivo"
-          placeholder="Motivo de la cancelación"
+          placeholder="Motivo de la cancelacion"
           minRows={3}
           autosize
           {...register('reason')}

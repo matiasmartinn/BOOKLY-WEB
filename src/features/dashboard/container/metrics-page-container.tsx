@@ -3,34 +3,39 @@ import {
   Badge,
   Box,
   Button,
-  Center,
   Group,
+  Paper,
   Select,
   SimpleGrid,
   Skeleton,
   Stack,
-  Text,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  Pie,
-  PieChart,
+  LabelList,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
 import { useOwnerBusinesses } from 'features/business/hooks';
-import { PageCard, PageShell } from 'shared/layout';
-import { formatDateOnly } from 'shared/utils';
+import { appChartColorVars, appChartTooltipStyles, appColorVars } from 'shared/ui/theme/theme';
+import {
+  addDaysToDateOnly,
+  compareDateOnly,
+  formatLongLocalDateOnly,
+  formatShortLocalDateOnly,
+  getCurrentBusinessDateOnly,
+} from 'shared/utils';
 import { useAuthStore } from 'store/use-auth-store';
-import { MetricsKpiCard } from '../components';
+import { EmptyChartState, MetricsChartCard, MetricsKpiCard } from '../components';
 import { useAppointmentMetrics } from '../hooks';
+import type { LabelFormatter } from 'recharts/types/component/Label';
 
 const DEFAULT_RANGE_DAYS = 30;
 const numberFormatter = new Intl.NumberFormat('es-AR');
@@ -38,94 +43,77 @@ const percentageFormatter = new Intl.NumberFormat('es-AR', {
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });
-const shortDateFormatter = new Intl.DateTimeFormat('es-AR', {
-  day: '2-digit',
-  month: 'short',
-});
-const longDateFormatter = new Intl.DateTimeFormat('es-AR', {
-  day: '2-digit',
-  month: 'short',
-  year: 'numeric',
-});
 
-const COLORS = {
-  brand: '#4f46e5',
-  brandSoft: '#c7d2fe',
-  success: '#2f9e44',
-  warning: '#f08c00',
-  danger: '#e03131',
-  muted: '#adb5bd',
+const STATUS_VISUALS = {
+  total: {
+    accentColor: appChartColorVars.primary,
+    accentBackground: appColorVars.brandSoft,
+  },
+  attended: {
+    label: 'Asistido',
+    color: appChartColorVars.success,
+    softColor: appColorVars.successSoft,
+  },
+  cancelled: {
+    label: 'Cancelado',
+    color: appChartColorVars.warning,
+    softColor: appColorVars.warningSoft,
+  },
+  noShow: {
+    label: 'No asistio',
+    color: appChartColorVars.danger,
+    softColor: appColorVars.errorSoft,
+  },
+  pending: {
+    label: 'Pendiente',
+    color: appChartColorVars.primary,
+    softColor: appColorVars.brandSoft,
+  },
 } as const;
 
-const getTodayDateOnly = () => {
-  const today = new Date();
-  const year = String(today.getFullYear());
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
+const SHARED_CHART_GRID = {
+  stroke: appChartColorVars.grid,
+  strokeDasharray: '4 4',
+} as const;
 
-  return `${year}-${month}-${day}`;
-};
+const SHARED_CHART_TICK = {
+  fontSize: 12,
+  fill: appColorVars.textSecondary,
+} as const;
 
-const shiftDateOnly = (value: string, days: number) => {
-  const date = new Date(`${value}T00:00:00`);
-  date.setDate(date.getDate() + days);
+const SHARED_CHART_AXIS_LINE = {
+  stroke: appColorVars.border,
+} as const;
 
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, '0'),
-    String(date.getDate()).padStart(2, '0'),
-  ].join('-');
-};
+const CHART_LABEL_STYLE = {
+  fill: appColorVars.textSecondary,
+  fontSize: 12,
+  fontWeight: 600,
+} as const;
+
+const VERTICAL_BAR_RADIUS: [number, number, number, number] = [8, 8, 0, 0];
+const HORIZONTAL_BAR_RADIUS: [number, number, number, number] = [0, 8, 8, 0];
+
+const compactFieldStyles = {
+  label: {
+    color: appColorVars.textSecondary,
+    fontSize: 'var(--mantine-font-size-xs)',
+    marginBottom: 4,
+    fontWeight: 600,
+  },
+} as const;
 
 const getDefaultRange = () => {
-  const to = getTodayDateOnly();
+  const to = getCurrentBusinessDateOnly();
 
   return {
-    from: shiftDateOnly(to, -(DEFAULT_RANGE_DAYS - 1)),
+    from: addDaysToDateOnly(to, -(DEFAULT_RANGE_DAYS - 1)) ?? to,
     to,
   };
 };
 
 const formatNumber = (value: number) => numberFormatter.format(value);
 const formatPercentage = (value: number) => `${percentageFormatter.format(value)}%`;
-const getDateOnlyObject = (value: string) => {
-  const date = new Date(`${value}T00:00:00`);
-
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  return date;
-};
-
-const formatShortDate = (value: string) => {
-  const date = getDateOnlyObject(value);
-  return date ? shortDateFormatter.format(date) : value;
-};
-
-const formatLongDate = (value: string) => {
-  const date = getDateOnlyObject(value);
-  return date ? longDateFormatter.format(date) : value;
-};
-
-const formatRange = (from: string, to: string) =>
-  `${formatDateOnly(from)} al ${formatDateOnly(to)}`;
-
-const getComparisonTone = (absoluteChange: number, percentageChange: number | null) => {
-  if (percentageChange == null) {
-    return 'muted' as const;
-  }
-
-  if (absoluteChange > 0) {
-    return 'positive' as const;
-  }
-
-  if (absoluteChange < 0) {
-    return 'negative' as const;
-  }
-
-  return 'neutral' as const;
-};
 
 const getComparisonLabel = (absoluteChange: number, percentageChange: number | null) => {
   if (percentageChange == null) {
@@ -138,6 +126,14 @@ const getComparisonLabel = (absoluteChange: number, percentageChange: number | n
 
   const signal = percentageChange > 0 ? '+' : '';
   return `${signal}${percentageFormatter.format(percentageChange)}% vs periodo anterior`;
+};
+
+const getRateContext = (rate: number | undefined, total: number | undefined) => {
+  const safeTotal = total ?? 0;
+  const safeRate = rate ?? 0;
+  const rateCount = Math.max(0, Math.round((safeRate / 100) * safeTotal));
+
+  return `${formatNumber(rateCount)} de ${formatNumber(safeTotal)} turnos`;
 };
 
 const getDailyChartTickInterval = (points: number) => {
@@ -156,6 +152,30 @@ const getDailyChartTickInterval = (points: number) => {
   return Math.max(4, Math.floor(points / 8));
 };
 
+const getDailyChartBarSize = (points: number) => {
+  if (points <= 7) {
+    return 34;
+  }
+
+  if (points <= 14) {
+    return 24;
+  }
+
+  return 18;
+};
+
+const getDailyChartBarGap = (points: number) => {
+  if (points <= 7) {
+    return '12%';
+  }
+
+  if (points <= 14) {
+    return '16%';
+  }
+
+  return '22%';
+};
+
 const getWeekdaySortValue = (dayOfWeek: number) => {
   if (dayOfWeek >= 1 && dayOfWeek <= 7) {
     return dayOfWeek;
@@ -168,42 +188,6 @@ const getWeekdaySortValue = (dayOfWeek: number) => {
   return dayOfWeek;
 };
 
-interface MetricsChartCardProps {
-  title: string;
-  description: string;
-  footer?: ReactNode;
-  children: ReactNode;
-}
-
-function MetricsChartCard({ title, description, footer, children }: MetricsChartCardProps) {
-  return (
-    <PageCard>
-      <Stack gap="md">
-        <Stack gap={4}>
-          <Text fw={600}>{title}</Text>
-          <Text size="sm" c="dimmed">
-            {description}
-          </Text>
-        </Stack>
-
-        <Box h={300}>{children}</Box>
-
-        {footer}
-      </Stack>
-    </PageCard>
-  );
-}
-
-function EmptyChartState({ message }: { message: string }) {
-  return (
-    <Center h="100%">
-      <Text size="sm" c="dimmed" ta="center" maw={320}>
-        {message}
-      </Text>
-    </Center>
-  );
-}
-
 export function MetricsPageContainer() {
   const authUser = useAuthStore((s) => s.user);
   const defaultRange = useMemo(() => getDefaultRange(), []);
@@ -213,7 +197,7 @@ export function MetricsPageContainer() {
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
 
   const { data: services = [] } = useOwnerBusinesses(authUser?.id);
-  const hasInvalidRange = Boolean(fromDate && toDate && fromDate > toDate);
+  const hasInvalidRange = Boolean(fromDate && toDate && compareDateOnly(fromDate, toDate) > 0);
 
   const metricsQuery = useMemo(() => {
     if (!authUser || !fromDate || !toDate || hasInvalidRange) {
@@ -247,33 +231,15 @@ export function MetricsPageContainer() {
     [services],
   );
 
-  const selectedServiceName = useMemo(() => {
-    if (!selectedServiceId) {
-      return 'Todos los servicios';
-    }
-
-    return serviceOptions.find((option) => option.value === selectedServiceId)?.label ?? 'Servicio';
-  }, [selectedServiceId, serviceOptions]);
-
-  const periodLabel = useMemo(() => {
-    if (!fromDate || !toDate) {
-      return 'Selecciona un rango valido';
-    }
-
-    return formatRange(fromDate, toDate);
-  }, [fromDate, toDate]);
-
   const dayChartData = useMemo(
     () =>
       metrics?.appointmentsByDay
         .map((item) => ({
           date: item.date,
-          label: formatShortDate(item.date),
+          label: formatShortLocalDateOnly(item.date),
           totalAppointments: item.totalAppointments,
-          sortValue: getDateOnlyObject(item.date)?.getTime() ?? Number.MAX_SAFE_INTEGER,
         }))
-        .sort((a, b) => a.sortValue - b.sortValue)
-        .map(({ sortValue, ...item }) => item) ?? [],
+        .sort((a, b) => compareDateOnly(a.date, b.date)) ?? [],
     [metrics],
   );
 
@@ -281,6 +247,18 @@ export function MetricsPageContainer() {
     () => getDailyChartTickInterval(dayChartData.length),
     [dayChartData.length],
   );
+
+  const dayChartBarSize = useMemo(
+    () => getDailyChartBarSize(dayChartData.length),
+    [dayChartData.length],
+  );
+
+  const dayChartBarGap = useMemo(
+    () => getDailyChartBarGap(dayChartData.length),
+    [dayChartData.length],
+  );
+
+  const showDayLabels = dayChartData.length > 0 && dayChartData.length <= 10;
 
   const weekdayChartData = useMemo(() => {
     if (!metrics) {
@@ -290,6 +268,7 @@ export function MetricsPageContainer() {
     const sortedWeekdays = [...metrics.appointmentsByWeekday].sort(
       (a, b) => getWeekdaySortValue(a.dayOfWeek) - getWeekdaySortValue(b.dayOfWeek),
     );
+
     const busiestWeekdayTotal = Math.max(
       0,
       ...sortedWeekdays.map((item) => item.totalAppointments),
@@ -326,26 +305,30 @@ export function MetricsPageContainer() {
 
     return [
       {
-        name: 'Asistio',
+        name: STATUS_VISUALS.attended.label,
         value: metrics.attendanceRate,
-        color: COLORS.success,
+        color: STATUS_VISUALS.attended.color,
+        softColor: STATUS_VISUALS.attended.softColor,
       },
       {
-        name: 'Cancelado',
+        name: STATUS_VISUALS.cancelled.label,
         value: metrics.cancellationRate,
-        color: COLORS.warning,
+        color: STATUS_VISUALS.cancelled.color,
+        softColor: STATUS_VISUALS.cancelled.softColor,
       },
       {
-        name: 'No asistio',
+        name: STATUS_VISUALS.noShow.label,
         value: metrics.noShowRate,
-        color: COLORS.danger,
+        color: STATUS_VISUALS.noShow.color,
+        softColor: STATUS_VISUALS.noShow.softColor,
       },
       ...(pendingRate > 0
         ? [
             {
-              name: 'Pendientes',
+              name: STATUS_VISUALS.pending.label,
               value: pendingRate,
-              color: COLORS.muted,
+              color: STATUS_VISUALS.pending.color,
+              softColor: STATUS_VISUALS.pending.softColor,
             },
           ]
         : []),
@@ -362,130 +345,256 @@ export function MetricsPageContainer() {
   const comparisonLabel = metrics
     ? getComparisonLabel(metrics.absoluteChange, metrics.percentageChange)
     : undefined;
-  const comparisonTone = metrics
-    ? getComparisonTone(metrics.absoluteChange, metrics.percentageChange)
-    : 'neutral';
+
+  const hasAlerts = !authUser || hasInvalidRange || isError;
+  const hasMetricsData = Boolean(metrics && metrics.totalAppointments > 0);
+
+  const formatBarLabel: LabelFormatter = (value) => {
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) && numericValue > 0 ? formatNumber(numericValue) : '';
+  };
+
+  const formatBarLabelPercentage: LabelFormatter = (value) => {
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) && numericValue > 0 ? formatPercentage(numericValue) : '';
+  };
 
   return (
-    <PageShell
-      title="Metricas"
-      description="Vista analitica del negocio para entender volumen, asistencia y demanda del periodo seleccionado."
-    >
-      <Stack gap="md">
-        {!authUser && (
-          <Alert color="red" variant="light">
-            No se pudo identificar la cuenta para consultar metricas.
-          </Alert>
-        )}
+    <Stack gap="lg">
+      {hasAlerts && (
+        <Stack gap="sm">
+          {!authUser && (
+            <Alert color="error" variant="light">
+              No se pudo identificar la cuenta para consultar metricas.
+            </Alert>
+          )}
 
-        {hasInvalidRange && (
-          <Alert color="yellow" variant="light">
-            El rango es invalido. La fecha Desde no puede ser mayor que Hasta.
-          </Alert>
-        )}
+          {hasInvalidRange && (
+            <Alert color="warning" variant="light">
+              El rango es invalido. La fecha Desde no puede ser mayor que Hasta.
+            </Alert>
+          )}
 
-        {isError && (
-          <Alert color="red" variant="light">
-            {error?.detail || 'No se pudieron cargar las metricas del periodo seleccionado.'}
-          </Alert>
-        )}
+          {isError && (
+            <Alert color="error" variant="light">
+              {error?.detail || 'No se pudieron cargar las metricas del periodo seleccionado.'}
+            </Alert>
+          )}
+        </Stack>
+      )}
 
-        <PageCard>
-          <Stack gap="md">
-            <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
-              <Stack gap={4}>
-                <Text fw={600}>Rango analizado</Text>
-                <Text size="sm" c="dimmed">
-                  {periodLabel}. Alcance: {selectedServiceName}.
-                </Text>
-              </Stack>
+      <Box maw={980} mx="auto" w="100%">
+        <Paper
+          radius="lg"
+          p="xs"
+          withBorder
+          shadow="xs"
+          style={{
+            borderColor: appColorVars.border,
+            backgroundColor: appColorVars.surface,
+          }}
+        >
+          <SimpleGrid cols={{ base: 1, md: 2, lg: 4 }} spacing="sm" verticalSpacing="sm">
+            <DatePickerInput
+              label="Desde"
+              placeholder="Fecha inicial"
+              value={fromDate}
+              onChange={setFromDate}
+              valueFormat="DD/MM/YYYY"
+              clearable={false}
+              disabled={!authUser}
+              size="sm"
+              styles={compactFieldStyles}
+            />
 
-              <Group gap="xs">
-                {isFetching && (
-                  <Badge color="brand" variant="light">
-                    Actualizando
-                  </Badge>
-                )}
+            <DatePickerInput
+              label="Hasta"
+              placeholder="Fecha final"
+              value={toDate}
+              onChange={setToDate}
+              valueFormat="DD/MM/YYYY"
+              clearable={false}
+              disabled={!authUser}
+              size="sm"
+              styles={compactFieldStyles}
+            />
 
-                <Button variant="default" onClick={resetFilters}>
-                  Ultimos 30 dias
-                </Button>
-              </Group>
+            <Select
+              label="Servicio"
+              placeholder="Todos los servicios"
+              data={serviceOptions}
+              value={selectedServiceId}
+              onChange={setSelectedServiceId}
+              clearable
+              searchable
+              disabled={!authUser}
+              size="sm"
+              styles={compactFieldStyles}
+            />
+
+            <Group justify="flex-end" align="flex-end" gap="xs" wrap="wrap" h="100%">
+              {isFetching && (
+                <Badge color="brand" variant="light" radius="sm">
+                  Actualizando
+                </Badge>
+              )}
+
+              <Button variant="default" size="sm" onClick={resetFilters}>
+                Ultimos 30 dias
+              </Button>
             </Group>
+          </SimpleGrid>
+        </Paper>
+      </Box>
 
-            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
-              <DatePickerInput
-                label="Desde"
-                placeholder="Fecha inicial"
-                value={fromDate}
-                onChange={setFromDate}
-                valueFormat="DD/MM/YYYY"
-                clearable={false}
-                disabled={!authUser}
+      <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="md" verticalSpacing="md">
+        <MetricsKpiCard
+          label="Total turnos"
+          value={isLoading ? '...' : formatNumber(metrics?.totalAppointments ?? 0)}
+          meta={comparisonLabel ?? 'Comparacion con periodo anterior'}
+          accentColor={STATUS_VISUALS.total.accentColor}
+          accentBackground={STATUS_VISUALS.total.accentBackground}
+        />
+        <MetricsKpiCard
+          label={STATUS_VISUALS.attended.label}
+          value={isLoading ? '...' : formatPercentage(metrics?.attendanceRate ?? 0)}
+          meta={getRateContext(metrics?.attendanceRate, metrics?.totalAppointments)}
+          accentColor={STATUS_VISUALS.attended.color}
+          accentBackground={STATUS_VISUALS.attended.softColor}
+        />
+        <MetricsKpiCard
+          label={STATUS_VISUALS.cancelled.label}
+          value={isLoading ? '...' : formatPercentage(metrics?.cancellationRate ?? 0)}
+          meta={getRateContext(metrics?.cancellationRate, metrics?.totalAppointments)}
+          accentColor={STATUS_VISUALS.cancelled.color}
+          accentBackground={STATUS_VISUALS.cancelled.softColor}
+        />
+        <MetricsKpiCard
+          label={STATUS_VISUALS.noShow.label}
+          value={isLoading ? '...' : formatPercentage(metrics?.noShowRate ?? 0)}
+          meta={getRateContext(metrics?.noShowRate, metrics?.totalAppointments)}
+          accentColor={STATUS_VISUALS.noShow.color}
+          accentBackground={STATUS_VISUALS.noShow.softColor}
+        />
+      </SimpleGrid>
+
+      <MetricsChartCard
+        title="Turnos por dia"
+        chartHeight={320}
+        padding="md"
+        shadow="sm"
+        footer={
+          metrics && metrics.busiestDays.length > 0 ? (
+            <Group gap="xs" wrap="wrap">
+              {metrics.busiestDays.map((item) => (
+                <Badge
+                  key={item.date}
+                  variant="light"
+                  radius="sm"
+                  style={{
+                    backgroundColor: appColorVars.brandSoft,
+                    color: appChartColorVars.primaryStrong,
+                  }}
+                >
+                  {formatShortLocalDateOnly(item.date)}: {formatNumber(item.totalAppointments)}
+                </Badge>
+              ))}
+            </Group>
+          ) : undefined
+        }
+      >
+        {isLoading ? (
+          <Skeleton h="100%" radius="md" />
+        ) : dayChartData.length === 0 || !hasMetricsData ? (
+          <EmptyChartState message="No hay turnos para mostrar en este rango." />
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={dayChartData}
+              margin={{
+                top: showDayLabels ? 24 : 12,
+                right: 12,
+                bottom: 4,
+                left: -12,
+              }}
+              barCategoryGap={dayChartBarGap}
+            >
+              <CartesianGrid {...SHARED_CHART_GRID} vertical={false} />
+              <XAxis
+                dataKey="label"
+                tick={SHARED_CHART_TICK}
+                tickLine={SHARED_CHART_AXIS_LINE}
+                axisLine={SHARED_CHART_AXIS_LINE}
+                interval={dayChartTickInterval}
+                minTickGap={16}
+                tickMargin={8}
+                padding={dayChartData.length <= 7 ? { left: 12, right: 12 } : { left: 4, right: 4 }}
               />
-
-              <DatePickerInput
-                label="Hasta"
-                placeholder="Fecha final"
-                value={toDate}
-                onChange={setToDate}
-                valueFormat="DD/MM/YYYY"
-                clearable={false}
-                disabled={!authUser}
+              <YAxis
+                allowDecimals={false}
+                domain={[0, 'dataMax + 1']}
+                tick={SHARED_CHART_TICK}
+                tickLine={SHARED_CHART_AXIS_LINE}
+                axisLine={SHARED_CHART_AXIS_LINE}
+                width={36}
+                tickMargin={8}
               />
-
-              <Select
-                label="Servicio"
-                placeholder="Todos los servicios"
-                data={serviceOptions}
-                value={selectedServiceId}
-                onChange={setSelectedServiceId}
-                clearable
-                searchable
-                disabled={!authUser}
+              <Tooltip
+                {...appChartTooltipStyles}
+                formatter={(value) => [`${formatNumber(Number(value))} turnos`, 'Total']}
+                labelFormatter={(_, payload) => {
+                  const rawDate = payload?.[0]?.payload?.date;
+                  return typeof rawDate === 'string' ? formatLongLocalDateOnly(rawDate) : '';
+                }}
               />
-            </SimpleGrid>
-          </Stack>
-        </PageCard>
+              <Bar
+                dataKey="totalAppointments"
+                fill={appChartColorVars.primary}
+                stroke={appChartColorVars.primaryStrong}
+                strokeWidth={1}
+                radius={VERTICAL_BAR_RADIUS}
+                barSize={dayChartBarSize}
+                minPointSize={dayChartData.some((item) => item.totalAppointments === 0) ? 0 : 3}
+              >
+                {showDayLabels ? (
+                  <LabelList
+                    dataKey="totalAppointments"
+                    position="top"
+                    offset={8}
+                    formatter={formatBarLabel}
+                    style={CHART_LABEL_STYLE}
+                  />
+                ) : null}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </MetricsChartCard>
 
-        <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }}>
-          <MetricsKpiCard
-            label="Total turnos"
-            value={isLoading ? '...' : formatNumber(metrics?.totalAppointments ?? 0)}
-            caption={
-              metrics
-                ? `Periodo anterior: ${formatNumber(metrics.previousPeriodTotal)}.`
-                : 'Cantidad total de turnos creados dentro del rango.'
-            }
-            trendLabel={comparisonLabel}
-            trendTone={comparisonTone}
-          />
-          <MetricsKpiCard
-            label="% asistencia"
-            value={isLoading ? '...' : formatPercentage(metrics?.attendanceRate ?? 0)}
-            caption="Participacion de turnos atendidos sobre el total del periodo."
-          />
-          <MetricsKpiCard
-            label="% cancelacion"
-            value={isLoading ? '...' : formatPercentage(metrics?.cancellationRate ?? 0)}
-            caption="Turnos cancelados respecto del volumen total analizado."
-          />
-          <MetricsKpiCard
-            label="% no asistio"
-            value={isLoading ? '...' : formatPercentage(metrics?.noShowRate ?? 0)}
-            caption="Ausencias registradas sobre el total del periodo."
-          />
-        </SimpleGrid>
-
+      <SimpleGrid cols={{ base: 1, xl: 2 }} spacing="md" verticalSpacing="md">
         <MetricsChartCard
-          title="Turnos por dia"
-          description="Cantidad de turnos registrados en cada dia del rango seleccionado."
+          title="Concurrencia por dia de semana"
+          chartHeight={220}
+          padding="sm"
+          shadow="sm"
           footer={
-            metrics && metrics.busiestDays.length > 0 ? (
+            busiestWeekdayBadges.length > 0 ? (
               <Group gap="xs" wrap="wrap">
-                {metrics.busiestDays.map((item) => (
-                  <Badge key={item.date} color="brand" variant="light">
-                    {formatShortDate(item.date)}: {formatNumber(item.totalAppointments)}
+                {busiestWeekdayBadges.map((item) => (
+                  <Badge
+                    key={item.dayOfWeek}
+                    variant="light"
+                    radius="sm"
+                    style={{
+                      backgroundColor: item.isPeak
+                        ? appColorVars.brandSoft
+                        : appColorVars.surfaceSoft,
+                      color: item.isPeak
+                        ? appChartColorVars.primaryStrong
+                        : appColorVars.textSecondary,
+                    }}
+                  >
+                    {item.label}: {formatNumber(item.totalAppointments)}
                   </Badge>
                 ))}
               </Group>
@@ -494,140 +603,142 @@ export function MetricsPageContainer() {
         >
           {isLoading ? (
             <Skeleton h="100%" radius="md" />
-          ) : dayChartData.length === 0 || !metrics || metrics.totalAppointments === 0 ? (
-            <EmptyChartState message="No hay turnos en este rango para construir la evolucion diaria." />
+          ) : weekdayChartData.length === 0 || !hasMetricsData ? (
+            <EmptyChartState message="No hay concurrencia semanal para mostrar." />
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
-                data={dayChartData}
-                margin={{ top: 8, right: 8, bottom: 8, left: -12 }}
-                barCategoryGap="24%"
+                data={weekdayChartData}
+                margin={{ top: 20, right: 12, bottom: 4, left: -12 }}
+                barCategoryGap="20%"
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <CartesianGrid {...SHARED_CHART_GRID} vertical={false} />
                 <XAxis
                   dataKey="label"
-                  tick={{ fontSize: 12 }}
-                  interval={dayChartTickInterval}
-                  minTickGap={16}
+                  tick={SHARED_CHART_TICK}
+                  tickLine={SHARED_CHART_AXIS_LINE}
+                  axisLine={SHARED_CHART_AXIS_LINE}
+                  tickMargin={8}
                 />
-                <YAxis allowDecimals={false} tick={{ fontSize: 12 }} width={32} />
+                <YAxis
+                  allowDecimals={false}
+                  domain={[0, 'dataMax + 1']}
+                  tick={SHARED_CHART_TICK}
+                  tickLine={SHARED_CHART_AXIS_LINE}
+                  axisLine={SHARED_CHART_AXIS_LINE}
+                  width={36}
+                  tickMargin={8}
+                />
                 <Tooltip
+                  {...appChartTooltipStyles}
                   formatter={(value) => [`${formatNumber(Number(value))} turnos`, 'Total']}
-                  labelFormatter={(_, payload) => {
-                    const rawDate = payload?.[0]?.payload?.date;
-                    return typeof rawDate === 'string' ? formatLongDate(rawDate) : '';
-                  }}
+                  labelFormatter={(value) => `${value}`}
                 />
-                <Bar
-                  dataKey="totalAppointments"
-                  fill={COLORS.brandSoft}
-                  stroke={COLORS.brand}
-                  radius={[6, 6, 0, 0]}
-                  minPointSize={dayChartData.some((item) => item.totalAppointments === 0) ? 0 : 2}
-                />
+                <Bar dataKey="totalAppointments" radius={VERTICAL_BAR_RADIUS} barSize={26}>
+                  {weekdayChartData.map((item) => (
+                    <Cell
+                      key={item.dayOfWeek}
+                      fill={
+                        item.totalAppointments === 0
+                          ? appColorVars.surfaceSoft
+                          : item.isPeak
+                            ? appChartColorVars.primaryStrong
+                            : appChartColorVars.primary
+                      }
+                      stroke={
+                        item.totalAppointments === 0
+                          ? appColorVars.borderSoft
+                          : appChartColorVars.primaryStrong
+                      }
+                      strokeWidth={item.isPeak ? 2 : 1}
+                    />
+                  ))}
+                  <LabelList
+                    dataKey="totalAppointments"
+                    position="top"
+                    offset={8}
+                    formatter={formatBarLabel}
+                    style={CHART_LABEL_STYLE}
+                  />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           )}
         </MetricsChartCard>
 
-        <SimpleGrid cols={{ base: 1, xl: 2 }}>
-          <MetricsChartCard
-            title="Concurrencia por dia de semana"
-            description="Acumula los turnos del periodo por dia literal para detectar que dias concentran mas demanda."
-            footer={
-              busiestWeekdayBadges.length > 0 ? (
-                <Group gap="xs" wrap="wrap">
-                  {busiestWeekdayBadges.map((item) => (
-                    <Badge
-                      key={item.dayOfWeek}
-                      color={item.isPeak ? 'brand' : 'gray'}
-                      variant="light"
-                    >
-                      {item.label}: {formatNumber(item.totalAppointments)}
-                    </Badge>
-                  ))}
-                </Group>
-              ) : undefined
-            }
-          >
-            {isLoading ? (
-              <Skeleton h="100%" radius="md" />
-            ) : weekdayChartData.length === 0 || !metrics || metrics.totalAppointments === 0 ? (
-              <EmptyChartState message="No hay turnos en este rango para analizar la concurrencia por dia de semana." />
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={weekdayChartData}
-                  margin={{ top: 8, right: 8, bottom: 8, left: -12 }}
-                  barCategoryGap="28%"
-                >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 12 }} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 12 }} width={32} />
-                  <Tooltip
-                    formatter={(value) => [`${formatNumber(Number(value))} turnos`, 'Total']}
-                    labelFormatter={(value) => `${value}`}
-                  />
-                  <Bar dataKey="totalAppointments" radius={[6, 6, 0, 0]}>
-                    {weekdayChartData.map((item) => (
-                      <Cell
-                        key={item.dayOfWeek}
-                        fill={item.isPeak ? COLORS.brand : COLORS.brandSoft}
-                        stroke={COLORS.brand}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            )}
-          </MetricsChartCard>
-          <MetricsChartCard
-            title="Distribucion de estados"
-            description="Resume la proporcion de turnos atendidos, perdidos y aun pendientes."
-            footer={
-              statusChartData.length > 0 ? (
-                <Group gap="xs" wrap="wrap">
-                  {statusChartData.map((item) => (
-                    <Badge
-                      key={item.name}
-                      variant="light"
-                      style={{ backgroundColor: `${item.color}1a`, color: item.color }}
-                    >
-                      {item.name}: {formatPercentage(item.value)}
-                    </Badge>
-                  ))}
-                </Group>
-              ) : undefined
-            }
-          >
-            {isLoading ? (
-              <Skeleton h="100%" radius="md" />
-            ) : !metrics || metrics.totalAppointments === 0 ? (
-              <EmptyChartState message="Todavia no hay turnos en el rango seleccionado para distribuir por estado." />
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={statusChartData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={105}
-                    paddingAngle={2}
+        <MetricsChartCard
+          title="Distribucion de estados"
+          chartHeight={220}
+          padding="sm"
+          shadow="sm"
+          footer={
+            statusChartData.length > 0 ? (
+              <Group gap="xs" wrap="wrap">
+                {statusChartData.map((item) => (
+                  <Badge
+                    key={item.name}
+                    variant="light"
+                    radius="sm"
+                    style={{ backgroundColor: item.softColor, color: item.color }}
                   >
-                    {statusChartData.map((item) => (
-                      <Cell key={item.name} fill={item.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => formatPercentage(Number(value))} />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-          </MetricsChartCard>
-        </SimpleGrid>
-      </Stack>
-    </PageShell>
+                    {item.name}: {formatPercentage(item.value)}
+                  </Badge>
+                ))}
+              </Group>
+            ) : undefined
+          }
+        >
+          {isLoading ? (
+            <Skeleton h="100%" radius="md" />
+          ) : !hasMetricsData ? (
+            <EmptyChartState message="Todavia no hay estados para distribuir." />
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={statusChartData}
+                layout="vertical"
+                margin={{ top: 8, right: 34, bottom: 4, left: 4 }}
+                barCategoryGap="18%"
+              >
+                <CartesianGrid {...SHARED_CHART_GRID} horizontal={false} />
+                <XAxis
+                  type="number"
+                  domain={[0, 100]}
+                  tick={SHARED_CHART_TICK}
+                  tickLine={SHARED_CHART_AXIS_LINE}
+                  axisLine={SHARED_CHART_AXIS_LINE}
+                  tickMargin={8}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  tick={SHARED_CHART_TICK}
+                  tickLine={false}
+                  axisLine={false}
+                  width={88}
+                  tickMargin={10}
+                />
+                <Tooltip
+                  {...appChartTooltipStyles}
+                  formatter={(value) => formatPercentage(Number(value))}
+                />
+                <Bar dataKey="value" radius={HORIZONTAL_BAR_RADIUS} barSize={24}>
+                  {statusChartData.map((item) => (
+                    <Cell key={item.name} fill={item.color} />
+                  ))}
+                  <LabelList
+                    dataKey="value"
+                    position="right"
+                    offset={8}
+                    formatter={formatBarLabelPercentage}
+                    style={CHART_LABEL_STYLE}
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </MetricsChartCard>
+      </SimpleGrid>
+    </Stack>
   );
 }

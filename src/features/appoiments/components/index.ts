@@ -9,6 +9,6 @@ export * from './modals/appointment-cancel-modal';
 export * from './modals/appointment-create-modal';
 export * from './modals/appointment-delete-modal';
 export * from './modals/appointment-edit-modal';
-export * from './modals/appointment-no-show-form';
+export * from './appointment-no-show-form';
 export * from './modals/appointment-no-show-modal';
 export * from './modals/appointment-reschedule-modal';

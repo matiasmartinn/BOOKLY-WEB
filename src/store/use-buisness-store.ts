@@ -1,6 +1,8 @@
 import { businessService } from 'features/business/services/business.service';
-import type { BusinessDto } from 'shared/models';
+import type { BusinessDto, UserModel } from 'shared/models';
 import { create } from 'zustand';
+
+type BusinessContextUser = Pick<UserModel, 'id' | 'role' | 'serviceIds'>;
 
 interface BusinessStore {
   services: BusinessDto[];
@@ -13,7 +15,7 @@ interface BusinessStore {
    * Una vez que llega, pre-selecciona el primero automáticamente
    * fetcheando su detalle completo.
    */
-  loadServices: (ownerId: number) => Promise<void>;
+  loadServices: (user: BusinessContextUser) => Promise<void>;
 
   /**
    * Cambia el servicio activo.
@@ -37,17 +39,49 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
   isLoadingDetail: false,
   initialized: false,
 
-  loadServices: async (ownerId) => {
-    set({ isLoading: true });
+  loadServices: async (user) => {
+    set({ isLoading: true, initialized: false });
     try {
-      const services = await businessService.getByOwner(ownerId);
-      set({ services, isLoading: false, initialized: true });
+      const normalizedRole = user.role.trim().toLowerCase();
 
-      if (services.length > 0) {
-        await get().selectService(services[0].id);
+      if (normalizedRole === 'owner') {
+        const services = await businessService.getByOwner(user.id);
+        set({ services, isLoading: false, initialized: true });
+
+        if (services.length > 0) {
+          await get().selectService(services[0].id);
+        } else {
+          set({ selectedService: null });
+        }
+
+        return;
       }
+
+      if (normalizedRole === 'secretary') {
+        const serviceIds = Array.from(new Set(user.serviceIds)).filter((id) => id > 0);
+
+        if (serviceIds.length === 0) {
+          set({ services: [], selectedService: null, isLoading: false, initialized: true });
+          return;
+        }
+
+        const services = await Promise.all(
+          serviceIds.map((serviceId) => businessService.getById(serviceId)),
+        );
+        const orderedServices = [...services].sort((left, right) => left.id - right.id);
+
+        set({
+          services: orderedServices,
+          selectedService: orderedServices[0] ?? null,
+          isLoading: false,
+          initialized: true,
+        });
+        return;
+      }
+
+      set({ services: [], selectedService: null, isLoading: false, initialized: true });
     } catch {
-      set({ isLoading: false, initialized: true });
+      set({ services: [], selectedService: null, isLoading: false, initialized: true });
     }
   },
 
@@ -68,5 +102,12 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
     }));
   },
 
-  clear: () => set({ services: [], selectedService: null }),
+  clear: () =>
+    set({
+      services: [],
+      selectedService: null,
+      isLoading: false,
+      isLoadingDetail: false,
+      initialized: false,
+    }),
 }));
