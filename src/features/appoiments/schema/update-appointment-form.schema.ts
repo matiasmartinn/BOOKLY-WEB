@@ -23,13 +23,6 @@ export const updateAppointmentFormSchema = z.object({
     .trim()
     .transform(emptyToUndefined)
     .pipe(z.email('El email no es válido.')),
-
-  clientNotes: z
-    .string()
-    .trim()
-    .max(500, 'Las notas no pueden superar los 500 caracteres.')
-    .optional()
-    .or(z.literal('')),
 });
 
 export type UpdateAppointmentFormValues = z.infer<typeof updateAppointmentFormSchema>;

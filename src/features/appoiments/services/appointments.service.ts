@@ -20,7 +20,6 @@ export interface UpdateAppointmentDto {
   clientName: string;
   clientPhone: string;
   clientEmail: string;
-  clientNotes?: string;
 }
 
 export interface RescheduleAppointmentDto {
@@ -60,10 +59,14 @@ export const appointmentService = {
       .then((r) => r.data),
 
   getByDay: (query: AppointmentDayQueryDto) =>
-    apiClient.get<AppointmentListItemDto[]>('/appointments/day', { params: query }).then((r) => r.data),
+    apiClient
+      .get<AppointmentListItemDto[]>('/appointments/day', { params: query })
+      .then((r) => r.data),
 
   search: (query: AppointmentQueryDto) =>
-    apiClient.get<AppointmentListItemDto[]>('/appointments/search', { params: query }).then((r) => r.data),
+    apiClient
+      .get<AppointmentListItemDto[]>('/appointments/search', { params: query })
+      .then((r) => r.data),
 
   getHistoryByService: (serviceId: number) =>
     apiClient

@@ -39,6 +39,8 @@ export interface AppointmentSummaryDto {
   startDateTime: string;
   endDateTime: string;
   clientName: string;
+  clientPhone: string;
+  clientNotes?: string;
   status: string;
   assignedSecretaryId?: number | null;
 }

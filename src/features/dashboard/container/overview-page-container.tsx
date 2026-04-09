@@ -5,7 +5,7 @@ import {
   faPlus,
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
-import { Alert, Badge, Button, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Alert, Button, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { PATHS } from 'app/router/PATHS';
 import { useAppointmentSummary } from 'features/appoiments/hooks';
 import { useMemo } from 'react';
@@ -22,11 +22,7 @@ import {
 import { useBusinessStore } from 'store/use-buisness-store';
 
 import { DashboardStatCard, QuickActionCard } from '../components';
-import {
-  appointmentStatusIncludes,
-  getAppointmentStatusColor,
-  getAppointmentStatusLabel,
-} from '../utils';
+import { appointmentStatusIncludes } from '../utils';
 
 const isCancelledAppointment = (status?: string | null) =>
   appointmentStatusIncludes(status, 'CANCEL');
@@ -176,6 +172,31 @@ export function OverviewPageContainer() {
             </Text>
           ) : (
             <Stack gap={0}>
+              <Group
+                justify="space-between"
+                align="center"
+                wrap="nowrap"
+                gap="sm"
+                style={{
+                  padding: '0.55rem 0',
+                  borderBottom: '1px solid var(--mantine-color-default-border)',
+                  fontWeight: 600,
+                }}
+              >
+                <Text size="sm" style={{ width: 80, flexShrink: 0 }}>
+                  Hora
+                </Text>
+                <Text size="sm" style={{ flex: 1, minWidth: 140 }}>
+                  Quien
+                </Text>
+                <Text size="sm" style={{ width: 130, flexShrink: 0 }}>
+                  Teléfono
+                </Text>
+                <Text size="sm" style={{ flex: 1.2, minWidth: 180 }}>
+                  Observaciones
+                </Text>
+              </Group>
+
               {appointmentSignals.nextAppointments.map((appointment, index) => (
                 <Group
                   key={appointment.id}
@@ -191,21 +212,21 @@ export function OverviewPageContainer() {
                         : undefined,
                   }}
                 >
-                  <Text size="sm" fw={600} style={{ minWidth: 84, flexShrink: 0 }}>
+                  <Text size="sm" fw={600} style={{ width: 80, flexShrink: 0 }}>
                     {formatTime(appointment.startDateTime)}
                   </Text>
 
-                  <Text size="sm" ta="center" flex={1} truncate>
+                  <Text size="sm" style={{ flex: 1, minWidth: 140 }} truncate>
                     {appointment.clientName}
                   </Text>
 
-                  <Badge
-                    color={getAppointmentStatusColor(appointment.status)}
-                    variant="light"
-                    style={{ flexShrink: 0 }}
-                  >
-                    {getAppointmentStatusLabel(appointment.status)}
-                  </Badge>
+                  <Text size="sm" c="dimmed" style={{ width: 130, flexShrink: 0 }} truncate>
+                    {appointment.clientPhone || '-'}
+                  </Text>
+
+                  <Text size="sm" c="dimmed" style={{ flex: 1.2, minWidth: 180 }} truncate>
+                    {appointment.clientNotes || '-'}
+                  </Text>
                 </Group>
               ))}
             </Stack>
@@ -245,57 +266,6 @@ export function OverviewPageContainer() {
           </SimpleGrid>
         </Stack>
       </PageCard>
-
-      {/* <PageCard>
-          <Stack gap="md">
-            <Stack gap={4}>
-              <Text fw={600}>Servicio seleccionado</Text>
-            </Stack>
-
-            {selectedService ? (
-              <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }}>
-                <Stack gap={4}>
-                  <Text size="xs" c="dimmed" tt="uppercase">
-                    Servicio
-                  </Text>
-                  <Text fw={600}>{selectedService.name}</Text>
-                  <Badge color={selectedService.isActive ? 'green' : 'yellow'} variant="light">
-                    {selectedService.isActive ? 'Activo' : 'Inactivo'}
-                  </Badge>
-                </Stack>
-
-                <Stack gap={4}>
-                  <Text size="xs" c="dimmed" tt="uppercase">
-                    Operacion
-                  </Text>
-                  <Text>Duracion: {selectedService.durationMinutes} min</Text>
-                  <Text>Capacidad: {selectedService.capacity}</Text>
-                  <Text>Modo: {selectedService.mode}</Text>
-                </Stack>
-
-                <Stack gap={4}>
-                  <Text size="xs" c="dimmed" tt="uppercase">
-                    Agenda
-                  </Text>
-                  <Text>Horarios configurados: {schedulesCount}</Text>
-                  <Text>Equipo asignado: {teamCount}</Text>
-                </Stack>
-
-                <Stack gap={4}>
-                  <Text size="xs" c="dimmed" tt="uppercase">
-                    Referencia
-                  </Text>
-                  <Text>Slug: {selectedService.slug || 'Sin slug'}</Text>
-                  <Text>{selectedService.description || 'Sin descripcion cargada.'}</Text>
-                </Stack>
-              </SimpleGrid>
-            ) : (
-              <Text size="sm" c="dimmed">
-                Este bloque se completa automaticamente cuando haya un servicio activo en contexto.
-              </Text>
-            )}
-          </Stack>
-        </PageCard> */}
     </Stack>
   );
 }

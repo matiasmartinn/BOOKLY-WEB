@@ -9,7 +9,6 @@ export interface UpdateAppointmentValues {
   clientName: string;
   clientPhone: string;
   clientEmail: string;
-  clientNotes?: string;
 }
 
 export const useUpdateAppointment = (appointmentId: number) => {
@@ -22,7 +21,6 @@ export const useUpdateAppointment = (appointmentId: number) => {
         clientName: values.clientName.trim(),
         clientPhone: values.clientPhone.trim(),
         clientEmail: values.clientEmail.trim(),
-        clientNotes: values.clientNotes?.trim() || undefined,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({

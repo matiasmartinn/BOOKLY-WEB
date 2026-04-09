@@ -1,14 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Alert,
-  Button,
-  Divider,
-  Group,
-  SimpleGrid,
-  Stack,
-  Textarea,
-  TextInput,
-} from '@mantine/core';
+import { Alert, Button, Divider, Group, SimpleGrid, Stack, TextInput } from '@mantine/core';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 
 import { useUpdateAppointment } from '../hooks';
@@ -26,7 +17,6 @@ const defaultValues: UpdateAppointmentFormValues = {
   clientName: '',
   clientPhone: '',
   clientEmail: '',
-  clientNotes: '',
 };
 
 export function AppointmentEditForm({
@@ -48,7 +38,6 @@ export function AppointmentEditForm({
       clientName: appointment.clientName ?? '',
       clientPhone: appointment.clientPhone ?? '',
       clientEmail: appointment.clientEmail ?? '',
-      clientNotes: appointment.clientNotes ?? '',
     },
   });
 
@@ -113,17 +102,6 @@ export function AppointmentEditForm({
           error={errors.clientEmail?.message}
           disabled={isPending}
         />
-
-        <Textarea
-          label="Notas internas"
-          placeholder="Observaciones del cliente"
-          minRows={3}
-          autosize
-          {...register('clientNotes')}
-          error={errors.clientNotes?.message}
-          disabled={isPending}
-        />
-
         <Divider />
 
         <Group justify="flex-end" wrap="wrap" gap="sm">
