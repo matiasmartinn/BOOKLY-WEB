@@ -11,6 +11,8 @@ import {
   Text,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { PATHS } from 'app/router/PATHS';
+import { DashboardStatCard } from 'features/dashboard/components';
 import { useMemo, useState } from 'react';
 import {
   Bar,
@@ -24,12 +26,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { PATHS } from 'app/router/PATHS';
-import { DashboardStatCard } from 'features/dashboard/components';
 import { GenericModal } from 'shared/components';
 import { PageShell } from 'shared/layout';
 import { appChartColorVars, appChartTooltipStyles, appColorVars } from 'shared/ui/theme/theme';
 import { useAppToast } from 'shared/ui/toast';
+
 import {
   AdminChartCard,
   AdminEmptyChartState,

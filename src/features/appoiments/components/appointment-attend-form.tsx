@@ -1,6 +1,7 @@
 import { Button, Group, Stack, Text } from '@mantine/core';
 import { useAppToast } from 'shared/ui/toast';
 import { formatLocalDateTime } from 'shared/utils';
+
 import { useMarkAppointmentAsAttended } from '../hooks';
 import type { AppointmentViewModel } from '../viewmodel';
 

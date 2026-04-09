@@ -1,6 +1,7 @@
 import { Alert, Badge, Stack, Text } from '@mantine/core';
 import { PageCard } from 'shared/layout';
 import { useBusinessStore } from 'store/use-buisness-store';
+
 import { BusinessProfileForm } from '../components/business-profile-form';
 
 export function BusinessPageContainer() {

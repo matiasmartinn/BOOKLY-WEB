@@ -1,4 +1,5 @@
 import { createTheme } from '@mantine/core';
+
 import { appColorTuples } from './tokens';
 
 export { appChartColorVars, appChartTooltipStyles, appColorVars } from './tokens';

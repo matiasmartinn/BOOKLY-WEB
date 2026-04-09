@@ -6,6 +6,7 @@ import type {
   AppointmentStatusHistoryDto,
   AppointmentSummaryDto,
 } from 'shared/models';
+
 import { appointmentService, type AppointmentDayQueryDto, type AppointmentQueryDto } from '../services';
 
 export const useAppointment = (appointmentId?: number) =>

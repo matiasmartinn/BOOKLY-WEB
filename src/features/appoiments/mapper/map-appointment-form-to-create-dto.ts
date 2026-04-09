@@ -1,7 +1,9 @@
-import type { CreateAppointmentDto } from '../services';
-import type { AppointmentFormValues } from '../schema';
-import type { AppointmentViewModel } from '../viewmodel';
 import { extractDateOnly, normalizeLocalDateTime } from 'shared/utils';
+
+import type { AppointmentFormValues } from '../schema';
+import type { CreateAppointmentDto } from '../services';
+import type { AppointmentViewModel } from '../viewmodel';
+
 
 export const createDefaultAppointmentFormValues = (): Partial<AppointmentFormValues> => ({
   clientName: '',

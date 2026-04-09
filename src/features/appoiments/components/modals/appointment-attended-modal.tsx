@@ -1,5 +1,6 @@
-import { GenericModal } from 'shared/components';
 import type { AppointmentViewModel } from 'features/appoiments/viewmodel';
+import { GenericModal } from 'shared/components';
+
 import { AppointmentAttendedForm } from '../appointment-attend-form';
 
 interface BaseStatusModalProps {

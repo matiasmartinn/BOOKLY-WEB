@@ -1,6 +1,7 @@
 import { Group, Modal, Stack, type ModalProps } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { ModalHeader } from 'shared/ui/components';
+
 import classes from './generic-modal.module.css';
 
 interface GenericModalProps {

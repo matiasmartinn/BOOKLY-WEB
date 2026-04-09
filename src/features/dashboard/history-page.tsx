@@ -1,4 +1,5 @@
 import { Page } from 'shared/layout';
+
 import { HistoryPageContainer } from './container';
 
 export function HistoryPage() {

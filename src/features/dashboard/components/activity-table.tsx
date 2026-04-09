@@ -1,5 +1,6 @@
 import { GenericTable, type SortState } from 'shared/components';
-import { compareLocalDateTime } from 'shared/utils';
+import { compareLocalDateTime, formatDateOnly, formatTime } from 'shared/utils';
+
 import { activityColumns } from '../defaults';
 import type { ActivityEventViewModel } from '../viewmodel/activity-event-view-model';
 
@@ -22,9 +23,6 @@ const activitySortFn = (a: ActivityEventViewModel, b: ActivityEventViewModel, so
       break;
     case 'clientName':
       comparison = a.clientName.localeCompare(b.clientName, 'es-AR');
-      break;
-    case 'status':
-      comparison = a.status.localeCompare(b.status, 'es-AR');
       break;
     case 'eventType':
       comparison = a.eventType.localeCompare(b.eventType, 'es-AR');
@@ -61,18 +59,20 @@ export function ActivityTable({
       showSearch
       showPaginator
       pageSize={10}
-      minWidth={980}
+      minWidth={1120}
       emptyMessage="Todavia no hay eventos para mostrar."
-      searchPlaceholder="Buscar por evento, cliente, actor o estado"
+      searchPlaceholder="Buscar por cliente, evento, actor o fecha"
       searchFn={(row, query) => {
         const value = query.toLowerCase();
         return [
-          row.eventType,
+          row.appointmentDateLabel,
+          row.appointmentTimeLabel,
           row.clientName,
           row.clientEmail ?? '',
+          row.eventType,
           row.actorLabel,
-          row.status,
-          row.appointmentDateLabel,
+          formatDateOnly(row.eventDateTime),
+          formatTime(row.eventDateTime),
         ].some((field) => field.toLowerCase().includes(value));
       }}
     />

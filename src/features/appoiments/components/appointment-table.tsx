@@ -1,5 +1,3 @@
-import { ActionIcon, Group, Tooltip } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faPen,
   faCalendarDays,
@@ -7,11 +5,17 @@ import {
   faCircleCheck,
   faCircleXmark,
 } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { GenericTable, type SortState } from 'shared/components/generic-table';
 import { compareLocalDateTime } from 'shared/utils';
-import type { AppointmentViewModel } from '../viewmodel';
+
 import { appointmentColumns } from '../defaults';
-import { getAppointmentActionVisibility } from '../utils';
+import {
+  getAppointmentActionVisibility,
+  type AppointmentActionPermissions,
+} from '../utils';
+import type { AppointmentViewModel } from '../viewmodel';
 
 const appointmentSortFn = (
   a: AppointmentViewModel,
@@ -53,6 +57,7 @@ interface AppointmentTableProps {
   onCancel: (row: AppointmentViewModel) => void;
   onMarkAsAttended: (row: AppointmentViewModel) => void;
   onMarkAsNoShow: (row: AppointmentViewModel) => void;
+  permissions: AppointmentActionPermissions;
   emptyMessage?: string;
 }
 
@@ -67,8 +72,15 @@ export function AppointmentTable({
   onCancel,
   onMarkAsAttended,
   onMarkAsNoShow,
+  permissions,
   emptyMessage,
 }: AppointmentTableProps) {
+  const hasVisibleActions =
+    permissions.canEdit ||
+    permissions.canReschedule ||
+    permissions.canCancel ||
+    permissions.canMarkAttendance;
+
   return (
     <GenericTable<AppointmentViewModel>
       data={appointmentData}
@@ -100,90 +112,95 @@ export function AppointmentTable({
       titleRefetchMessage="Error al cargar los turnos del dia."
       onHandleTableRefetch={onRefetch}
       minWidth={900}
-      columnOfActions={{
-        width: 220,
-        textAlign: 'center',
-        render: (row) => {
-          const actions = getAppointmentActionVisibility(row);
+      columnOfActions={
+        hasVisibleActions
+          ? {
+              header: 'Acciones',
+              width: 220,
+              textAlign: 'center',
+              render: (row) => {
+                const actions = getAppointmentActionVisibility(row, permissions);
 
-          return (
-            <Group justify="center" gap="xs">
-              {actions.canEdit && (
-                <Tooltip label="Editar" withArrow>
-                  <ActionIcon
-                    variant="subtle"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit(row);
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faPen} />
-                  </ActionIcon>
-                </Tooltip>
-              )}
+                return (
+                  <Group justify="center" gap="xs">
+                    {actions.canEdit && (
+                      <Tooltip label="Editar" withArrow>
+                        <ActionIcon
+                          variant="subtle"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit(row);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faPen} />
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
 
-              {actions.canReschedule && (
-                <Tooltip label="Reprogramar" withArrow>
-                  <ActionIcon
-                    variant="subtle"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onReschedule(row);
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faCalendarDays} />
-                  </ActionIcon>
-                </Tooltip>
-              )}
+                    {actions.canReschedule && (
+                      <Tooltip label="Reprogramar" withArrow>
+                        <ActionIcon
+                          variant="subtle"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onReschedule(row);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faCalendarDays} />
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
 
-              {actions.canCancel && (
-                <Tooltip label="Cancelar" withArrow>
-                  <ActionIcon
-                    color="red"
-                    variant="subtle"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onCancel(row);
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faBan} />
-                  </ActionIcon>
-                </Tooltip>
-              )}
+                    {actions.canCancel && (
+                      <Tooltip label="Cancelar" withArrow>
+                        <ActionIcon
+                          color="red"
+                          variant="subtle"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onCancel(row);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faBan} />
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
 
-              {actions.canMarkAsAttended && (
-                <Tooltip label="Marcar asistio" withArrow>
-                  <ActionIcon
-                    color="green"
-                    variant="subtle"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onMarkAsAttended(row);
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faCircleCheck} />
-                  </ActionIcon>
-                </Tooltip>
-              )}
+                    {actions.canMarkAsAttended && (
+                      <Tooltip label="Marcar asistio" withArrow>
+                        <ActionIcon
+                          color="green"
+                          variant="subtle"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onMarkAsAttended(row);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faCircleCheck} />
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
 
-              {actions.canMarkAsNoShow && (
-                <Tooltip label="Marcar no asistio" withArrow>
-                  <ActionIcon
-                    color="orange"
-                    variant="subtle"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onMarkAsNoShow(row);
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faCircleXmark} />
-                  </ActionIcon>
-                </Tooltip>
-              )}
-            </Group>
-          );
-        },
-      }}
+                    {actions.canMarkAsNoShow && (
+                      <Tooltip label="Marcar no asistio" withArrow>
+                        <ActionIcon
+                          color="orange"
+                          variant="subtle"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onMarkAsNoShow(row);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faCircleXmark} />
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
+                  </Group>
+                );
+              },
+            }
+          : undefined
+      }
     />
   );
 }

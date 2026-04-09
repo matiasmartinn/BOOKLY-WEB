@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
   Anchor,
@@ -8,15 +9,16 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { isApiError } from 'app/api';
 import { PATHS } from 'app/router';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import { useRegister } from '../auth.hooks';
-import { registerUserSchema, type RegisterUserRequst } from './register-user.schema';
 import { AuthFormWrapper } from 'features/auth/components';
+import { useState } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+
+import { useRegister } from '../auth.hooks';
+
+import { registerUserSchema, type RegisterUserRequst } from './register-user.schema';
 
 function getRegisterErrorMessage(error: unknown) {
   if (isApiError(error)) {

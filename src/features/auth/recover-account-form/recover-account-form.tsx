@@ -1,13 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Anchor, Button, Stack, Text, TextInput } from '@mantine/core';
 import { PATHS } from 'app/router';
+import { AuthFormWrapper } from 'features/auth/components';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+
 import { useRecoverAccount } from '../auth.hooks';
 import { getAuthErrorMessage } from '../get-auth-error-message';
+
 import { recoverAccountSchema, type RecoverAccountValues } from './recover-account.schema';
-import { AuthFormWrapper } from 'features/auth/components';
 
 export function RecoverAccountForm() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);

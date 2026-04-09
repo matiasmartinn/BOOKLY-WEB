@@ -1,6 +1,6 @@
+import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
-import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
 interface QuickActionCardProps {
   label: string;

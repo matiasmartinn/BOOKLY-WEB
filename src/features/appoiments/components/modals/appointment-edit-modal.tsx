@@ -1,6 +1,7 @@
-import { GenericModal } from 'shared/components';
-import { AppointmentEditForm } from '../appointment-edit-form';
 import type { AppointmentViewModel } from 'features/appoiments/viewmodel';
+import { GenericModal } from 'shared/components';
+
+import { AppointmentEditForm } from '../appointment-edit-form';
 
 interface AppointmentEditModalProps {
   appointment: AppointmentViewModel | null;

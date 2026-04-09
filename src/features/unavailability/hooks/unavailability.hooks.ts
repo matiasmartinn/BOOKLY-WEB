@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import { useBusinessStore } from 'store/use-buisness-store';
+
 import { unavailabilityService, type CreateUnavailabilityDto } from '../services/unavailability.service';
 
 export const useAddUnavailability = () => {
@@ -10,6 +11,12 @@ export const useAddUnavailability = () => {
   return useMutation<void, ProblemDetails, CreateUnavailabilityDto>({
     mutationFn: (dto) => unavailabilityService.create(selectedService!.id, dto),
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['appointments'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['metrics', 'appointments'],
+      });
       queryClient.invalidateQueries({
         queryKey: ['schedule-unavailabilities', selectedService?.id],
       });
@@ -30,6 +37,12 @@ export const useRemoveUnavailability = (unavailabilityId: number) => {
   return useMutation<void, ProblemDetails, void>({
     mutationFn: () => unavailabilityService.remove(selectedService!.id, unavailabilityId),
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['appointments'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['metrics', 'appointments'],
+      });
       queryClient.invalidateQueries({
         queryKey: ['schedule-unavailabilities', selectedService?.id],
       });

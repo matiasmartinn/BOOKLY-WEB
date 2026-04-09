@@ -1,4 +1,5 @@
 import { Page } from 'shared/layout';
+
 import { SchedulesPageContainer } from './container';
 
 export function SchedulesPage() {

@@ -1,5 +1,6 @@
 import { apiClient } from 'app/api';
-import { type BusinessDto, type SecretaryDto, SecretaryPermission, type UserDto } from 'shared/models';
+import type { SecretaryPermission } from 'shared/models';
+import { type BusinessDto, type SecretaryDto, type UserDto } from 'shared/models';
 
 export interface CreateSecretaryDto {
   firstName: string;
@@ -20,8 +21,6 @@ export interface SetSecretaryServiceAccessDto {
 
 export interface UpdateSecretaryPermissionDto {
   permission: SecretaryPermission;
-  currentUserId: number;
-  currentUserRole: string;
 }
 
 export const usersService = {
@@ -46,12 +45,7 @@ export const usersService = {
     dto: UpdateSecretaryPermissionDto,
   ) =>
     apiClient
-      .put<void>(`/services/${serviceId}/secretaries/${secretaryId}/permissions/${dto.permission}`, null, {
-        params: {
-          currentUserId: dto.currentUserId,
-          currentUserRole: dto.currentUserRole,
-        },
-      })
+      .put<void>(`/services/${serviceId}/secretaries/${secretaryId}/permissions/${dto.permission}`)
       .then((response) => response.data),
 
   revokeSecretaryPermission: (
@@ -60,12 +54,7 @@ export const usersService = {
     dto: UpdateSecretaryPermissionDto,
   ) =>
     apiClient
-      .delete<void>(`/services/${serviceId}/secretaries/${secretaryId}/permissions/${dto.permission}`, {
-        params: {
-          currentUserId: dto.currentUserId,
-          currentUserRole: dto.currentUserRole,
-        },
-      })
+      .delete<void>(`/services/${serviceId}/secretaries/${secretaryId}/permissions/${dto.permission}`)
       .then((response) => response.data),
 
   activateSecretary: (id: number) =>

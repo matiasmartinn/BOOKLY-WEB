@@ -5,6 +5,7 @@ import type {
   ClientDetailDto,
   ClientListItemDto,
 } from 'shared/models';
+
 import { clientsService } from '../services';
 
 export const useOwnerClients = (ownerId?: number, search?: string) =>

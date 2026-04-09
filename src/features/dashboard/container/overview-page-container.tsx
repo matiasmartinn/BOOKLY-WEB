@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-import { Alert, Badge, Button, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import {
   faCalendarCheck,
   faClock,
@@ -7,11 +5,13 @@ import {
   faPlus,
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
-import { useNavigate } from 'react-router-dom';
+import { Alert, Badge, Button, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { PATHS } from 'app/router/PATHS';
 import { useAppointmentSummary } from 'features/appoiments/hooks';
-import type { AppointmentSummaryDto } from 'shared/models';
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageCard } from 'shared/layout';
+import type { AppointmentSummaryDto } from 'shared/models';
 import {
   compareLocalDateTime,
   formatDateOnly,
@@ -20,6 +20,7 @@ import {
   getCurrentBusinessDateTime,
 } from 'shared/utils';
 import { useBusinessStore } from 'store/use-buisness-store';
+
 import { DashboardStatCard, QuickActionCard } from '../components';
 import {
   appointmentStatusIncludes,

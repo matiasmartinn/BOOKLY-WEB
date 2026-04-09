@@ -1,5 +1,6 @@
 // components/GenericTable/GenericTable.tsx
-import { useMemo, useState, useRef, type ReactNode, type CSSProperties } from 'react';
+import { faSort, faSortUp, faSortDown, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   Box,
   Center,
@@ -14,8 +15,7 @@ import {
   LoadingOverlay,
   UnstyledButton,
 } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortUp, faSortDown, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { useMemo, useState, useRef, type ReactNode, type CSSProperties } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

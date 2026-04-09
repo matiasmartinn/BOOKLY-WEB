@@ -1,5 +1,6 @@
 import { apiClient } from 'app/api';
 import type { AppointmentDto } from 'shared/models';
+
 import type { PublicCreateAppointmentDto, PublicServiceBookingDto } from '../types/public-booking';
 
 const buildPublicServicePath = (slug: string, token: string, suffix = '') =>

@@ -1,20 +1,21 @@
 import { Badge, Stack, Text } from '@mantine/core';
 import type { TableColumn } from 'shared/components/generic-table';
-import { formatLocalDateTime } from 'shared/utils';
-import { getAppointmentStatusColor, getAppointmentStatusLabel } from '../utils';
+import { formatDateOnly, formatTime } from 'shared/utils';
+
 import type { ActivityEventViewModel } from '../viewmodel/activity-event-view-model';
 
 export const activityColumns: TableColumn<ActivityEventViewModel>[] = [
   {
-    key: 'eventType',
-    title: 'Tipo de evento',
-    accessor: 'eventType',
-    sortable: true,
-    render: (row) => (
-      <Badge color={row.eventTypeColor} variant="light">
-        {row.eventType}
-      </Badge>
-    ),
+    key: 'appointmentDateLabel',
+    title: 'Fecha',
+    accessor: 'appointmentDateLabel',
+    noWrap: true,
+  },
+  {
+    key: 'appointmentTimeLabel',
+    title: 'Horario',
+    accessor: 'appointmentTimeLabel',
+    noWrap: true,
   },
   {
     key: 'clientName',
@@ -33,50 +34,39 @@ export const activityColumns: TableColumn<ActivityEventViewModel>[] = [
     ),
   },
   {
+    key: 'eventType',
+    title: 'Tipo de evento',
+    accessor: 'eventType',
+    sortable: true,
+    render: (row) => (
+      <Badge color={row.eventTypeColor} variant="light">
+        {row.eventType}
+      </Badge>
+    ),
+  },
+  {
     key: 'actorLabel',
     title: 'Actor',
     accessor: 'actorLabel',
     sortable: true,
     render: (row) => (
-      <Stack gap={2}>
-        <Text size="sm" fw={500}>
-          {row.actorLabel}
-        </Text>
-        {row.actorUserId != null ? (
-          <Text size="xs" c="dimmed">
-            userId: {row.actorUserId}
-          </Text>
-        ) : null}
-      </Stack>
+      <Text size="sm" fw={500}>
+        {row.actorLabel}
+      </Text>
     ),
   },
   {
     key: 'eventDateTime',
-    title: 'Fecha del evento',
+    title: 'Realizado',
     accessor: 'eventDateTime',
     sortable: true,
-    render: (row) => formatLocalDateTime(row.eventDateTime),
-  },
-  {
-    key: 'status',
-    title: 'Estado',
-    accessor: 'status',
-    sortable: true,
-    render: (row) => (
-      <Badge color={getAppointmentStatusColor(row.status)} variant="light">
-        {getAppointmentStatusLabel(row.status)}
-      </Badge>
-    ),
-  },
-  {
-    key: 'appointmentDateLabel',
-    title: 'Turno asociado',
-    accessor: 'appointmentDateLabel',
     render: (row) => (
       <Stack gap={2}>
-        <Text size="sm">{row.appointmentDateLabel}</Text>
+        <Text size="sm" fw={500}>
+          {formatTime(row.eventDateTime)}
+        </Text>
         <Text size="xs" c="dimmed">
-          {row.appointmentTimeLabel}
+          {formatDateOnly(row.eventDateTime)}
         </Text>
       </Stack>
     ),

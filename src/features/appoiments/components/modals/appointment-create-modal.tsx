@@ -1,4 +1,5 @@
 import { GenericModal } from 'shared/components';
+
 import { AppointmentForm } from '../appoitnment-form';
 
 interface AppointmentCreateModalProps {

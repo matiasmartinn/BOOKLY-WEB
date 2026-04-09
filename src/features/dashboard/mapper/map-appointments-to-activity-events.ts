@@ -1,6 +1,7 @@
-import type { AppointmentStatusHistoryDto } from 'shared/models';
 import type { AppointmentViewModel } from 'features/appoiments/viewmodel';
+import type { AppointmentStatusHistoryDto } from 'shared/models';
 import { compareLocalDateTime } from 'shared/utils';
+
 import { appointmentStatusIncludes } from '../utils';
 import type { ActivityEventViewModel } from '../viewmodel/activity-event-view-model';
 

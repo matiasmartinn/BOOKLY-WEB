@@ -3,6 +3,7 @@ import { isApiError } from 'app/api';
 import { GenericModal } from 'shared/components';
 import type { SubscriptionPlanOptionDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
+
 import { createChangePlanDto, createRenewSubscriptionDto } from '../adapter';
 import {
   useCancelSubscription,
@@ -20,6 +21,7 @@ import {
   getSubscriptionStatusColor,
   getSubscriptionStatusLabel,
 } from '../utils/subscription.utils';
+
 import { SubscriptionPlanCard } from './subscription-plan-card';
 
 export type SubscriptionManagementModalIntent = 'manage' | 'change' | 'cancel' | 'renew';
@@ -29,7 +31,6 @@ interface SubscriptionManagementModalProps {
   opened: boolean;
   onClose: () => void;
   onCompleted?: (message: string) => void;
-  initialIntent?: SubscriptionManagementModalIntent;
 }
 
 const isFreePlan = (plan: SubscriptionPlanOptionDto) => plan.key?.trim().toLowerCase() === 'free';
@@ -39,7 +40,6 @@ export function SubscriptionManagementModal({
   opened,
   onClose,
   onCompleted,
-  initialIntent = 'manage',
 }: SubscriptionManagementModalProps) {
   const canManageSubscription = ownerId != null;
   const toast = useAppToast();
@@ -263,9 +263,6 @@ export function SubscriptionManagementModal({
                   </Text>
                   <Text size="sm">
                     Secretarios: {formatSubscriptionLimitValue(currentPlanLimits.maxSecretaries)}
-                  </Text>
-                  <Text size="sm">
-                    Campos extra: {currentPlanLimits.allowsExtraFields ? 'Si' : 'No'}
                   </Text>
                 </Stack>
               </SimpleGrid>

@@ -1,6 +1,7 @@
 import type { UnavailabilityDto } from 'shared/models';
-import type { UnavailabilityViewModel } from '../viewmodel';
 import { formatLocalDateOnlyRange, getDateOnlyRangeDays, isSameDateOnly } from 'shared/utils';
+
+import type { UnavailabilityViewModel } from '../viewmodel';
 
 export const mapUnavailabilityToViewModel = (item: UnavailabilityDto): UnavailabilityViewModel => {
   const sameDay = isSameDateOnly(item.startDate, item.endDate);

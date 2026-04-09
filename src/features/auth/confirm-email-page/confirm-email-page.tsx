@@ -1,12 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Anchor, Button, Stack, Text, TextInput } from '@mantine/core';
 import { PATHS } from 'app/router';
+import { AuthFormWrapper } from 'features/auth/components';
 import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import { Link, useSearchParams } from 'react-router-dom';
+
 import { useConfirmEmail, useResendConfirmation } from '../auth.hooks';
 import { getAuthErrorMessage } from '../get-auth-error-message';
-import { AuthFormWrapper } from 'features/auth/components';
+
 import { resendConfirmationSchema, type ResendConfirmationValues } from './schema';
 
 export function ConfirmEmailPage() {

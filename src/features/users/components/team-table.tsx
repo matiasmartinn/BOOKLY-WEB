@@ -1,8 +1,9 @@
-import { ActionIcon, Button, Group, Tooltip } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBan, faCheck, faLock, faPlus, faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ActionIcon, Button, Group, Tooltip } from '@mantine/core';
 import { GenericTable } from 'shared/components';
 import type { SecretaryDto } from 'shared/models';
+
 import { teamColumns } from '../defaults';
 
 interface TeamTableProps {
@@ -17,6 +18,7 @@ interface TeamTableProps {
   onManagePermissions: (secretary: SecretaryDto) => void;
   onManageStatus: (secretary: SecretaryDto) => void;
   canCreate: boolean;
+  canManagePermissions: boolean;
 }
 
 export function TeamTable({
@@ -31,6 +33,7 @@ export function TeamTable({
   onManagePermissions,
   onManageStatus,
   canCreate,
+  canManagePermissions,
 }: TeamTableProps) {
   return (
     <GenericTable
@@ -95,9 +98,9 @@ export function TeamTable({
 
             <Tooltip
               label={
-                selectedServiceId
-                  ? 'Permisos del servicio actual'
-                  : 'Selecciona un servicio para gestionar permisos'
+                canManagePermissions
+                  ? 'Gestionar permisos por servicio'
+                  : 'Necesitas al menos un servicio para gestionar permisos'
               }
               withArrow
             >
@@ -109,7 +112,7 @@ export function TeamTable({
                     event.stopPropagation();
                     onManagePermissions(row);
                   }}
-                  disabled={!selectedServiceId}
+                  disabled={!canManagePermissions}
                 >
                   <FontAwesomeIcon icon={faLock} />
                 </ActionIcon>

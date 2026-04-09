@@ -1,7 +1,8 @@
-import { Stack, Text, Group, Box, ThemeIcon, Divider } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStore, faClock } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Stack, Text, Group, Box, ThemeIcon, Divider } from '@mantine/core';
 import { useFormContext } from 'react-hook-form';
+
 import type { CreateBusinessFormValues } from '../../schema';
 
 const SERVICE_TYPE_LABELS: Record<number, string> = {

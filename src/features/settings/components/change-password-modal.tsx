@@ -1,6 +1,6 @@
 import { Alert, Button, Stack, Text } from '@mantine/core';
-import { useRecoverAccount } from 'features/auth/hooks';
 import { getAuthErrorMessage } from 'features/auth/get-auth-error-message';
+import { useRecoverAccount } from 'features/auth/hooks';
 import { GenericModal } from 'shared/components';
 import { useAppToast } from 'shared/ui/toast';
 

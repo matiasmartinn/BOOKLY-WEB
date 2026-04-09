@@ -1,15 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Anchor, Button, PasswordInput, Stack, Text } from '@mantine/core';
 import { PATHS } from 'app/router';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { AuthFormWrapper } from 'features/auth/components';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
+
 import { useCompleteAdminInvitation, useCompleteSecretaryInvitation } from '../auth.hooks';
 import { getAuthErrorMessage } from '../get-auth-error-message';
+
 import {
   secretaryOnboardingSchema,
   type SecretaryOnboardingValues,
 } from './secretary-onboarding.schema';
-import { AuthFormWrapper } from 'features/auth/components';
+
 
 export function SecretaryOnboardingForm() {
   const { pathname } = useLocation();

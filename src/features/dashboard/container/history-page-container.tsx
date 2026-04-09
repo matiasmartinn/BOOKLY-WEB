@@ -1,4 +1,3 @@
-import { useMemo, useState } from 'react';
 import {
   Alert,
   Button,
@@ -13,8 +12,10 @@ import { DatePickerInput } from '@mantine/dates';
 import { useSearchAppointments } from 'features/appoiments/hooks';
 import { useOwnerBusinesses } from 'features/business/hooks';
 import { useOwnerSecretaries } from 'features/users/hooks';
+import { useMemo, useState } from 'react';
 import { compareDateOnly, getCurrentBusinessDateOnly } from 'shared/utils';
 import { useAuthStore } from 'store/use-auth-store';
+
 import { CompactHistoryStat, HistoryTable } from '../components';
 import { appointmentStatusIncludes, getAppointmentStatusLabel } from '../utils';
 import type { HistoryAppointmentViewModel } from '../viewmodel/history-appointment-view-model';
@@ -26,6 +27,38 @@ const compactFieldStyles = {
     marginBottom: 4,
   },
 } as const;
+
+const actorRoleLabelByRole: Record<string, string> = {
+  Admin: 'Administrador/a',
+  Owner: 'Owner',
+  Secretary: 'Secretario/a',
+};
+
+const resolveCreatedByLabel = (
+  userDisplayName?: string | null,
+  userRole?: string | null,
+  userId?: number | null,
+) => {
+  if (userId == null) {
+    return 'Cliente';
+  }
+
+  const roleLabel = userRole ? (actorRoleLabelByRole[userRole] ?? userRole) : null;
+
+  if (userDisplayName && roleLabel) {
+    return `${userDisplayName} (${roleLabel})`;
+  }
+
+  if (userDisplayName) {
+    return userDisplayName;
+  }
+
+  if (roleLabel) {
+    return roleLabel;
+  }
+
+  return `Usuario #${userId}`;
+};
 
 export function HistoryPageContainer() {
   const authUser = useAuthStore((s) => s.user);
@@ -64,27 +97,20 @@ export function HistoryPageContainer() {
     refetch,
   } = useSearchAppointments(searchQuery);
 
-  const secretaryNameById = useMemo(
-    () =>
-      new Map(
-        secretaries.map((secretary) => [
-          secretary.id,
-          secretary.fullName || `${secretary.firstName} ${secretary.lastName}`,
-        ]),
-      ),
-    [secretaries],
-  );
-
   const historyRows = useMemo<HistoryAppointmentViewModel[]>(() => {
     const mapped = appointments.map((appointment) => ({
       id: appointment.id,
       serviceId: appointment.serviceId,
       serviceName: appointment.serviceName,
       assignedSecretaryId: appointment.assignedSecretaryId ?? null,
-      secretaryName:
-        appointment.assignedSecretaryId != null
-          ? (secretaryNameById.get(appointment.assignedSecretaryId) ?? 'Secretario/a asignado')
-          : 'Sin asignar',
+      createdByUserId: appointment.createdByUserId ?? null,
+      createdByUserDisplayName: appointment.createdByUserDisplayName ?? null,
+      createdByUserRole: appointment.createdByUserRole ?? null,
+      createdByLabel: resolveCreatedByLabel(
+        appointment.createdByUserDisplayName,
+        appointment.createdByUserRole,
+        appointment.createdByUserId,
+      ),
       clientName: appointment.clientName,
       clientPhone: appointment.clientPhone,
       clientEmail: appointment.clientEmail,
@@ -102,7 +128,7 @@ export function HistoryPageContainer() {
     return mapped.filter(
       (appointment) => String(appointment.assignedSecretaryId ?? '') === selectedSecretaryId,
     );
-  }, [appointments, secretaryNameById, selectedSecretaryId]);
+  }, [appointments, selectedSecretaryId]);
 
   const serviceOptions = useMemo(
     () =>

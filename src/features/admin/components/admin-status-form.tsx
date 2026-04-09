@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { Alert, Button, Group, Stack, Text } from '@mantine/core';
+import { Alert, Button, Group, Stack } from '@mantine/core';
 import { isApiError } from 'app/api';
+import { useEffect } from 'react';
 import { useAppToast } from 'shared/ui/toast';
 
 interface AdminStatusFormProps {

@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Button, Group, Loader, Stack, Text, TextInput } from '@mantine/core';
 import { isApiError } from 'app/api';
+import { useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { formatLocalDateTime } from 'shared/utils';
+
 import { useUpdateUser, useUser } from '../hooks';
 import { updateUserProfileSchema, type UpdateUserProfileFormValues } from '../schema';
 

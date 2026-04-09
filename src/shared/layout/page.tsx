@@ -1,5 +1,6 @@
 import { Container, Stack } from '@mantine/core';
 import type { ReactNode } from 'react';
+
 import { PageHeader } from './page-header';
 
 export interface PageProps {

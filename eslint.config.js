@@ -9,7 +9,7 @@ import importPlugin from 'eslint-plugin-import';
 export default defineConfig(
   // Ignorados globales
   {
-    ignores: ['dist', 'node_modules', 'coverage']
+    ignores: ['dist', 'node_modules', 'coverage'],
   },
 
   // Base JS
@@ -22,17 +22,17 @@ export default defineConfig(
   {
     plugins: {
       react: reactPlugin,
-      'react-hooks': reactHooksPlugin
+      'react-hooks': reactHooksPlugin,
     },
     settings: {
-      react: { version: 'detect' }
+      react: { version: 'detect' },
     },
     rules: {
       'react/react-in-jsx-scope': 'off',
       'react/jsx-uses-react': 'off',
       'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn'
-    }
+      'react-hooks/exhaustive-deps': 'warn',
+    },
   },
 
   // Reglas para tu código de app
@@ -43,11 +43,11 @@ export default defineConfig(
         project: ['./tsconfig.app.json'],
         tsconfigRootDir: import.meta.dirname,
         ecmaVersion: 2022,
-        sourceType: 'module'
-      }
+        sourceType: 'module',
+      },
     },
     plugins: {
-      import: importPlugin
+      import: importPlugin,
     },
     rules: {
       // TS
@@ -61,23 +61,16 @@ export default defineConfig(
         {
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
           'newlines-between': 'always',
-          alphabetize: { order: 'asc', caseInsensitive: true }
-        }
-      ]
-    }
+        },
+      ],
+    },
   },
 
   // Archivos de config: permitimos default export (Vite, Tailwind, etc.)
   {
-    files: [
-      'vite.config.*',
-      'tailwind.config.*',
-      'postcss.config.*',
-      'eslint.config.*',
-      '*.cjs'
-    ],
+    files: ['vite.config.*', 'tailwind.config.*', 'postcss.config.*', 'eslint.config.*', '*.cjs'],
     rules: {
-      'import/no-default-export': 'off'
-    }
-  }
+      'import/no-default-export': 'off',
+    },
+  },
 );

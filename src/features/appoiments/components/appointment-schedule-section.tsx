@@ -1,6 +1,7 @@
 import { Alert, Button, Skeleton, SimpleGrid, Stack, Text } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { formatTime } from 'shared/utils';
+
 import classes from './appointment-schedule-section.module.css';
 
 interface AppointmentScheduleSectionProps {
@@ -19,7 +20,6 @@ interface AppointmentScheduleSectionProps {
   onSlotChange: (value: string) => void;
   selectedDate: string | null;
   selectedSlot: string;
-  slotError?: string;
   slots: string[];
 }
 
@@ -39,7 +39,6 @@ export function AppointmentScheduleSection({
   onSlotChange,
   selectedDate,
   selectedSlot,
-  slotError,
   slots,
 }: AppointmentScheduleSectionProps) {
   const getDayProps = (date: string) =>

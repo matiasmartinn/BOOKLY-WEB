@@ -1,4 +1,5 @@
 import { Box, Stack, Text } from '@mantine/core';
+
 import classes from './auth-shell.module.css';
 
 interface AuthBrandProps {

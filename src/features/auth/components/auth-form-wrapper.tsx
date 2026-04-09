@@ -1,5 +1,6 @@
 import { Box, Stack, Title, type BoxProps } from '@mantine/core';
 import type { ReactNode } from 'react';
+
 import classes from './auth-form-wrapper.module.css';
 
 interface AuthFormWrapperProps extends BoxProps {

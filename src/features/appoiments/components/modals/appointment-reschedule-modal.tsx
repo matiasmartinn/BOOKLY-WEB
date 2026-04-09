@@ -1,5 +1,6 @@
 import type { AppointmentViewModel } from 'features/appoiments/viewmodel';
 import { GenericModal } from 'shared/components';
+
 import { AppointmentRescheduleForm } from '../appointment-reschedule-form';
 
 interface AppointmentRescheduleModalProps {

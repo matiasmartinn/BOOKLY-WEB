@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
+
 import { AuthAside } from './auth-aside';
 import { AuthContent } from './auth-content';
 import { resolveAuthViewContent } from './auth-shell-content';

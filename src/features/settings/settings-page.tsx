@@ -1,12 +1,10 @@
 import { Page } from 'shared/layout';
+
 import { SettingsPageContainer } from './container';
 
 export function SettingsPage() {
   return (
-    <Page
-      title="Cuenta"
-      description="Administra tu informacion personal y el plan activo desde una sola pantalla."
-    >
+    <Page title="Cuenta" description="Administra tu informacion personal.">
       <SettingsPageContainer />
     </Page>
   );

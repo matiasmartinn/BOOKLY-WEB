@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { BusinessDto } from 'shared/models';
+
 import { usersService, type SetSecretaryServiceAccessDto } from '../services';
+
 import { ownerSecretariesQueryKey } from './query-keys';
 
 export const useSetSecretaryServiceAccess = (serviceId: number, ownerId?: number) => {

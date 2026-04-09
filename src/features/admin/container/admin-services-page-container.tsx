@@ -1,10 +1,12 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Group, Select, SimpleGrid, Stack, TextInput } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useMemo, useState } from 'react';
 import { GenericModal } from 'shared/components';
 import { PageCard } from 'shared/layout';
+
+import { AdminServicesTable, AdminStatusForm } from '../components';
 import { ADMIN_PLAN_OPTIONS, ADMIN_SERVICE_STATUS_OPTIONS } from '../defaults';
 import {
   useAdminServices,
@@ -12,7 +14,6 @@ import {
   useEnableService,
 } from '../hooks';
 import type { AdminServiceListItemDto, AdminServicesQueryDto } from '../models';
-import { AdminServicesTable, AdminStatusForm } from '../components';
 
 interface ServiceFiltersState {
   search: string;

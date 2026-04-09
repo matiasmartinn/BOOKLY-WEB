@@ -1,7 +1,8 @@
-import { Box, Group, ScrollArea, Stack, ThemeIcon, Text, Badge } from '@mantine/core';
-import { StepIndicator, WizardProgress, type WizardStep } from './components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStore } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Box, Group, ScrollArea, Stack, ThemeIcon, Text, Badge } from '@mantine/core';
+
+import { StepIndicator, WizardProgress, type WizardStep } from './components';
 
 interface WizardLeftPanelProps {
   steps: WizardStep[];

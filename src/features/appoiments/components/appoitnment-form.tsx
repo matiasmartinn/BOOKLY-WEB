@@ -1,5 +1,3 @@
-import { useMemo, useState } from 'react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
@@ -11,13 +9,17 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core';
-import { appointmentFormSchema, type AppointmentFormValues } from '../schema';
+import { useMemo, useState } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useBusinessStore } from 'store/use-buisness-store';
+
 import {
   useAppointmentAvailableDates,
   useAppointmentAvailableSlots,
   useCreateAppointment,
 } from '../hooks';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { appointmentFormSchema, type AppointmentFormValues } from '../schema';
+
 import { AppointmentScheduleSection } from './appointment-schedule-section';
 
 interface AppointmentFormProps {
@@ -194,7 +196,6 @@ export function AppointmentForm({
           onSlotChange={handleSlotChange}
           selectedDate={selectedDate}
           selectedSlot={selectedSlot}
-          slotError={errors.slot?.message}
           slots={slots}
         />
 

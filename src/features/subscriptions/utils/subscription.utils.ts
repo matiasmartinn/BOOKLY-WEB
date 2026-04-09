@@ -13,7 +13,6 @@ const subscriptionDateFormatter = new Intl.DateTimeFormat('es-AR', {
 const DEFAULT_SUBSCRIPTION_PLAN_LIMITS: SubscriptionPlanLimitsDto = {
   maxServices: null,
   maxSecretaries: null,
-  allowsExtraFields: false,
 };
 
 export const formatSubscriptionDate = (value?: string | null) => {
@@ -50,10 +49,6 @@ export const getSubscriptionPlanLimits = (
     typeof limits?.maxSecretaries === 'number' || limits?.maxSecretaries === null
       ? limits.maxSecretaries
       : DEFAULT_SUBSCRIPTION_PLAN_LIMITS.maxSecretaries,
-  allowsExtraFields:
-    typeof limits?.allowsExtraFields === 'boolean'
-      ? limits.allowsExtraFields
-      : DEFAULT_SUBSCRIPTION_PLAN_LIMITS.allowsExtraFields,
 });
 
 export const getSubscriptionPlanDisplayName = (plan?: Partial<SubscriptionPlanDto> | null) => {
@@ -82,7 +77,7 @@ export const formatPlanLimitsSummary = (limits?: Partial<SubscriptionPlanLimitsD
 
   return `Servicios: ${formatSubscriptionLimitValue(safeLimits.maxServices)} | Secretarios: ${formatSubscriptionLimitValue(
     safeLimits.maxSecretaries,
-  )} | Campos extra: ${safeLimits.allowsExtraFields ? 'Si' : 'No'}`;
+  )}`;
 };
 
 export const getSubscriptionStatusLabel = (subscription: SubscriptionDto) => {

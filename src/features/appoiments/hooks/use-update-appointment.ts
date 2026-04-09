@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { AppointmentDto } from 'shared/models/appointment-dto';
 import { useBusinessStore } from 'store/use-buisness-store';
+
 import { appointmentService } from '../services';
 
 export interface UpdateAppointmentValues {

@@ -1,4 +1,5 @@
 import { Page } from 'shared/layout';
+
 import { TeamPageContainer } from './container';
 
 export function TeamPage() {

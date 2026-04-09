@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { Alert, Badge, Button, Grid, Group, Skeleton, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { PageCard } from 'shared/layout';
 import { useAppToast } from 'shared/ui/toast';
+
 import { useOwnerSubscription } from '../hooks';
 import {
   formatSubscriptionLimitValue,
@@ -12,10 +12,8 @@ import {
   getSubscriptionStatusColor,
   getSubscriptionStatusLabel,
 } from '../utils/subscription.utils';
-import {
-  SubscriptionManagementModal,
-  type SubscriptionManagementModalIntent,
-} from './subscription-management-modal';
+
+import { SubscriptionManagementModal } from './subscription-management-modal';
 
 interface SubscriptionSettingsSectionProps {
   ownerId?: number;
@@ -27,7 +25,6 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
   }
 
   const [opened, { open, close }] = useDisclosure(false);
-  const [modalIntent, setModalIntent] = useState<SubscriptionManagementModalIntent>('manage');
   const toast = useAppToast();
 
   const {
@@ -41,8 +38,7 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
   const currentPlanName = getSubscriptionPlanDisplayName(subscription?.currentPlan);
   const currentPlanLimits = getSubscriptionPlanLimits(subscription?.currentPlan?.limits);
 
-  const openModal = (intent: SubscriptionManagementModalIntent) => {
-    setModalIntent(intent);
+  const openModal = () => {
     open();
   };
 
@@ -109,9 +105,6 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
                         Secretarios maximos:{' '}
                         {formatSubscriptionLimitValue(currentPlanLimits.maxSecretaries)}
                       </Text>
-                      <Text size="sm">
-                        Campos extra: {currentPlanLimits.allowsExtraFields ? 'Si' : 'No'}
-                      </Text>
                     </Stack>
                   </Stack>
                 </Grid.Col>
@@ -119,15 +112,15 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
                 <Grid.Col span={{ base: 12, md: 5 }}>
                   <Stack align="flex-end" gap="sm">
                     <Group gap="xs" justify="flex-end" wrap="wrap">
-                      <Button variant="light" onClick={() => openModal('change')}>
+                      <Button variant="light" onClick={openModal}>
                         Cambiar plan
                       </Button>
                       {subscription.canCancel && (
-                        <Button color="red" variant="light" onClick={() => openModal('cancel')}>
+                        <Button color="red" variant="light" onClick={openModal}>
                           Cancelar suscripcion
                         </Button>
                       )}
-                      {subscription.canRenew && <Button onClick={() => openModal('renew')}>Renovar</Button>}
+                      {subscription.canRenew && <Button onClick={openModal}>Renovar</Button>}
                     </Group>
                   </Stack>
                 </Grid.Col>
@@ -152,7 +145,7 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
               </Alert>
 
               <Group justify="flex-end">
-                <Button variant="light" onClick={() => openModal('manage')}>
+                <Button variant="light" onClick={openModal}>
                   Gestionar plan
                 </Button>
               </Group>
@@ -165,7 +158,6 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
         ownerId={ownerId}
         opened={opened}
         onClose={close}
-        initialIntent={modalIntent}
         onCompleted={(message) => {
           toast.success(message);
           close();

@@ -1,5 +1,6 @@
 import { apiClient } from 'app/api';
-import type { SubscriptionDto, SubscriptionPlanOptionDto } from 'shared/models';
+import type { SubscriptionDto } from 'shared/models';
+
 import {
   mapSubscriptionPlanOptionsFromApi,
   type SubscriptionPlanOptionApiDto,

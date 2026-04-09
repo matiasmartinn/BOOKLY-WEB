@@ -1,11 +1,12 @@
-import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Button, Group, Loader, SimpleGrid, Stack, Text, TextInput } from '@mantine/core';
 import { isApiError } from 'app/api';
-import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useUpdateUser, useUser } from 'features/users/hooks';
+import { useEffect, useMemo } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useAppToast } from 'shared/ui/toast';
 import { useAuthStore } from 'store/use-auth-store';
+
 import { accountUserSchema, type AccountUserFormValues } from '../schema';
 
 const defaultValues: AccountUserFormValues = {

@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, Button, Group, Stack, Text, TextInput } from '@mantine/core';
+import { Alert, Button, Group, Stack, TextInput } from '@mantine/core';
 import { isApiError } from 'app/api';
-import { useForm, type SubmitHandler } from 'react-hook-form';
 import { createSecretarySchema, type CreateSecretaryFormValues } from 'features/users/schema';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+
 import { useInviteAdmin } from '../hooks';
 
 interface InviteAdminFormProps {

@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
+
 import { adminService } from '../services';
+
 import {
   adminDashboardQueryKey,
   adminServicesQueryKey,

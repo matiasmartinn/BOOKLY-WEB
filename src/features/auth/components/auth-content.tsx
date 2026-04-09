@@ -1,5 +1,6 @@
 import { Box } from '@mantine/core';
 import type { ReactNode } from 'react';
+
 import { AuthBrand } from './auth-brand';
 import classes from './auth-shell.module.css';
 

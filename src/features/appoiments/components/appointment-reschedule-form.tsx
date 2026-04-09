@@ -1,16 +1,19 @@
-import { useMemo, useState } from 'react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Button, Divider, Group, Stack } from '@mantine/core';
-import type { AppointmentViewModel } from '../viewmodel';
-import { rescheduleAppointmentFormSchema, type RescheduleAppointmentFormValues } from '../schema';
+import { useMemo, useState } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { extractDateOnly, normalizeLocalDateTime } from 'shared/utils';
+import { useBusinessStore } from 'store/use-buisness-store';
+
 import {
   useAppointmentAvailableDates,
   useAppointmentAvailableSlots,
   useRescheduleAppointment,
 } from '../hooks';
-import { useBusinessStore } from 'store/use-buisness-store';
-import { extractDateOnly, normalizeLocalDateTime } from 'shared/utils';
+import { rescheduleAppointmentFormSchema, type RescheduleAppointmentFormValues } from '../schema';
+import type { AppointmentViewModel } from '../viewmodel';
+
+
 import { AppointmentScheduleSection } from './appointment-schedule-section';
 
 interface AppointmentRescheduleFormProps {
@@ -157,7 +160,6 @@ export function AppointmentRescheduleForm({
           onSlotChange={handleSlotChange}
           selectedDate={selectedDate}
           selectedSlot={selectedSlot}
-          slotError={errors.slot?.message}
           slots={slots}
         />
 

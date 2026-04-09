@@ -1,4 +1,24 @@
 import {
+  faBars,
+  faCalendarCheck,
+  faCalendarXmark,
+  faChartColumn,
+  faChartPie,
+  faCheck,
+  faChevronDown,
+  faClock,
+  faClockRotateLeft,
+  faPlus,
+  faRectangleList,
+  faRightFromBracket,
+  faStore,
+  faToggleOn,
+  faUser,
+  faUsers,
+  type IconDefinition,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
   ActionIcon,
   Box,
   Divider,
@@ -11,30 +31,11 @@ import {
   Tooltip,
   UnstyledButton,
 } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faBars,
-  faCalendarCheck,
-  faCalendarXmark,
-  faChartColumn,
-  faChartPie,
-  faCheck,
-  faChevronDown,
-  faClock,
-  faClockRotateLeft,
-  faLock,
-  faPlus,
-  faRectangleList,
-  faStore,
-  faToggleOn,
-  faUser,
-  faUsers,
-  type IconDefinition,
-} from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { PATHS } from 'app/router/PATHS';
 import { SubscriptionSidebarBanner } from 'features/subscriptions/components';
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuthStore } from 'store/use-auth-store';
 
 export type UserRole = 'owner' | 'secretary' | 'admin';
 
@@ -194,6 +195,8 @@ interface ServiceSwitcherProps {
   activeServiceId: string;
   onServiceChange: (serviceId: string) => void;
   collapsed: boolean;
+  allowCreate?: boolean;
+  emptyLabel?: string;
 }
 
 function ServiceSwitcher({
@@ -201,6 +204,8 @@ function ServiceSwitcher({
   activeServiceId,
   onServiceChange,
   collapsed,
+  allowCreate = true,
+  emptyLabel = 'Sin servicios asignados',
 }: ServiceSwitcherProps) {
   const navigate = useNavigate();
   const [opened, setOpened] = useState(false);
@@ -208,12 +213,29 @@ function ServiceSwitcher({
   const isEmpty = services.length === 0;
 
   const handleCreateService = () => {
+    if (!allowCreate) {
+      return;
+    }
+
     setOpened(false);
     navigate(PATHS.service.create, { state: { create: true } });
   };
 
-  if (collapsed) {
-    if (isEmpty) {
+  if (isEmpty) {
+    if (collapsed) {
+      if (!allowCreate) {
+        return (
+          <Tooltip label={emptyLabel} position="right" withArrow>
+            <Box
+              w={8}
+              h={8}
+              mx="auto"
+              style={{ borderRadius: '50%', backgroundColor: 'var(--app-color-text-muted)' }}
+            />
+          </Tooltip>
+        );
+      }
+
       return (
         <Tooltip label="Crear primer servicio" position="right" withArrow>
           <UnstyledButton
@@ -236,19 +258,24 @@ function ServiceSwitcher({
       );
     }
 
-    return (
-      <Tooltip label={activeService?.name ?? 'Servicio'} position="right" withArrow>
+    if (!allowCreate) {
+      return (
         <Box
-          w={8}
-          h={8}
-          mx="auto"
-          style={{ borderRadius: '50%', backgroundColor: 'var(--mantine-color-brand-5)' }}
-        />
-      </Tooltip>
-    );
-  }
+          px="xs"
+          py={6}
+          style={{
+            borderRadius: 'var(--mantine-radius-md)',
+            backgroundColor: 'var(--app-color-surface-soft)',
+            border: '1px solid var(--app-color-border)',
+          }}
+        >
+          <Text size="xs" fw={500} c="dimmed">
+            {emptyLabel}
+          </Text>
+        </Box>
+      );
+    }
 
-  if (isEmpty) {
     return (
       <UnstyledButton
         onClick={handleCreateService}
@@ -271,6 +298,139 @@ function ServiceSwitcher({
           </Text>
         </Group>
       </UnstyledButton>
+    );
+  }
+
+  const serviceOptionsContent = (
+    <Popover.Dropdown p={4}>
+      <ScrollArea.Autosize mah={240}>
+        <Stack gap={2}>
+          {services.map((service) => {
+            const isActive = service.id === activeServiceId;
+
+            return (
+              <UnstyledButton
+                key={service.id}
+                px="sm"
+                py={8}
+                style={(theme) => ({
+                  borderRadius: theme.radius.md,
+                  backgroundColor: isActive ? 'var(--app-color-surface-hover)' : 'transparent',
+                })}
+                onClick={() => {
+                  onServiceChange(service.id);
+                  setOpened(false);
+                }}
+              >
+                <Group gap={8} wrap="nowrap">
+                  <Box
+                    w={6}
+                    h={6}
+                    style={{
+                      borderRadius: '50%',
+                      backgroundColor: isActive
+                        ? 'var(--mantine-color-brand-5)'
+                        : 'var(--app-color-text-muted)',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Text
+                    size="xs"
+                    fw={isActive ? 500 : 400}
+                    c={isActive ? 'var(--app-color-text-primary)' : 'dimmed'}
+                    flex={1}
+                    truncate
+                  >
+                    {service.name}
+                  </Text>
+                  {isActive ? (
+                    <FontAwesomeIcon
+                      icon={faCheck}
+                      style={{ fontSize: 9, color: 'var(--mantine-color-brand-5)' }}
+                    />
+                  ) : null}
+                </Group>
+              </UnstyledButton>
+            );
+          })}
+
+          {allowCreate ? (
+            <>
+              <Divider my={4} />
+
+              <UnstyledButton px="sm" py={8} onClick={handleCreateService}>
+                <Group gap={8} wrap="nowrap">
+                  <Box
+                    w={16}
+                    h={16}
+                    style={{
+                      borderRadius: 4,
+                      border: '1px solid var(--app-color-border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      icon={faPlus}
+                      style={{ fontSize: 8, color: 'var(--mantine-color-brand-5)' }}
+                    />
+                  </Box>
+                  <Text size="xs" fw={500} c="dimmed">
+                    Nuevo servicio
+                  </Text>
+                </Group>
+              </UnstyledButton>
+            </>
+          ) : null}
+        </Stack>
+      </ScrollArea.Autosize>
+    </Popover.Dropdown>
+  );
+
+  if (collapsed) {
+    return (
+      <Popover
+        opened={opened}
+        onChange={setOpened}
+        position="right-start"
+        width={220}
+        radius="md"
+        offset={8}
+      >
+        <Popover.Target>
+          <UnstyledButton
+            onClick={() => setOpened((current) => !current)}
+            style={{
+              width: 20,
+              height: 20,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto',
+            }}
+          >
+            <Tooltip
+              label={activeService?.name ?? 'Servicio'}
+              position="right"
+              withArrow
+              disabled={opened}
+            >
+              <Box
+                w={8}
+                h={8}
+                style={{
+                  borderRadius: '50%',
+                  backgroundColor: 'var(--mantine-color-brand-5)',
+                }}
+              />
+            </Tooltip>
+          </UnstyledButton>
+        </Popover.Target>
+
+        {serviceOptionsContent}
+      </Popover>
     );
   }
 
@@ -321,142 +481,8 @@ function ServiceSwitcher({
         </UnstyledButton>
       </Popover.Target>
 
-      <Popover.Dropdown p={4}>
-        <ScrollArea.Autosize mah={240}>
-          <Stack gap={2}>
-            {services.map((service) => {
-              const isActive = service.id === activeServiceId;
-
-              return (
-                <UnstyledButton
-                  key={service.id}
-                  px="sm"
-                  py={8}
-                  style={(theme) => ({
-                    borderRadius: theme.radius.md,
-                    backgroundColor: isActive ? 'var(--app-color-surface-hover)' : 'transparent',
-                  })}
-                  onClick={() => {
-                    onServiceChange(service.id);
-                    setOpened(false);
-                  }}
-                >
-                  <Group gap={8} wrap="nowrap">
-                    <Box
-                      w={6}
-                      h={6}
-                      style={{
-                        borderRadius: '50%',
-                        backgroundColor: isActive
-                          ? 'var(--mantine-color-brand-5)'
-                          : 'var(--app-color-text-muted)',
-                        flexShrink: 0,
-                      }}
-                    />
-                    <Text
-                      size="xs"
-                      fw={isActive ? 500 : 400}
-                      c={isActive ? 'var(--app-color-text-primary)' : 'dimmed'}
-                      flex={1}
-                      truncate
-                    >
-                      {service.name}
-                    </Text>
-                    {isActive ? (
-                      <FontAwesomeIcon
-                        icon={faCheck}
-                        style={{ fontSize: 9, color: 'var(--mantine-color-brand-5)' }}
-                      />
-                    ) : null}
-                  </Group>
-                </UnstyledButton>
-              );
-            })}
-
-            <Divider my={4} />
-
-            <UnstyledButton px="sm" py={8} onClick={handleCreateService}>
-              <Group gap={8} wrap="nowrap">
-                <Box
-                  w={16}
-                  h={16}
-                  style={{
-                    borderRadius: 4,
-                    border: '1px solid var(--app-color-border)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <FontAwesomeIcon
-                    icon={faPlus}
-                    style={{ fontSize: 8, color: 'var(--mantine-color-brand-5)' }}
-                  />
-                </Box>
-                <Text size="xs" fw={500} c="dimmed">
-                  Nuevo servicio
-                </Text>
-              </Group>
-            </UnstyledButton>
-          </Stack>
-        </ScrollArea.Autosize>
-      </Popover.Dropdown>
+      {serviceOptionsContent}
     </Popover>
-  );
-}
-
-function ServiceBadge({
-  serviceName,
-  collapsed,
-}: {
-  serviceName: string;
-  collapsed: boolean;
-}) {
-  if (collapsed) {
-    return (
-      <Tooltip label={serviceName || 'Servicio asignado'} position="right" withArrow>
-        <Box
-          w={8}
-          h={8}
-          mx="auto"
-          style={{ borderRadius: '50%', backgroundColor: 'var(--mantine-color-brand-5)' }}
-        />
-      </Tooltip>
-    );
-  }
-
-  return (
-    <Group
-      gap={8}
-      px="xs"
-      py={6}
-      wrap="nowrap"
-      style={{
-        borderRadius: 'var(--mantine-radius-md)',
-        backgroundColor: 'var(--app-color-surface-soft)',
-        border: '1px solid var(--app-color-border)',
-      }}
-    >
-      <Box
-        w={7}
-        h={7}
-        style={{
-          borderRadius: '50%',
-          backgroundColor: 'var(--mantine-color-brand-5)',
-          flexShrink: 0,
-        }}
-      />
-      <Text size="xs" fw={500} c="var(--app-color-text-primary)" flex={1} truncate>
-        {serviceName || 'Servicio asignado'}
-      </Text>
-      <Tooltip label="Tu cuenta opera sobre este servicio" withArrow>
-        <FontAwesomeIcon
-          icon={faLock}
-          style={{ fontSize: 9, color: 'var(--app-color-text-muted)' }}
-        />
-      </Tooltip>
-    </Group>
   );
 }
 
@@ -542,7 +568,17 @@ function NavItemButton({ item, isActive, collapsed, onClick }: NavItemButtonProp
   return button;
 }
 
-function UserFooter({ user, collapsed }: { user: SidebarUser; collapsed: boolean }) {
+function UserFooter({
+  user,
+  collapsed,
+  onLogout,
+  isLoggingOut,
+}: {
+  user: SidebarUser;
+  collapsed: boolean;
+  onLogout: () => void;
+  isLoggingOut: boolean;
+}) {
   const roleLabel =
     user.role === 'owner'
       ? 'Owner'
@@ -552,25 +588,33 @@ function UserFooter({ user, collapsed }: { user: SidebarUser; collapsed: boolean
 
   if (collapsed) {
     return (
-      <Tooltip label={`${user.name} - ${roleLabel}`} position="right" withArrow>
-        <Box
-          w={28}
-          h={28}
-          mx="auto"
-          style={{
-            borderRadius: '50%',
-            backgroundColor: 'var(--app-color-surface-soft)',
-            border: '1px solid var(--app-color-border)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text size="xs" fw={600}>
-            {user.initials}
-          </Text>
-        </Box>
-      </Tooltip>
+      <Stack gap="xs" align="center">
+        <Tooltip label={`${user.name} - ${roleLabel}`} position="right" withArrow>
+          <Box
+            w={28}
+            h={28}
+            mx="auto"
+            style={{
+              borderRadius: '50%',
+              backgroundColor: 'var(--app-color-surface-soft)',
+              border: '1px solid var(--app-color-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Text size="xs" fw={600}>
+              {user.initials}
+            </Text>
+          </Box>
+        </Tooltip>
+
+        <Tooltip label="Cerrar sesion" position="right" withArrow>
+          <ActionIcon variant="default" size="md" onClick={onLogout} disabled={isLoggingOut}>
+            <FontAwesomeIcon icon={faRightFromBracket} />
+          </ActionIcon>
+        </Tooltip>
+      </Stack>
     );
   }
 
@@ -601,6 +645,17 @@ function UserFooter({ user, collapsed }: { user: SidebarUser; collapsed: boolean
           {roleLabel}
         </Text>
       </Box>
+      <Tooltip label="Cerrar sesion" withArrow>
+        <ActionIcon
+          variant="default"
+          ml="auto"
+          onClick={onLogout}
+          disabled={isLoggingOut}
+          aria-label="Cerrar sesion"
+        >
+          <FontAwesomeIcon icon={faRightFromBracket} />
+        </ActionIcon>
+      </Tooltip>
     </Group>
   );
 }
@@ -630,6 +685,8 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const visibleSections = NAV_SECTIONS_BY_ROLE[user.role]
     .map((section) => ({
@@ -648,6 +705,21 @@ export function DashboardSidebar({
   const handleNavigate = (path: string) => {
     navigate(path);
     onNavigate?.();
+  };
+
+  const handleLogout = async () => {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      navigate(PATHS.auth.login, { replace: true });
+      onNavigate?.();
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -700,19 +772,16 @@ export function DashboardSidebar({
           ) : null}
         </Stack>
 
-        {user.role === 'owner' ? (
+        {user.role === 'owner' || user.role === 'secretary' ? (
           <ServiceSwitcher
             services={services}
             activeServiceId={activeServiceId}
             onServiceChange={onServiceChange}
             collapsed={collapsed}
-          />
-        ) : user.role === 'secretary' ? (
-          <ServiceBadge
-            serviceName={
-              services.find((service) => service.id === activeServiceId)?.name ?? services[0]?.name ?? ''
+            allowCreate={user.role === 'owner'}
+            emptyLabel={
+              user.role === 'owner' ? 'Sin servicios creados' : 'Sin servicios asignados'
             }
-            collapsed={collapsed}
           />
         ) : (
           <AdminBadge collapsed={collapsed} />
@@ -793,7 +862,14 @@ export function DashboardSidebar({
         ) : null}
 
         <Divider />
-        <UserFooter user={user} collapsed={collapsed} />
+        <UserFooter
+          user={user}
+          collapsed={collapsed}
+          onLogout={() => {
+            void handleLogout();
+          }}
+          isLoggingOut={isLoggingOut}
+        />
       </Stack>
     </Stack>
   );

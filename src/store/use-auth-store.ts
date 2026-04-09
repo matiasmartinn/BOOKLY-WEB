@@ -1,52 +1,142 @@
-import { authService } from 'features/auth/auth.service';
+import { queryClient } from 'app/api/query-client';
+import type { LoginRequest } from 'features/auth/login-form/login.schema';
+import { authService, type AuthSession } from 'features/auth/services';
+import type { UserModel } from 'shared/models';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { UserModel } from 'shared/models';
-import type { LoginRequest } from 'features/auth/login-form/login.schema';
+
 import { useBusinessStore } from './use-buisness-store';
 
 interface AuthStore {
+  session: AuthSession | null;
   user: UserModel | null;
   isAuthenticated: boolean;
+  hasHydrated: boolean;
   login: (dto: LoginRequest) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  refreshSession: () => Promise<AuthSession | null>;
+  clearSession: () => void;
   setUser: (user: UserModel | null) => void;
+  finishHydration: () => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
-  // persist guarda user + isAuthenticated en localStorage bajo la clave 'auth'.
-  // Al refrescar la página, Zustand rehidrata el store antes del primer render,
-  // evitando el return null que dejaba la pantalla en blanco.
   persist(
-    (set) => ({
+    (set, get) => ({
+      session: null,
       user: null,
       isAuthenticated: false,
+      hasHydrated: false,
 
       login: async (dto) => {
-        const user = await authService.login(dto);
-        set({ user, isAuthenticated: true });
-        await useBusinessStore.getState().loadServices(user);
+        const authResult = await authService.login(dto);
+
+        queryClient.clear();
+        useBusinessStore.getState().clear();
+
+        set({
+          session: authResult.session,
+          user: authResult.user,
+          isAuthenticated: true,
+        });
+
+        await useBusinessStore.getState().loadServices(authResult.user);
       },
 
-      logout: () => {
+      logout: async () => {
+        const refreshToken = get().session?.refreshToken;
+
+        try {
+          if (refreshToken) {
+            await authService.logout(refreshToken);
+          }
+        } finally {
+          get().clearSession();
+        }
+      },
+
+      refreshSession: async () => {
+        const currentRefreshToken = get().session?.refreshToken;
+
+        if (!currentRefreshToken) {
+          get().clearSession();
+          return null;
+        }
+
+        const authResult = await authService.refreshSession(currentRefreshToken);
+
+        set({
+          session: authResult.session,
+          user: authResult.user,
+          isAuthenticated: true,
+        });
+
+        return authResult.session;
+      },
+
+      clearSession: () => {
+        queryClient.clear();
         useBusinessStore.getState().clear();
-        set({ user: null, isAuthenticated: false });
+        set({
+          session: null,
+          user: null,
+          isAuthenticated: false,
+        });
       },
 
       setUser: (user) => {
+        if (!user) {
+          get().clearSession();
+          return;
+        }
+
         set((state) => ({
+          session: state.session
+            ? {
+                ...state.session,
+                email: user.email,
+                role: user.role,
+                fullName: user.fullName,
+              }
+            : null,
           user,
-          isAuthenticated: user ? state.isAuthenticated : false,
+          isAuthenticated: Boolean(user && state.session),
         }));
+      },
+
+      finishHydration: () => {
+        set({ hasHydrated: true });
       },
     }),
     {
       name: 'auth',
-      // Solo persistimos los datos del usuario, no funciones ni estados de carga.
+      version: 2,
       partialize: (state) => ({
+        session: state.session,
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
+      migrate: (persistedState, version) => {
+        if (version !== 2) {
+          return {
+            session: null,
+            user: null,
+            isAuthenticated: false,
+          };
+        }
+
+        const state = persistedState as Partial<AuthStore> | undefined;
+        const hasValidSession = Boolean(state?.session && state.user);
+
+        return {
+          session: hasValidSession ? state?.session ?? null : null,
+          user: hasValidSession ? state?.user ?? null : null,
+          isAuthenticated: hasValidSession,
+        };
+      },
+      onRehydrateStorage: () => (state) => {
+        state?.finishHydration();
+      },
     },
   ),
 );

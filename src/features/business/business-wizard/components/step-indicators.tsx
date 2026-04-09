@@ -1,7 +1,8 @@
-import { Box, Group, Stack, UnstyledButton, Text } from '@mantine/core';
-import type { WizardStep } from './business-wizard-step';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Box, Group, Stack, UnstyledButton, Text } from '@mantine/core';
+
+import type { WizardStep } from './business-wizard-step';
 import { SummaryItem } from './summary-items';
 
 type StepStatus = 'completed' | 'active' | 'pending';

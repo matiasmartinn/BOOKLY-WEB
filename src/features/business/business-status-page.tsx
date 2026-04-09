@@ -1,4 +1,5 @@
 import { Page } from 'shared/layout';
+
 import { BusinessStatusPageContainer } from './container';
 
 export function BusinessStatusPage() {

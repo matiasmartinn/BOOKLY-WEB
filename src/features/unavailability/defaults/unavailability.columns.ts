@@ -1,4 +1,5 @@
 import type { TableColumn } from 'shared/components/generic-table';
+
 import type { UnavailabilityViewModel } from '../viewmodel';
 
 export const unavailabilityColumns: TableColumn<UnavailabilityViewModel>[] = [

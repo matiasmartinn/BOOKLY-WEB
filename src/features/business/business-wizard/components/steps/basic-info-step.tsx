@@ -1,8 +1,10 @@
 import { Stack, TextInput, Textarea, Select, Text, Box } from '@mantine/core';
-import { useFormContext } from 'react-hook-form';
 import { useServiceTypes } from 'features/service-types/hooks';
-import type { CreateBusinessFormValues } from '../../schema';
 import { useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
+
+import type { CreateBusinessFormValues } from '../../schema';
+
 
 function toSlug(value: string): string {
   return value

@@ -1,6 +1,7 @@
 import { Badge } from '@mantine/core';
-import type { TableColumn } from 'shared/components/generic-table';
 import { getAppointmentStatusColor, getAppointmentStatusLabel } from 'features/dashboard/utils';
+import type { TableColumn } from 'shared/components/generic-table';
+
 import type { AppointmentViewModel } from '../viewmodel';
 
 export const appointmentColumns: TableColumn<AppointmentViewModel>[] = [

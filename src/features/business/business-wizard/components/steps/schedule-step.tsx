@@ -1,7 +1,8 @@
+import { Group, Stack, Switch, Box, ActionIcon, Text, NumberInput, Divider } from '@mantine/core';
 import { useState } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
-import { Group, Stack, Switch, Box, ActionIcon, Text, NumberInput, Divider } from '@mantine/core';
 import { SelectDayTimePicker } from 'shared/ui/components';
+
 import type { CreateBusinessFormValues, ScheduleValue } from '../../schema';
 
 const DAY_ARRAY = [

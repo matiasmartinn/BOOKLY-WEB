@@ -1,6 +1,7 @@
 import type { AppointmentDto, AppointmentListItemDto } from 'shared/models/appointment-dto';
-import type { AppointmentViewModel } from '../viewmodel';
 import { formatDateTime, formatTime } from 'shared/utils';
+
+import type { AppointmentViewModel } from '../viewmodel';
 
 type AppointmentLike = AppointmentDto | AppointmentListItemDto;
 

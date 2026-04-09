@@ -1,5 +1,6 @@
 import { Stack, NumberInput, Text, Group, Box, SimpleGrid } from '@mantine/core';
 import { useFormContext, Controller } from 'react-hook-form';
+
 import type { CreateBusinessFormValues } from '../../schema';
 
 const DURATION_PRESETS = [15, 30, 45, 60, 90, 120];

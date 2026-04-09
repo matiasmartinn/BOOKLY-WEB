@@ -14,6 +14,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import type { AppointmentDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
 import { formatDateTime, normalizeLocalDateTime } from 'shared/utils';
+
 import {
   useCreatePublicAppointment,
   usePublicAvailableDates,
@@ -26,6 +27,7 @@ import {
 } from '../schema/public-appointment.schema';
 import type { PublicBookingProblemState, PublicServiceBookingDto } from '../types/public-booking';
 import { resolvePublicBookingProblemState } from '../utils';
+
 import { PublicBookingScheduleSection } from './public-booking-schedule-section';
 
 interface PublicBookingFormProps {

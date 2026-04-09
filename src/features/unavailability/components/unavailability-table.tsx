@@ -1,10 +1,11 @@
-import { ActionIcon, Group, Tooltip } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { GenericTable } from 'shared/components/generic-table';
+
 import { unavailabilityColumns } from '../defaults';
-import type { UnavailabilityViewModel } from '../viewmodel';
 import { useScheduleUnavailability } from '../hooks';
+import type { UnavailabilityViewModel } from '../viewmodel';
 
 interface UnavailabilityTableProps {
   onDelete?: (row: UnavailabilityViewModel) => void;

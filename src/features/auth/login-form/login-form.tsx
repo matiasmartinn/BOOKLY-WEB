@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
   Anchor,
@@ -9,13 +10,32 @@ import {
 } from '@mantine/core';
 import { isApiError } from 'app/api';
 import { PATHS } from 'app/router';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginRequest } from './login.schema';
-import { useState } from 'react';
-import { useAuthStore } from 'store/use-auth-store';
 import { AuthFormWrapper } from 'features/auth/components';
+import { useState } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuthStore } from 'store/use-auth-store';
+
+import { loginSchema, type LoginRequest } from './login.schema';
+
+
+function getRedirectTarget(state: unknown): string {
+  if (typeof state !== 'object' || state === null || !('from' in state)) {
+    return PATHS.dashboard.overview;
+  }
+
+  const from = state.from;
+
+  if (typeof from !== 'object' || from === null || !('pathname' in from)) {
+    return PATHS.dashboard.overview;
+  }
+
+  const pathname = typeof from.pathname === 'string' ? from.pathname : PATHS.dashboard.overview;
+  const search = 'search' in from && typeof from.search === 'string' ? from.search : '';
+  const hash = 'hash' in from && typeof from.hash === 'string' ? from.hash : '';
+
+  return `${pathname}${search}${hash}`;
+}
 
 function getLoginErrorMessage(error: unknown) {
   if (isApiError(error)) {
@@ -24,7 +44,7 @@ function getLoginErrorMessage(error: unknown) {
     }
 
     if (error.status === 401) {
-      return 'Credenciales incorrectas. Revisa tu email y contrasena.';
+      return error.detail || 'No pudimos iniciar sesion en este momento. Intenta nuevamente.';
     }
 
     return error.detail || 'No pudimos iniciar sesion en este momento. Intenta nuevamente.';
@@ -35,6 +55,7 @@ function getLoginErrorMessage(error: unknown) {
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const login = useAuthStore((s) => s.login);
   const [isPending, setIsPending] = useState(false);
 
@@ -54,7 +75,7 @@ export function LoginForm() {
 
     try {
       await login(data);
-      navigate(PATHS.dashboard.overview);
+      navigate(getRedirectTarget(location.state), { replace: true });
     } catch (error) {
       setError('root', { message: getLoginErrorMessage(error) });
     } finally {

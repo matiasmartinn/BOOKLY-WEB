@@ -2,6 +2,7 @@ import { Alert, Box, Divider, Stack } from '@mantine/core';
 import { SubscriptionSettingsSection } from 'features/subscriptions/components';
 import { PageCard } from 'shared/layout';
 import { useAuthStore } from 'store/use-auth-store';
+
 import { UserProfileForm, UserSecuritySection } from '../components';
 
 export function SettingsPageContainer() {

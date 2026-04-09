@@ -1,14 +1,15 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Box } from '@mantine/core';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useAuthStore } from 'store/use-auth-store';
-import { createBusinessSchema, stepSchemas, type CreateBusinessFormValues } from '../schema';
+
+import { useCreateBusiness } from '../../hooks/use-create-business';
 import { WizardLeftPanel } from '../business-wizard-left-panel';
 import { WizardRightPanel } from '../business-wizard-right-panel';
-import { BasicInfoStep, ConfirmStep, SchedulesStep } from '../components/steps';
-import { useCreateBusiness } from '../../hooks/use-create-business';
 import { BUSINESS_WIZARD_STEPS } from '../components/business-wizard-step';
+import { BasicInfoStep, ConfirmStep, SchedulesStep } from '../components/steps';
+import { createBusinessSchema, stepSchemas, type CreateBusinessFormValues } from '../schema';
 
 const STEP_COMPONENTS: Partial<Record<string, React.ReactNode>> = {
   basic: <BasicInfoStep />,

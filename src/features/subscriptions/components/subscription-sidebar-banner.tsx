@@ -1,6 +1,7 @@
 import { Badge, Box, Button, Loader, Stack, Text, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppToast } from 'shared/ui/toast';
+
 import { useOwnerSubscription } from '../hooks';
 import {
   getSubscriptionCtaLabel,
@@ -8,10 +9,8 @@ import {
   getSubscriptionStatusColor,
   getSubscriptionStatusLabel,
 } from '../utils/subscription.utils';
-import {
-  SubscriptionManagementModal,
-  type SubscriptionManagementModalIntent,
-} from './subscription-management-modal';
+
+import { SubscriptionManagementModal } from './subscription-management-modal';
 
 interface SubscriptionSidebarBannerProps {
   ownerId?: number;
@@ -23,7 +22,6 @@ export function SubscriptionSidebarBanner({
   collapsed,
 }: SubscriptionSidebarBannerProps) {
   const [opened, { open, close }] = useDisclosure(false);
-  const modalIntent: SubscriptionManagementModalIntent = 'manage';
   const canManageSubscription = ownerId != null;
   const toast = useAppToast();
 
@@ -129,7 +127,6 @@ export function SubscriptionSidebarBanner({
         ownerId={ownerId}
         opened={opened}
         onClose={close}
-        initialIntent={modalIntent}
         onCompleted={(message) => {
           toast.success(message);
           close();

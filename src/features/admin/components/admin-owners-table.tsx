@@ -1,9 +1,10 @@
-import { ActionIcon, Group, Tooltip } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBan, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { GenericTable } from 'shared/components';
-import type { AdminOwnerListItemDto } from '../models';
+
 import { adminOwnerColumns } from '../defaults';
+import type { AdminOwnerListItemDto } from '../models';
 
 interface AdminOwnersTableProps {
   owners: AdminOwnerListItemDto[];
@@ -54,6 +55,7 @@ export function AdminOwnersTable({
         onPageSizeChange,
       }}
       columnOfActions={{
+        header: 'Acciones',
         width: 120,
         textAlign: 'center',
         render: (row) => {

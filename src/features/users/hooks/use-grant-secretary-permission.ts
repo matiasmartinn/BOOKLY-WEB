@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
+
 import { usersService, type UpdateSecretaryPermissionDto } from '../services';
+
 import { ownerSecretariesQueryKey } from './query-keys';
 
 export const useGrantSecretaryPermission = (

@@ -1,7 +1,6 @@
 export interface SubscriptionPlanLimitsDto {
   maxServices: number | null;
   maxSecretaries: number | null;
-  allowsExtraFields: boolean;
 }
 
 export interface SubscriptionPlanDto {

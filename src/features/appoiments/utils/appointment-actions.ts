@@ -1,10 +1,18 @@
-import type { AppointmentViewModel } from '../viewmodel';
 import { appointmentStatusIncludes } from 'features/dashboard/utils';
 import {
   compareLocalDateTime,
   getCurrentBusinessDateTime,
   normalizeLocalDateTime,
 } from 'shared/utils';
+
+import type { AppointmentViewModel } from '../viewmodel';
+
+export interface AppointmentActionPermissions {
+  canEdit: boolean;
+  canReschedule: boolean;
+  canCancel: boolean;
+  canMarkAttendance: boolean;
+}
 
 const canTransitionFromStatus = (status: string) =>
   appointmentStatusIncludes(
@@ -30,16 +38,17 @@ const hasAppointmentStarted = (
 
 export const getAppointmentActionVisibility = (
   appointment: AppointmentViewModel,
+  permissions: AppointmentActionPermissions,
   currentBusinessDateTime = getCurrentBusinessDateTime(),
 ) => {
   const canTransition = canTransitionFromStatus(appointment.status);
   const started = hasAppointmentStarted(appointment.startDateTime, currentBusinessDateTime);
 
   return {
-    canEdit: true,
-    canReschedule: canTransition && !started,
-    canCancel: canTransition && !started,
-    canMarkAsAttended: canTransition,
-    canMarkAsNoShow: canTransition,
+    canEdit: permissions.canEdit,
+    canReschedule: permissions.canReschedule && canTransition && !started,
+    canCancel: permissions.canCancel && canTransition && !started,
+    canMarkAsAttended: permissions.canMarkAttendance && canTransition,
+    canMarkAsNoShow: permissions.canMarkAttendance && canTransition,
   };
 };

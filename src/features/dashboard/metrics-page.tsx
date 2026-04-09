@@ -1,4 +1,5 @@
 import { Page } from 'shared/layout';
+
 import { MetricsPageContainer } from './container';
 
 export function MetricsPage() {

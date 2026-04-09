@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { mapAppointmentListToViewModel } from '../mapper/map-appointment-to-viewmodel';
 import { useBusinessStore } from 'store/use-buisness-store';
+
+import { mapAppointmentListToViewModel } from '../mapper/map-appointment-to-viewmodel';
 import { appointmentService } from '../services';
 
 export const useGetAppointments = () => {

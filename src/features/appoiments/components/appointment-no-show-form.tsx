@@ -1,8 +1,8 @@
 import { Button, Group, Stack, Text } from '@mantine/core';
-import { useAppToast } from 'shared/ui/toast';
-import { formatLocalDateTime } from 'shared/utils';
 import { useMarkAppointmentAsNoShow } from 'features/appoiments/hooks';
 import type { AppointmentViewModel } from 'features/appoiments/viewmodel';
+import { useAppToast } from 'shared/ui/toast';
+import { formatLocalDateTime } from 'shared/utils';
 
 interface AppointmentNoShowFormProps {
   appointment: AppointmentViewModel;

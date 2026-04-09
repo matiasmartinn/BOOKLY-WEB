@@ -1,5 +1,4 @@
 import { apiClient } from 'app/api';
-import { useAuthStore } from 'store/use-auth-store';
 import type {
   AppointmentDto,
   AppointmentListItemDto,
@@ -7,21 +6,14 @@ import type {
   AppointmentSummaryDto,
 } from 'shared/models';
 
-export interface CreateAppointmentFieldValueDto {
-  fieldDefinitionId: number;
-  value: string;
-}
-
 export interface CreateAppointmentDto {
   serviceId: number;
-  userId?: number | null;
   assignedSecretaryId?: number | null;
   clientName: string;
   clientPhone: string;
   clientEmail: string;
   startDateTime: string;
   clientNotes?: string;
-  fieldValues?: CreateAppointmentFieldValueDto[];
 }
 
 export interface UpdateAppointmentDto {
@@ -36,7 +28,6 @@ export interface RescheduleAppointmentDto {
 }
 
 export interface CancelAppointmentDto {
-  userId?: number | null;
   reason?: string;
 }
 
@@ -55,10 +46,6 @@ export interface AppointmentQueryDto {
   clientSearch?: string;
   clientEmail?: string;
 }
-
-const buildActorPayload = () => ({
-  userId: useAuthStore.getState().user?.id ?? null,
-});
 
 export const appointmentService = {
   getById: (appointmentId: number) =>
@@ -96,7 +83,7 @@ export const appointmentService = {
       .then((r) => r.data),
 
   create: (dto: CreateAppointmentDto) =>
-    apiClient.post<AppointmentDto>('/appointments', { ...dto, ...buildActorPayload() }).then((r) => r.data),
+    apiClient.post<AppointmentDto>('/appointments', dto).then((r) => r.data),
 
   update: (id: number, dto: UpdateAppointmentDto) =>
     apiClient.put<AppointmentDto>(`/appointments/${id}`, dto).then((r) => r.data),
@@ -105,15 +92,11 @@ export const appointmentService = {
     apiClient.patch<AppointmentDto>(`/appointments/${id}/reschedule`, dto).then((r) => r.data),
 
   cancel: (id: number, dto: CancelAppointmentDto) =>
-    apiClient.patch<void>(`/appointments/${id}/cancel`, { ...dto, ...buildActorPayload() }).then((r) => r.data),
+    apiClient.patch<void>(`/appointments/${id}/cancel`, dto).then((r) => r.data),
 
   markAsAttended: (id: number) =>
-    apiClient
-      .patch<void>(`/appointments/${id}/attended`, null, { params: buildActorPayload() })
-      .then((r) => r.data),
+    apiClient.patch<void>(`/appointments/${id}/attended`).then((r) => r.data),
 
   markAsNoShow: (id: number) =>
-    apiClient
-      .patch<void>(`/appointments/${id}/no-show`, null, { params: buildActorPayload() })
-      .then((r) => r.data),
+    apiClient.patch<void>(`/appointments/${id}/no-show`).then((r) => r.data),
 };

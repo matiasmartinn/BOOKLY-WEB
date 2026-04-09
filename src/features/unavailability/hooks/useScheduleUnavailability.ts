@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { unavailabilityService } from '../services/unavailability.service';
 import { useBusinessStore } from 'store/use-buisness-store';
+
 import { mapUnavailabilityListToViewModel } from '../adapter/unavailability.adapter';
+import { unavailabilityService } from '../services/unavailability.service';
 
 export const useScheduleUnavailability = () => {
   const selectedService = useBusinessStore((s) => s.selectedService);

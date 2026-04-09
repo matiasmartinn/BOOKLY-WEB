@@ -3,7 +3,10 @@ export interface HistoryAppointmentViewModel {
   serviceId: number;
   serviceName: string;
   assignedSecretaryId: number | null;
-  secretaryName: string;
+  createdByUserId: number | null;
+  createdByUserDisplayName: string | null;
+  createdByUserRole: string | null;
+  createdByLabel: string;
   clientName: string;
   clientPhone: string;
   clientEmail: string | null;

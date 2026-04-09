@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { QueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { BusinessDto, ServicePublicBookingDto } from 'shared/models';
+
 import {
   businessService,
   type SetBusinessSecretariesDto,

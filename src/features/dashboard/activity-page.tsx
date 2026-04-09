@@ -1,4 +1,5 @@
 import { Page } from 'shared/layout';
+
 import { ActivityPageContainer } from './container';
 
 export function EventsPage() {

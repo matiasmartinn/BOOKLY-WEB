@@ -11,6 +11,7 @@ import {
   Stack,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
+import { useOwnerBusinesses } from 'features/business/hooks';
 import { useMemo, useState } from 'react';
 import {
   Bar,
@@ -23,7 +24,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { useOwnerBusinesses } from 'features/business/hooks';
+import type { LabelFormatter } from 'recharts/types/component/Label';
 import { appChartColorVars, appChartTooltipStyles, appColorVars } from 'shared/ui/theme/theme';
 import {
   addDaysToDateOnly,
@@ -33,9 +34,10 @@ import {
   getCurrentBusinessDateOnly,
 } from 'shared/utils';
 import { useAuthStore } from 'store/use-auth-store';
+
 import { EmptyChartState, MetricsChartCard, MetricsKpiCard } from '../components';
 import { useAppointmentMetrics } from '../hooks';
-import type { LabelFormatter } from 'recharts/types/component/Label';
+
 
 const DEFAULT_RANGE_DAYS = 30;
 const numberFormatter = new Intl.NumberFormat('es-AR');

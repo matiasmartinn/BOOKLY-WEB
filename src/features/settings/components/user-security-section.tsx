@@ -1,6 +1,7 @@
 import { Button, Group, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useAuthStore } from 'store/use-auth-store';
+
 import { ChangePasswordModal } from './change-password-modal';
 
 export function UserSecuritySection() {

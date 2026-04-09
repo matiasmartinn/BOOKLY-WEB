@@ -1,4 +1,3 @@
-import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
@@ -14,11 +13,13 @@ import {
 } from '@mantine/core';
 import { isApiError } from 'app/api';
 import { PublicBookingSharePanel } from 'features/public-booking/components';
-import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useServiceTypes } from 'features/service-types/hooks';
+import { useEffect, useMemo } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import type { BusinessDto, ServicePublicBookingDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
 import { useBusinessStore } from 'store/use-buisness-store';
+
 import { useUpdateBusiness } from '../hooks';
 import {
   updateBusinessProfileSchema,

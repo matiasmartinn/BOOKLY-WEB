@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { AppointmentDto } from 'shared/models';
+
 import { publicBookingService } from '../services';
 import type { PublicCreateAppointmentDto } from '../types/public-booking';
+
 import { publicBookingQueryKeys } from './query-keys';
 
 export const useCreatePublicAppointment = (slug?: string, token?: string) => {

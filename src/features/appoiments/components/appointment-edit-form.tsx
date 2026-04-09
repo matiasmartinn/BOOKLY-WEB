@@ -1,4 +1,3 @@
-import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
@@ -10,9 +9,11 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core';
-import type { AppointmentViewModel } from '../viewmodel';
-import { updateAppointmentFormSchema, type UpdateAppointmentFormValues } from '../schema';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+
 import { useUpdateAppointment } from '../hooks';
+import { updateAppointmentFormSchema, type UpdateAppointmentFormValues } from '../schema';
+import type { AppointmentViewModel } from '../viewmodel';
 
 interface AppointmentEditFormProps {
   appointment: AppointmentViewModel;

@@ -1,9 +1,10 @@
-import { ActionIcon, Group, Tooltip } from '@mantine/core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBan, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ActionIcon, Group, Tooltip } from '@mantine/core';
 import { GenericTable } from 'shared/components';
-import type { AdminServiceListItemDto } from '../models';
+
 import { adminServiceColumns } from '../defaults';
+import type { AdminServiceListItemDto } from '../models';
 
 interface AdminServicesTableProps {
   services: AdminServiceListItemDto[];
@@ -54,11 +55,15 @@ export function AdminServicesTable({
         onPageSizeChange,
       }}
       columnOfActions={{
+        header: 'Acciones',
         width: 120,
         textAlign: 'center',
         render: (row) => (
           <Group justify="center" gap="xs">
-            <Tooltip label={row.isActive ? 'Deshabilitar servicio' : 'Habilitar servicio'} withArrow>
+            <Tooltip
+              label={row.isActive ? 'Deshabilitar servicio' : 'Habilitar servicio'}
+              withArrow
+            >
               <ActionIcon
                 variant="subtle"
                 color={row.isActive ? 'red' : 'green'}

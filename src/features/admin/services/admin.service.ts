@@ -1,5 +1,6 @@
 import { apiClient } from 'app/api';
 import type { UserDto } from 'shared/models';
+
 import type {
   AdminDashboardDto,
   AdminDashboardQueryDto,
@@ -11,7 +12,7 @@ import type {
   InviteAdminDto,
 } from '../models';
 
-const buildQueryParams = (query?: Record<string, unknown>) =>
+const buildQueryParams = (query?: object) =>
   Object.fromEntries(
     Object.entries(query ?? {}).filter(([, value]) => value !== undefined && value !== null && value !== ''),
   );

@@ -1,6 +1,7 @@
 import { type QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { SubscriptionDto, SubscriptionPlanOptionDto } from 'shared/models';
+
 import type { ChangePlanDto, RenewSubscriptionDto } from '../schema';
 import { subscriptionsService } from '../services';
 

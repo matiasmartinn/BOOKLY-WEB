@@ -1,10 +1,11 @@
+import { Group, Paper, Stack, Text, Badge, Button } from '@mantine/core';
 import type { SubscriptionPlanOptionDto } from 'shared/models';
+
 import {
   formatPlanLimitsSummary,
   getPlanChangeTypeLabel,
   getSubscriptionPlanDisplayName,
 } from '../utils/subscription.utils';
-import { Group, Paper, Stack, Text, Badge, Button } from '@mantine/core';
 
 interface SubscriptionPlanCardProps {
   plan: SubscriptionPlanOptionDto;

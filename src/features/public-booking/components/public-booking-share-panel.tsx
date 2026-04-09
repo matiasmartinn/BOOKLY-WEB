@@ -20,6 +20,7 @@ import {
 import { useMemo, useState } from 'react';
 import type { ServicePublicBookingDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
+
 import { buildPublicBookingUrl } from '../utils';
 
 const publicBookingDateFormatter = new Intl.DateTimeFormat('es-AR', {

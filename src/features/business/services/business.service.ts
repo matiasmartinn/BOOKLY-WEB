@@ -1,6 +1,6 @@
 import { apiClient } from 'app/api';
-import type { BusinessDto, ServicePublicBookingDto } from 'shared/models';
 import type { CreateServiceScheduleDto } from 'features/schedules/services/schedules.service';
+import type { BusinessDto, ServicePublicBookingDto } from 'shared/models';
 
 export interface CreateBusinessDto {
   name: string;

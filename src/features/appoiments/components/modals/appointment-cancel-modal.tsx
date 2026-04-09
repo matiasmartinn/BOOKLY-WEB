@@ -1,6 +1,7 @@
-import { GenericModal } from 'shared/components';
-import { AppointmentCancelForm } from '../appointment-cancel-form';
 import type { AppointmentViewModel } from 'features/appoiments/viewmodel';
+import { GenericModal } from 'shared/components';
+
+import { AppointmentCancelForm } from '../appointment-cancel-form';
 
 interface AppointmentCancelModalProps {
   appointment: AppointmentViewModel | null;

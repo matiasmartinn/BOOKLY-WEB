@@ -1,4 +1,5 @@
 import { Badge, Box, Button, Group, Progress, ScrollArea, Stack, Text } from '@mantine/core';
+
 import type { WizardStep } from './components';
 
 interface WizardRightPanelProps {

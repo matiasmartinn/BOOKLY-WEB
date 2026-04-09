@@ -1,40 +1,28 @@
-import { useEffect, useMemo } from 'react';
 import { AppShell, Burger, Group, Text } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { PATHS } from 'app/router/PATHS';
+import { usersService } from 'features/users/services/users.service';
+import { useEffect, useMemo, useRef } from 'react';
+import { Outlet } from 'react-router-dom';
 import { useAuthStore } from 'store/use-auth-store';
 import { useBusinessStore } from 'store/use-buisness-store';
+
 import {
   DashboardSidebar,
   type SidebarUser,
 } from './components/dashboard-sidebar';
-import {
-  buildSidebarPermissions,
-  canAccessDashboardPath,
-  getDefaultDashboardPath,
-  normalizeUserRole,
-} from './dashboard-navigation';
+import { buildSidebarPermissions, normalizeUserRole } from './dashboard-navigation';
 
 export function DashboardLayout() {
   const [mobileOpened, mobile] = useDisclosure(false);
   const [desktopCollapsed, desktop] = useDisclosure(false);
 
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
-
   const isMobile = useMediaQuery('(max-width: 48em)');
   const isCollapsed = isMobile ? false : desktopCollapsed;
 
   const authUser = useAuthStore((state) => state.user);
-  const { services, selectedService, selectService, loadServices, isLoading, initialized } =
-    useBusinessStore();
-
-  useEffect(() => {
-    if (authUser && !initialized && !isLoading) {
-      void loadServices(authUser);
-    }
-  }, [authUser, initialized, isLoading, loadServices]);
+  const setAuthUser = useAuthStore((state) => state.setUser);
+  const { services, selectedService, selectService, refreshServices } = useBusinessStore();
+  const isRefreshingSecretaryContext = useRef(false);
 
   const sidebarRole = normalizeUserRole(authUser?.role);
   const permissions = useMemo(
@@ -43,22 +31,44 @@ export function DashboardLayout() {
   );
 
   useEffect(() => {
-    if (!authUser || !initialized) {
+    if (sidebarRole !== 'secretary' || !authUser?.id) {
       return;
     }
 
-    const defaultPath = getDefaultDashboardPath(sidebarRole, permissions);
-    const isAllowedPath = canAccessDashboardPath(pathname, sidebarRole, permissions);
+    const refreshSecretaryContext = async () => {
+      if (isRefreshingSecretaryContext.current) {
+        return;
+      }
 
-    if (pathname === PATHS.dashboard.overview && sidebarRole !== 'owner') {
-      navigate(defaultPath, { replace: true });
-      return;
-    }
+      isRefreshingSecretaryContext.current = true;
+      try {
+        const freshUser = await usersService.getById(authUser.id);
+        setAuthUser(freshUser);
+        await refreshServices(freshUser);
+      } catch {
+        // The next guarded request or auth flow will handle session issues.
+      } finally {
+        isRefreshingSecretaryContext.current = false;
+      }
+    };
+    const handleWindowFocus = () => {
+      void refreshSecretaryContext();
+    };
 
-    if (!isAllowedPath) {
-      navigate(defaultPath, { replace: true });
-    }
-  }, [authUser, initialized, navigate, pathname, permissions, sidebarRole]);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void refreshSecretaryContext();
+      }
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [authUser?.id, refreshServices, setAuthUser, sidebarRole]);
 
   const handleSidebarNavigate = () => {
     if (window.innerWidth < 992) {

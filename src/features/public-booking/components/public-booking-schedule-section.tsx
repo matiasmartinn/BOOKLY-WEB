@@ -1,6 +1,7 @@
 import { Alert, Button, Skeleton, SimpleGrid, Stack, Text } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { formatTime } from 'shared/utils';
+
 import classes from './public-booking-schedule-section.module.css';
 
 interface PublicBookingScheduleSectionProps {

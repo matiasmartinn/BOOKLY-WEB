@@ -11,9 +11,10 @@ import {
 } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import type { PublicBookingProblemState } from '../types/public-booking';
+
 import { PublicBookingForm, PublicBookingStatusView } from '../components';
 import { usePublicService } from '../hooks';
+import type { PublicBookingProblemState } from '../types/public-booking';
 import { getPublicBookingProblemState, resolvePublicBookingProblemState } from '../utils';
 
 const getModeLabel = (mode: string) => {

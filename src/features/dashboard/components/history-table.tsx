@@ -1,7 +1,8 @@
 import { GenericTable, type SortState } from 'shared/components/generic-table';
 import { compareLocalDateTime } from 'shared/utils';
-import { getAppointmentStatusLabel } from '../utils';
+
 import { historyColumns } from '../defaults';
+import { getAppointmentStatusLabel } from '../utils';
 import type { HistoryAppointmentViewModel } from '../viewmodel/history-appointment-view-model';
 
 interface HistoryTableProps {
@@ -31,8 +32,8 @@ const historySortFn = (
     case 'serviceName':
       cmp = a.serviceName.localeCompare(b.serviceName, 'es-AR');
       break;
-    case 'secretaryName':
-      cmp = a.secretaryName.localeCompare(b.secretaryName, 'es-AR');
+    case 'createdByLabel':
+      cmp = a.createdByLabel.localeCompare(b.createdByLabel, 'es-AR');
       break;
     case 'status':
       cmp = getAppointmentStatusLabel(a.status).localeCompare(
@@ -50,7 +51,7 @@ const historySortFn = (
 const historySearchFn = (row: HistoryAppointmentViewModel, query: string) => {
   const value = query.trim().toLowerCase();
 
-  return [row.clientName, row.clientPhone, row.clientEmail ?? ''].some((field) =>
+  return [row.clientName, row.clientPhone, row.clientEmail ?? '', row.createdByLabel].some((field) =>
     field.toLowerCase().includes(value),
   );
 };
@@ -75,7 +76,7 @@ export function HistoryTable({
       defaultSort={{ columnKey: 'startDateTime', direction: 'desc' }}
       sortFn={historySortFn}
       showSearch
-      searchPlaceholder="Buscar por nombre, telefono o email"
+      searchPlaceholder="Buscar por cliente, email o generado por"
       searchFn={historySearchFn}
       showPaginator
       pageSize={10}

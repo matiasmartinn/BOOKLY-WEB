@@ -1,5 +1,6 @@
 import type { AppointmentViewModel } from 'features/appoiments/viewmodel';
 import { GenericModal } from 'shared/components';
+
 import { AppointmentNoShowForm } from '../appointment-no-show-form';
 
 interface BaseStatusModalProps {

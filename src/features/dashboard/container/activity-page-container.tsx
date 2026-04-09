@@ -1,7 +1,8 @@
-import { Alert, Stack, Text } from '@mantine/core';
+import { Alert, Stack } from '@mantine/core';
 import { useAppointmentHistoryByService, useGetAppointments } from 'features/appoiments/hooks';
 import { PageCard } from 'shared/layout';
 import { useBusinessStore } from 'store/use-buisness-store';
+
 import { ActivityTable } from '../components';
 import { mapAppointmentsToActivityEvents } from '../mapper/map-appointments-to-activity-events';
 

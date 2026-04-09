@@ -1,10 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { UserDto } from 'shared/models';
+
 import type { LoginRequest } from '../login-form/login.schema';
 import type { RegisterUserRequst } from '../register-form/register-user.schema';
 import {
   authService,
+  type AuthenticatedSessionResult,
   type CompleteAdminInvitationDto,
   type CompleteSecretaryInvitationDto,
   type ConfirmEmailDto,
@@ -21,7 +23,7 @@ export const useRegister = () =>
   });
 
 export const useLogin = () =>
-  useMutation<UserDto, ProblemDetails, LoginRequest>({
+  useMutation<AuthenticatedSessionResult, ProblemDetails, LoginRequest>({
     mutationFn: authService.login,
   });
 

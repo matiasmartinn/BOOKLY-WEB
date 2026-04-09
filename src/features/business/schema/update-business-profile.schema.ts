@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { createBusinessSchema } from '../business-wizard/schema';
 
 export const updateBusinessProfileSchema = z.object({

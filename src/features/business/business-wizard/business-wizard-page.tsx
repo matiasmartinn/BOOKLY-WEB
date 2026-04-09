@@ -1,8 +1,9 @@
 import { Box } from '@mantine/core';
-import { useNavigate } from 'react-router-dom';
-import { useBusinessStore } from 'store/use-buisness-store';
-import { useAuthStore } from 'store/use-auth-store';
 import { PATHS } from 'app/router/PATHS';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from 'store/use-auth-store';
+import { useBusinessStore } from 'store/use-buisness-store';
+
 import { BusinessWizardContainer } from './container';
 
 export function BusinessWizardPage() {

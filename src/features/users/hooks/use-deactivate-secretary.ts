@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
+
 import { usersService } from '../services';
+
 import { userQueryKey } from './query-keys';
 
 export const useDeactivateSecretary = (secretaryId: number) => {

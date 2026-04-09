@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { AppointmentMetricsDto } from 'shared/models';
+
 import { metricsService, type AppointmentMetricsQueryDto } from '../services';
 
 const appointmentMetricsQueryKey = (query?: AppointmentMetricsQueryDto) =>

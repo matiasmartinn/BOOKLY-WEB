@@ -2,6 +2,7 @@ import { Alert, Button, Group, Stack, Text } from '@mantine/core';
 import { isApiError } from 'app/api';
 import type { SecretaryDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
+
 import { useActivateSecretary, useDeactivateSecretary } from '../hooks';
 
 interface SecretaryStatusFormProps {

@@ -1,17 +1,19 @@
 import { PATHS } from 'app/router/PATHS';
 import { SecretaryPermission, type BusinessDto, type UserModel } from 'shared/models';
+
 import type { SidebarPermissions, UserRole } from './components/dashboard-sidebar';
 
 type DashboardUser = Pick<UserModel, 'id' | 'role'> | null;
 
-const APPOINTMENT_PERMISSIONS = new Set<SecretaryPermission>([
-  SecretaryPermission.ViewAppointments,
-  SecretaryPermission.CreateAppointments,
-  SecretaryPermission.EditAppointments,
-  SecretaryPermission.CancelAppointments,
-  SecretaryPermission.RescheduleAppointments,
-  SecretaryPermission.MarkAttendance,
-]);
+export interface ServicePermissions {
+  viewAppointments: boolean;
+  createAppointments: boolean;
+  editAppointments: boolean;
+  cancelAppointments: boolean;
+  rescheduleAppointments: boolean;
+  markAttendance: boolean;
+  manageSchedules: boolean;
+}
 
 const ACCOUNT_PATHS = new Set<string>([
   PATHS.dashboard.account,
@@ -37,6 +39,51 @@ export function normalizeUserRole(role?: string): UserRole {
   }
 
   return 'owner';
+}
+
+export function buildServicePermissions(
+  user: DashboardUser,
+  selectedService: BusinessDto | null,
+): ServicePermissions {
+  const role = normalizeUserRole(user?.role);
+
+  if (role === 'owner') {
+    return {
+      viewAppointments: true,
+      createAppointments: true,
+      editAppointments: true,
+      cancelAppointments: true,
+      rescheduleAppointments: true,
+      markAttendance: true,
+      manageSchedules: true,
+    };
+  }
+
+  if (role === 'admin') {
+    return {
+      viewAppointments: false,
+      createAppointments: false,
+      editAppointments: false,
+      cancelAppointments: false,
+      rescheduleAppointments: false,
+      markAttendance: false,
+      manageSchedules: false,
+    };
+  }
+
+  const grantedPermissions =
+    selectedService?.secretaryPermissions.find((item) => item.secretaryId === user?.id)?.permissions ??
+    [];
+
+  return {
+    viewAppointments: grantedPermissions.includes(SecretaryPermission.ViewAppointments),
+    createAppointments: grantedPermissions.includes(SecretaryPermission.CreateAppointments),
+    editAppointments: grantedPermissions.includes(SecretaryPermission.EditAppointments),
+    cancelAppointments: grantedPermissions.includes(SecretaryPermission.CancelAppointments),
+    rescheduleAppointments: grantedPermissions.includes(SecretaryPermission.RescheduleAppointments),
+    markAttendance: grantedPermissions.includes(SecretaryPermission.MarkAttendance),
+    manageSchedules: grantedPermissions.includes(SecretaryPermission.ManageSchedules),
+  };
 }
 
 export function buildSidebarPermissions(
@@ -69,13 +116,10 @@ export function buildSidebarPermissions(
     };
   }
 
-  const grantedPermissions =
-    selectedService?.secretaryPermissions.find((item) => item.secretaryId === user?.id)?.permissions ??
-    [];
-
-  const canManageSchedules = grantedPermissions.includes(SecretaryPermission.ManageSchedules);
-  const canViewAppointments = grantedPermissions.some((permission) =>
-    APPOINTMENT_PERMISSIONS.has(permission),
+  const servicePermissions = buildServicePermissions(user, selectedService);
+  const canManageSchedules = servicePermissions.manageSchedules;
+  const canViewAppointments = Object.entries(servicePermissions).some(([key, granted]) =>
+    key !== 'manageSchedules' && granted,
   );
 
   return {
@@ -122,6 +166,10 @@ export function canAccessDashboardPath(
 ): boolean {
   if (ACCOUNT_PATHS.has(pathname)) {
     return permissions.viewSettings;
+  }
+
+  if (ADMIN_PATHS.has(pathname)) {
+    return role === 'admin';
   }
 
   if (role === 'owner') {

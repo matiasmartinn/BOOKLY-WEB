@@ -1,4 +1,5 @@
 import { Badge, Stack, Text, Title } from '@mantine/core';
+
 import classes from '../home-page.module.css';
 
 interface SectionHeaderProps {

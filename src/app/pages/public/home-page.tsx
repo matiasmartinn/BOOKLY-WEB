@@ -1,4 +1,14 @@
 import {
+  faCalendarCheck,
+  faCheck,
+  faClock,
+  faClockRotateLeft,
+  faPlus,
+  faUsers,
+  type IconDefinition,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
   Badge,
   Box,
   Button,
@@ -11,18 +21,9 @@ import {
   ThemeIcon,
   Title,
 } from '@mantine/core';
-import {
-  faCalendarCheck,
-  faCheck,
-  faClock,
-  faClockRotateLeft,
-  faPlus,
-  faUsers,
-  type IconDefinition,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PATHS } from 'app/router/PATHS';
 import { Link } from 'react-router-dom';
+
 import { HeroProductMock, SectionHeader } from './components';
 import classes from './home-page.module.css';
 
@@ -62,24 +63,6 @@ const heroSignals: FeatureCardData[] = [
     icon: faClockRotateLeft,
     accent: 'violetAccent',
     points: ['Historico', 'Metricas'],
-  },
-];
-
-const steps = [
-  {
-    step: '01',
-    title: 'Crea tu servicio',
-    description: 'Define el servicio principal y ordena la operacion desde una base comun.',
-  },
-  {
-    step: '02',
-    title: 'Configura agenda y equipo',
-    description: 'Carga horarios, excepciones y personas que participan del dia a dia.',
-  },
-  {
-    step: '03',
-    title: 'Empieza a gestionar turnos',
-    description: 'Trabaja con reservas, seguimiento e informacion del negocio en un solo flujo.',
   },
 ];
 

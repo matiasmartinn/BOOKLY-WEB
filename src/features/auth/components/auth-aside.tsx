@@ -1,7 +1,8 @@
 import { Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import type { AuthViewContent } from './auth-shell-content';
+
 import { AuthBrand } from './auth-brand';
+import type { AuthViewContent } from './auth-shell-content';
 import classes from './auth-shell.module.css';
 
 interface AuthAsideProps {

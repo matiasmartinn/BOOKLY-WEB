@@ -1,13 +1,14 @@
-import { useState } from 'react';
 import { Alert, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useOwnerSecretaries } from 'features/users/hooks';
+import { useState } from 'react';
 import { GenericModal } from 'shared/components';
 import { PageCard } from 'shared/layout';
-import { useAppToast } from 'shared/ui/toast';
 import type { BusinessDto, SecretaryDto } from 'shared/models';
+import { useAppToast } from 'shared/ui/toast';
 import { useAuthStore } from 'store/use-auth-store';
 import { useBusinessStore } from 'store/use-buisness-store';
+
 import {
   CreateSecretaryForm,
   EditSecretaryProfileForm,
@@ -18,6 +19,7 @@ import {
 
 export function TeamPageContainer() {
   const authUser = useAuthStore((s) => s.user);
+  const services = useBusinessStore((s) => s.services);
   const selectedService = useBusinessStore((s) => s.selectedService);
   const selectService = useBusinessStore((s) => s.selectService);
 
@@ -30,6 +32,7 @@ export function TeamPageContainer() {
   const [statusOpened, statusHandlers] = useDisclosure(false);
 
   const { data = [], isLoading, isFetching, isError, refetch } = useOwnerSecretaries(authUser?.id);
+  const initialPermissionServiceId = selectedService?.id ?? services[0]?.id;
 
   const clearSelection = () => setSelectedSecretary(null);
 
@@ -73,7 +76,7 @@ export function TeamPageContainer() {
   };
 
   const openPermissions = (secretary: SecretaryDto) => {
-    if (!selectedService) return;
+    if (services.length === 0) return;
 
     setSelectedSecretary(secretary);
     permissionsHandlers.open();
@@ -104,7 +107,8 @@ export function TeamPageContainer() {
       <Stack gap="md">
         {!selectedService && (
           <Alert color="yellow" variant="light">
-            Gestion del equipo sobre el servicio seleccionado.
+            Puedes gestionar permisos por servicio desde el modal. Para crear un secretario/a,
+            primero debes seleccionar un servicio en el sidebar.
           </Alert>
         )}
 
@@ -125,6 +129,7 @@ export function TeamPageContainer() {
             onManagePermissions={openPermissions}
             onManageStatus={openStatus}
             canCreate={Boolean(authUser && selectedService)}
+            canManagePermissions={services.length > 0}
           />
         </PageCard>
       </Stack>
@@ -163,12 +168,12 @@ export function TeamPageContainer() {
         title="Permisos"
         size="lg"
       >
-        {permissionsOpened && selectedSecretary && selectedService && authUser ? (
+        {permissionsOpened && selectedSecretary && authUser && services.length > 0 ? (
           <SecretaryPermissionsForm
             ownerId={authUser.id}
-            currentUserRole={authUser.role}
             secretary={selectedSecretary}
-            selectedService={selectedService}
+            services={services}
+            initialServiceId={initialPermissionServiceId}
             onCancel={closePermissions}
             onSuccess={handlePermissionsSuccess}
             onServiceUpdated={handleServiceUpdated}

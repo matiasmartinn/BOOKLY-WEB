@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Alert, Button, Checkbox, Group, Stack, Text } from '@mantine/core';
+import { Alert, Button, Checkbox, Group, Select, Stack, Text } from '@mantine/core';
 import { isApiError } from 'app/api';
+import { useBusiness } from 'features/business/hooks';
 import {
   useGrantSecretaryPermission,
   useRevokeSecretaryPermission,
   useSetSecretaryServiceAccess,
 } from 'features/users/hooks';
+import { useEffect, useMemo, useState } from 'react';
 import {
   SecretaryPermission,
   type BusinessDto,
@@ -16,9 +17,9 @@ import { useBusinessStore } from 'store/use-buisness-store';
 
 interface SecretaryPermissionsFormProps {
   ownerId: number;
-  currentUserRole: string;
   secretary: SecretaryDto;
-  selectedService: BusinessDto;
+  services: BusinessDto[];
+  initialServiceId?: number;
   onCancel: () => void;
   onSuccess: () => void;
   onServiceUpdated: (service: BusinessDto) => void;
@@ -70,47 +71,81 @@ const SECRETARY_PERMISSION_OPTIONS: PermissionOption[] = [
 
 export function SecretaryPermissionsForm({
   ownerId,
-  currentUserRole,
   secretary,
-  selectedService,
+  services,
+  initialServiceId,
   onCancel,
   onSuccess,
   onServiceUpdated,
 }: SecretaryPermissionsFormProps) {
-  const selectService = useBusinessStore((state) => state.selectService);
+  const updateService = useBusinessStore((state) => state.updateService);
+  const [activeServiceId, setActiveServiceId] = useState<number | null>(
+    initialServiceId ?? services[0]?.id ?? null,
+  );
+  const {
+    data: serviceData,
+    isLoading: isServiceLoading,
+    isFetching: isServiceFetching,
+    refetch: refetchService,
+  } = useBusiness(activeServiceId ?? undefined);
+
+  const activeService = useMemo(
+    () => serviceData ?? services.find((service) => service.id === activeServiceId) ?? null,
+    [activeServiceId, serviceData, services],
+  );
+  const serviceOptions = useMemo(
+    () =>
+      [...services]
+        .sort((left, right) => left.name.localeCompare(right.name, 'es-AR'))
+        .map((service) => ({
+          value: String(service.id),
+          label: service.name,
+        })),
+    [services],
+  );
 
   const permissionEntry = useMemo<ServiceSecretaryPermissionsDto | undefined>(
-    () =>
-      selectedService.secretaryPermissions.find((item) => item.secretaryId === secretary.id),
-    [secretary.id, selectedService.secretaryPermissions],
+    () => activeService?.secretaryPermissions.find((item) => item.secretaryId === secretary.id),
+    [activeService, secretary.id],
   );
 
-  const currentHasAccess = selectedService.secretaryIds.includes(secretary.id);
-  const currentPermissions = useMemo(
-    () => permissionEntry?.permissions ?? [],
-    [permissionEntry],
-  );
+  const currentHasAccess = activeService?.secretaryIds.includes(secretary.id) ?? false;
+  const currentPermissions = useMemo(() => permissionEntry?.permissions ?? [], [permissionEntry]);
 
   const [hasAccess, setHasAccess] = useState(currentHasAccess);
-  const [selectedPermissions, setSelectedPermissions] = useState<SecretaryPermission[]>(
-    currentPermissions,
-  );
+  const [selectedPermissions, setSelectedPermissions] =
+    useState<SecretaryPermission[]>(currentPermissions);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const setAccessMutation = useSetSecretaryServiceAccess(selectedService.id, ownerId);
-  const grantPermissionMutation = useGrantSecretaryPermission(selectedService.id, secretary.id, ownerId);
-  const revokePermissionMutation = useRevokeSecretaryPermission(selectedService.id, secretary.id, ownerId);
+  const setAccessMutation = useSetSecretaryServiceAccess(activeService?.id ?? 0, ownerId);
+  const grantPermissionMutation = useGrantSecretaryPermission(
+    activeService?.id ?? 0,
+    secretary.id,
+    ownerId,
+  );
+  const revokePermissionMutation = useRevokeSecretaryPermission(
+    activeService?.id ?? 0,
+    secretary.id,
+    ownerId,
+  );
 
   const isPending =
+    isServiceLoading ||
+    isServiceFetching ||
     setAccessMutation.isPending ||
     grantPermissionMutation.isPending ||
     revokePermissionMutation.isPending;
 
   useEffect(() => {
+    setActiveServiceId(initialServiceId ?? services[0]?.id ?? null);
+    setSubmitError(null);
+  }, [initialServiceId, secretary.id, services]);
+
+  useEffect(() => {
     setHasAccess(currentHasAccess);
     setSelectedPermissions(currentPermissions);
     setSubmitError(null);
-  }, [currentHasAccess, currentPermissions, selectedService.id, secretary.id]);
+  }, [activeService?.id, currentHasAccess, currentPermissions, secretary.id]);
 
   const togglePermission = (permission: SecretaryPermission, checked: boolean) => {
     setSelectedPermissions((current) => {
@@ -125,7 +160,12 @@ export function SecretaryPermissionsForm({
   const handleSubmit = async () => {
     setSubmitError(null);
 
-    const currentSecretaryIds = selectedService.secretaryIds.filter((id): id is number => id != null);
+    if (!activeService) {
+      setSubmitError('No se pudo cargar el servicio a gestionar.');
+      return;
+    }
+
+    const currentSecretaryIds = activeService.secretaryIds.filter((id): id is number => id != null);
     const nextSecretaryIds = hasAccess
       ? Array.from(new Set([...currentSecretaryIds, secretary.id]))
       : currentSecretaryIds.filter((id) => id !== secretary.id);
@@ -148,23 +188,19 @@ export function SecretaryPermissionsForm({
       for (const permission of permissionsToGrant) {
         await grantPermissionMutation.mutateAsync({
           permission,
-          currentUserId: ownerId,
-          currentUserRole,
         });
       }
 
       for (const permission of permissionsToRevoke) {
         await revokePermissionMutation.mutateAsync({
           permission,
-          currentUserId: ownerId,
-          currentUserRole,
         });
       }
 
-      await selectService(selectedService.id);
-
-      const refreshedService = useBusinessStore.getState().selectedService;
+      const refreshedResult = await refetchService();
+      const refreshedService = refreshedResult.data;
       if (refreshedService) {
+        updateService(refreshedService);
         onServiceUpdated(refreshedService);
       }
 
@@ -178,37 +214,41 @@ export function SecretaryPermissionsForm({
 
   return (
     <Stack gap="lg">
-      <Stack gap={4}>
-        <Text fw={600}>Permisos del servicio</Text>
-        <Text size="sm" c="dimmed">
-          Define si el secretario puede operar en este servicio y que acciones puede realizar.
-        </Text>
-      </Stack>
-
       {submitError && (
         <Alert color="red" variant="light">
           {submitError}
         </Alert>
       )}
 
-      <Alert color="blue" variant="light">
-        Servicio actual: {selectedService.name}
-      </Alert>
-
+      {serviceOptions.length > 0 ? (
+        <Select
+          label="Servicio"
+          fw={500}
+          description="Selecciona el servicio sobre el que quieres gestionar acceso y permisos."
+          data={serviceOptions}
+          value={activeServiceId != null ? String(activeServiceId) : null}
+          onChange={(value) => {
+            setActiveServiceId(value ? Number(value) : null);
+            setSubmitError(null);
+          }}
+          disabled={isPending || serviceOptions.length === 1}
+          allowDeselect={false}
+        />
+      ) : (
+        <Alert color="yellow" variant="light">
+          No hay servicios disponibles para configurar.
+        </Alert>
+      )}
       <Checkbox
         checked={hasAccess}
         onChange={(event) => setHasAccess(event.currentTarget.checked)}
-        label={`Puede operar en ${selectedService.name}`}
+        label={`Puede operar en ${activeService?.name ?? 'este servicio'}`}
         description="Si desactivas este acceso, el secretario deja de estar asignado al servicio."
-        disabled={isPending}
+        disabled={isPending || !activeService}
       />
 
       <Stack gap="xs">
-        <Text fw={500}>Permisos granulares</Text>
-        <Text size="sm" c="dimmed">
-          Estos permisos se aplican sobre el servicio actualmente seleccionado.
-        </Text>
-
+        <Text fw={600}>Permisos</Text>
         {SECRETARY_PERMISSION_OPTIONS.map((option) => (
           <Checkbox
             key={option.value}
@@ -216,15 +256,10 @@ export function SecretaryPermissionsForm({
             onChange={(event) => togglePermission(option.value, event.currentTarget.checked)}
             label={option.label}
             description={option.description}
-            disabled={isPending || !hasAccess}
+            disabled={isPending || !hasAccess || !activeService}
           />
         ))}
       </Stack>
-
-      <Text size="sm" c="dimmed">
-        Servicios asignados actualmente: {secretary.serviceIds.length}
-      </Text>
-
       <Group justify="flex-end">
         <Button type="button" variant="default" onClick={onCancel} disabled={isPending}>
           Cancelar

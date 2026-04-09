@@ -25,6 +25,12 @@ interface BusinessStore {
   selectService: (id: number) => Promise<void>;
 
   /**
+   * Sincroniza servicios sin disparar el loader global del dashboard.
+   * Se usa para refrescos silenciosos del contexto actual.
+   */
+  refreshServices: (user: BusinessContextUser) => Promise<void>;
+
+  /**
    * Actualización local luego de un PUT — evita re-fetchear toda la lista.
    */
   updateService: (updated: BusinessDto) => void;
@@ -39,17 +45,67 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
   isLoadingDetail: false,
   initialized: false,
 
+  refreshServices: async (user) => {
+    try {
+      const normalizedRole = user.role.trim().toLowerCase();
+      const currentSelectedServiceId = get().selectedService?.id;
+
+      if (normalizedRole === 'owner') {
+        const services = await businessService.getByOwner(user.id);
+        const nextSelectedServiceId =
+          services.find((service) => service.id === currentSelectedServiceId)?.id ?? services[0]?.id;
+
+        if (!nextSelectedServiceId) {
+          set({ services, selectedService: null });
+          return;
+        }
+
+        const selectedService = await businessService.getById(nextSelectedServiceId);
+        set({ services, selectedService });
+        return;
+      }
+
+      if (normalizedRole === 'secretary') {
+        const serviceIds = Array.from(new Set(user.serviceIds)).filter((id) => id > 0);
+
+        if (serviceIds.length === 0) {
+          set({ services: [], selectedService: null });
+          return;
+        }
+
+        const services = await Promise.all(
+          serviceIds.map((serviceId) => businessService.getById(serviceId)),
+        );
+        const orderedServices = [...services].sort((left, right) => left.id - right.id);
+        const nextSelectedService =
+          orderedServices.find((service) => service.id === currentSelectedServiceId) ??
+          orderedServices[0] ??
+          null;
+
+        set({ services: orderedServices, selectedService: nextSelectedService });
+        return;
+      }
+
+      set({ services: [], selectedService: null });
+    } catch {
+      // Silent refreshes should not reset the current dashboard state on transient failures.
+    }
+  },
+
   loadServices: async (user) => {
     set({ isLoading: true, initialized: false });
     try {
       const normalizedRole = user.role.trim().toLowerCase();
+      const currentSelectedServiceId = get().selectedService?.id;
 
       if (normalizedRole === 'owner') {
         const services = await businessService.getByOwner(user.id);
         set({ services, isLoading: false, initialized: true });
 
         if (services.length > 0) {
-          await get().selectService(services[0].id);
+          const nextSelectedServiceId =
+            services.find((service) => service.id === currentSelectedServiceId)?.id ?? services[0].id;
+          await get().selectService(nextSelectedServiceId);
         } else {
           set({ selectedService: null });
         }
@@ -69,10 +125,14 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
           serviceIds.map((serviceId) => businessService.getById(serviceId)),
         );
         const orderedServices = [...services].sort((left, right) => left.id - right.id);
+        const nextSelectedService =
+          orderedServices.find((service) => service.id === currentSelectedServiceId) ??
+          orderedServices[0] ??
+          null;
 
         set({
           services: orderedServices,
-          selectedService: orderedServices[0] ?? null,
+          selectedService: nextSelectedService,
           isLoading: false,
           initialized: true,
         });

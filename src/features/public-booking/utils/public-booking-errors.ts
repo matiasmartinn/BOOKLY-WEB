@@ -1,4 +1,5 @@
 import type { ProblemDetails } from 'app/api';
+
 import type {
   PublicBookingProblemState,
   PublicBookingTerminalState,

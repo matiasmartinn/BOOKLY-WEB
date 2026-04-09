@@ -4,7 +4,6 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'node:path';
 
-// eslint-disable-next-line import/no-default-export
 export default defineConfig({
   plugins: [
     react(),

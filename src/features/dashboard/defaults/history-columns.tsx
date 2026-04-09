@@ -1,6 +1,7 @@
 import { Badge, Stack, Text } from '@mantine/core';
 import type { TableColumn } from 'shared/components/generic-table';
 import { formatDateTime, formatTime } from 'shared/utils';
+
 import { getAppointmentStatusColor, getAppointmentStatusLabel } from '../utils';
 import type { HistoryAppointmentViewModel } from '../viewmodel/history-appointment-view-model';
 
@@ -41,9 +42,9 @@ export const historyColumns: TableColumn<HistoryAppointmentViewModel>[] = [
     sortable: true,
   },
   {
-    key: 'secretaryName',
-    title: 'Secretario/a',
-    accessor: 'secretaryName',
+    key: 'createdByLabel',
+    title: 'Generado por',
+    accessor: 'createdByLabel',
     sortable: true,
   },
   {

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import { getMonthDateOnlyRange } from 'shared/utils';
 import { useBusinessStore } from 'store/use-buisness-store';
+
 import { appointmentService } from '../services';
 
 export const useAppointmentAvailableDates = (visibleDate: string | null) => {

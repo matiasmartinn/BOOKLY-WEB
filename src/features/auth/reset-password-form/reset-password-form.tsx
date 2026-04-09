@@ -1,12 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Anchor, Button, PasswordInput, Stack, Text } from '@mantine/core';
 import { PATHS } from 'app/router';
-import { Link, useSearchParams } from 'react-router-dom';
+import { AuthFormWrapper } from 'features/auth/components';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import { Link, useSearchParams } from 'react-router-dom';
+
 import { useResetPassword } from '../auth.hooks';
 import { getAuthErrorMessage } from '../get-auth-error-message';
+
 import { resetPasswordSchema, type ResetPasswordValues } from './reset-password.schema';
-import { AuthFormWrapper } from 'features/auth/components';
+
 
 export function ResetPasswordForm() {
   const [searchParams] = useSearchParams();
