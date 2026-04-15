@@ -27,7 +27,6 @@ import {
   YAxis,
 } from 'recharts';
 import { GenericModal } from 'shared/components';
-import { PageShell } from 'shared/layout';
 import { appChartColorVars, appChartTooltipStyles, appColorVars } from 'shared/ui/theme/theme';
 import { useAppToast } from 'shared/ui/toast';
 
@@ -251,10 +250,9 @@ export function AdminDashboardPageContainer() {
   ];
 
   return (
-    <PageShell
-      title="Resumen admin"
-      actions={
-        <Group align="end">
+    <>
+      <Stack gap="lg">
+        <Group justify="flex-end" align="end" wrap="wrap">
           <Select
             w={190}
             label="Periodo"
@@ -267,17 +265,9 @@ export function AdminDashboardPageContainer() {
             }}
           />
 
-          <Button
-            onClick={() => {
-              inviteHandlers.open();
-            }}
-          >
-            Invitar admin
-          </Button>
+          <Button onClick={inviteHandlers.open}>Invitar admin</Button>
         </Group>
-      }
-    >
-      <Stack gap="lg">
+
         {isError ? (
           <Alert color={dashboard ? 'warning' : 'error'} variant="light">
             {dashboard
@@ -513,13 +503,19 @@ export function AdminDashboardPageContainer() {
         {inviteOpened ? (
           <InviteAdminForm
             onCancel={inviteHandlers.close}
-            onSuccess={() => {
+            onSuccess={(result) => {
               inviteHandlers.close();
-              toast.success('Invitacion enviada correctamente.');
+              if (result.emailDispatch.emailSent) {
+                toast.success(result.emailDispatch.message);
+              } else {
+                toast.error(result.emailDispatch.message, {
+                  title: 'Admin creado con advertencia',
+                });
+              }
             }}
           />
         ) : null}
       </GenericModal>
-    </PageShell>
+    </>
   );
 }

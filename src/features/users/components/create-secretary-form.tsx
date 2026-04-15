@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Button, Group, Stack, TextInput } from '@mantine/core';
 import { isApiError } from 'app/api';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import type { UserEmailDispatchResultDto } from 'shared/models';
 
 import { useCreateSecretary } from '../hooks';
 import { createSecretarySchema, type CreateSecretaryFormValues } from '../schema';
@@ -10,7 +11,7 @@ interface CreateSecretaryFormProps {
   ownerId: number;
   serviceId: number;
   onCancel: () => void;
-  onSuccess: () => void;
+  onSuccess: (result: UserEmailDispatchResultDto) => void;
 }
 
 const defaultValues: CreateSecretaryFormValues = {
@@ -46,7 +47,9 @@ export function CreateSecretaryForm({
         serviceId,
       },
       {
-        onSuccess,
+        onSuccess: (result) => {
+          onSuccess(result);
+        },
       },
     );
   };

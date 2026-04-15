@@ -93,6 +93,7 @@ export function ConfirmStep() {
             value: values.serviceTypeId ? (SERVICE_TYPE_LABELS[values.serviceTypeId] ?? '—') : '—',
           },
           { label: 'Descripción', value: values.description || 'Sin descripción' },
+          { label: 'Telefono', value: values.phoneNumber || 'Sin telefono' },
           { label: 'URL', value: values.slug ? `bookly.app/${values.slug}` : '—' },
         ]}
       />

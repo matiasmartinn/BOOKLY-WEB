@@ -1,7 +1,7 @@
 export const PATHS = {
   public: {
     home: '/',
-    booking: '/book/:slug/:token',
+    booking: '/book/:slug/:code',
   },
   auth: {
     root: '/auth',
@@ -20,6 +20,7 @@ export const PATHS = {
     adminOverview: '/dashboard/admin',
     adminOwners: '/dashboard/admin/owners',
     adminServices: '/dashboard/admin/services',
+    adminServiceTypes: '/dashboard/admin/service-types',
     events: '/dashboard/events',
     activity: '/dashboard/activity',
     appointments: '/dashboard/appointments',

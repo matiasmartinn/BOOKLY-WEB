@@ -3,4 +3,6 @@ export * from './admin-section-card';
 export * from './admin-status-form';
 export * from './admin-owners-table';
 export * from './admin-services-table';
+export * from './admin-service-types-table';
+export * from './admin-service-type-form';
 export * from './invite-admin-form';

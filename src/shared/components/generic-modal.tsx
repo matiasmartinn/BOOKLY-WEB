@@ -17,6 +17,7 @@ interface GenericModalProps {
   closeOnEscape?: boolean;
   withCloseButton?: boolean;
   loading?: boolean;
+  styles?: ModalProps['styles'];
 }
 
 export function GenericModal({
@@ -32,6 +33,7 @@ export function GenericModal({
   closeOnEscape = true,
   withCloseButton = true,
   loading = false,
+  styles,
 }: GenericModalProps) {
   const modalTitle = description ? (
     <ModalHeader title={title} description={description} />
@@ -51,8 +53,9 @@ export function GenericModal({
       closeOnClickOutside={!loading && closeOnClickOutside}
       closeOnEscape={!loading && closeOnEscape}
       withCloseButton={withCloseButton && !loading}
-      radius="md"
+      radius="xl"
       padding="xl"
+      styles={styles}
       classNames={{
         content: classes.content,
         header: classes.header,

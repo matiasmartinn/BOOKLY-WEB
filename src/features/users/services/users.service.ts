@@ -1,6 +1,6 @@
 import { apiClient } from 'app/api';
 import type { SecretaryPermission } from 'shared/models';
-import { type BusinessDto, type SecretaryDto, type UserDto } from 'shared/models';
+import { type BusinessDto, type SecretaryDto, type UserDto, type UserEmailDispatchResultDto } from 'shared/models';
 
 export interface CreateSecretaryDto {
   firstName: string;
@@ -28,7 +28,7 @@ export const usersService = {
 
   createSecretary: (ownerId: number, dto: CreateSecretaryDto) =>
     apiClient
-      .post<UserDto>(`/users/owners/${ownerId}/secretaries`, dto)
+      .post<UserEmailDispatchResultDto>(`/users/owners/${ownerId}/secretaries`, dto)
       .then((response) => response.data),
 
   getSecretariesByOwner: (ownerId: number) =>

@@ -33,14 +33,14 @@ import { PublicBookingScheduleSection } from './public-booking-schedule-section'
 interface PublicBookingFormProps {
   service: PublicServiceBookingDto;
   slug: string;
-  token: string;
+  code: string;
   onTerminalError?: (state: PublicBookingProblemState) => void;
 }
 
 export function PublicBookingForm({
   service,
   slug,
-  token,
+  code,
   onTerminalError,
 }: PublicBookingFormProps) {
   const toast = useAppToast();
@@ -55,7 +55,7 @@ export function PublicBookingForm({
     reset,
     setError,
     setValue,
-    formState: { errors },
+    formState: { errors, submitCount },
   } = useForm<PublicAppointmentFormValues>({
     resolver: zodResolver(createPublicAppointmentSchema),
     mode: 'onTouched',
@@ -70,7 +70,7 @@ export function PublicBookingForm({
     isLoading: isLoadingAvailableDates,
     isError: isAvailableDatesError,
     error: availableDatesError,
-  } = usePublicAvailableDates(slug, token, calendarDate);
+  } = usePublicAvailableDates(slug, code, calendarDate);
 
   const {
     data: slots = [],
@@ -78,7 +78,7 @@ export function PublicBookingForm({
     isFetching: isFetchingSlots,
     isError: isSlotsError,
     error: availableSlotsError,
-  } = usePublicAvailableSlots(slug, token, selectedDate);
+  } = usePublicAvailableSlots(slug, code, selectedDate);
 
   const {
     mutateAsync,
@@ -86,7 +86,7 @@ export function PublicBookingForm({
     isPending,
     isError: isSubmitError,
     error: submitError,
-  } = useCreatePublicAppointment(slug, token);
+  } = useCreatePublicAppointment(slug, code);
 
   const availableDateSet = useMemo(
     () => new Set(availableDates.map((date) => date.trim())),
@@ -106,14 +106,14 @@ export function PublicBookingForm({
 
   useEffect(() => {
     const terminalProblem =
-      resolvePublicBookingProblemState(availableDatesError) ??
-      resolvePublicBookingProblemState(availableSlotsError) ??
-      resolvePublicBookingProblemState(submitError);
+      resolvePublicBookingProblemState(availableDatesError, code) ??
+      resolvePublicBookingProblemState(availableSlotsError, code) ??
+      resolvePublicBookingProblemState(submitError, code);
 
     if (terminalProblem) {
       onTerminalError?.(terminalProblem);
     }
-  }, [availableDatesError, availableSlotsError, onTerminalError, submitError]);
+  }, [availableDatesError, availableSlotsError, code, onTerminalError, submitError]);
 
   const handleDateChange = (value: string | null) => {
     setValue('date', value ?? null, {
@@ -124,7 +124,7 @@ export function PublicBookingForm({
     setCalendarDate(value ?? null);
     setValue('slot', '', {
       shouldDirty: true,
-      shouldValidate: true,
+      shouldValidate: false,
     });
     clearErrors('slot');
   };
@@ -203,7 +203,7 @@ export function PublicBookingForm({
           </Alert>
         ) : null}
 
-        {isSubmitError && submitError && !resolvePublicBookingProblemState(submitError) ? (
+        {isSubmitError && submitError && !resolvePublicBookingProblemState(submitError, code) ? (
           <Alert color="red" variant="light">
             {submitError.detail}
           </Alert>
@@ -232,7 +232,7 @@ export function PublicBookingForm({
             onSlotChange={handleSlotChange}
             selectedDate={selectedDate}
             selectedSlot={selectedSlot}
-            slotError={errors.slot?.message}
+            slotError={submitCount > 0 ? errors.slot?.message : undefined}
             slots={slots}
           />
         </Stack>

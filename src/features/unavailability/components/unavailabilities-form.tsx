@@ -1,14 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Alert,
-  Button,
-  Group,
-  SimpleGrid,
-  Stack,
-  Switch,
-  Text,
-  Textarea,
-} from '@mantine/core';
+import { Alert, Button, Group, SimpleGrid, Stack, Switch, Text, Textarea } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { isApiError } from 'app/api';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
@@ -90,15 +81,6 @@ export function UnavailabilitiesForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap="lg">
-        <Stack gap={4}>
-          <Text fw={600}>Nueva excepcion</Text>
-          <Text size="sm" c="dimmed">
-            {selectedService
-              ? `Servicio activo: ${selectedService.name}. Define el rango bloqueado y, si aplica, la franja horaria.`
-              : 'Selecciona un servicio desde el sidebar para poder registrar excepciones.'}
-          </Text>
-        </Stack>
-
         {errors.root?.message && (
           <Alert color="red" variant="light">
             {errors.root.message}

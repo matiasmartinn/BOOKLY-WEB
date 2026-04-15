@@ -147,6 +147,7 @@ const logout = (refreshToken: string) =>
       '/auth/logout',
       { refreshToken },
       {
+        skipAuth: true,
         skipAuthRefresh: true,
       },
     )

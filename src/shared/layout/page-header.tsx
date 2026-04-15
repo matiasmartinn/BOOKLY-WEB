@@ -10,11 +10,26 @@ interface PageHeaderProps {
 export function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
     <Group justify="space-between" align="flex-start" wrap="wrap">
-      <Box>
-        <Title order={2}>{title}</Title>
+      <Box maw={680}>
+        <Title
+          order={2}
+          style={{
+            color: 'var(--app-color-text-primary)',
+            letterSpacing: '-0.02em',
+          }}
+        >
+          {title}
+        </Title>
 
         {description && (
-          <Text c="dimmed" size="sm" mt={4}>
+          <Text
+            size="md"
+            mt={6}
+            style={{
+              color: 'var(--app-color-text-secondary)',
+              lineHeight: 1.6,
+            }}
+          >
             {description}
           </Text>
         )}

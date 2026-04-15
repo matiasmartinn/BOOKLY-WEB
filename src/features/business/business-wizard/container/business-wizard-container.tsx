@@ -1,7 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box } from '@mantine/core';
-import { useState } from 'react';
+import { Alert, Box } from '@mantine/core';
+import { isApiError } from 'app/api';
+import { useState, type ReactNode } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { findOverlappingScheduleDay } from 'features/schedules/utils/schedules.utils';
+import type { BusinessDto } from 'shared/models';
 import { useAuthStore } from 'store/use-auth-store';
 
 import { useCreateBusiness } from '../../hooks/use-create-business';
@@ -11,7 +14,7 @@ import { BUSINESS_WIZARD_STEPS } from '../components/business-wizard-step';
 import { BasicInfoStep, ConfirmStep, SchedulesStep } from '../components/steps';
 import { createBusinessSchema, stepSchemas, type CreateBusinessFormValues } from '../schema';
 
-const STEP_COMPONENTS: Partial<Record<string, React.ReactNode>> = {
+const STEP_COMPONENTS: Partial<Record<string, ReactNode>> = {
   basic: <BasicInfoStep />,
   schedules: <SchedulesStep />,
   confirm: <ConfirmStep />,
@@ -23,15 +26,26 @@ const STEP_VALIDATION_KEYS: Partial<Record<string, keyof typeof stepSchemas>> = 
 };
 
 interface BusinessWizardProps {
-  onComplete: () => void;
+  onComplete: (createdService: BusinessDto) => void | Promise<void>;
   onCancel: () => void;
+}
+
+const OVERLAPPING_SCHEDULES_MESSAGE = 'Hay horarios superpuestos en el mismo dia.';
+const MINIMUM_SCHEDULES_MESSAGE = 'Configura al menos un horario de atencion.';
+
+function getCreateServiceErrorMessage(error: unknown) {
+  if (isApiError(error) && error.detail.trim().length > 0) {
+    return error.detail;
+  }
+
+  return 'No se pudo crear el servicio.';
 }
 
 export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizardProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const authUser = useAuthStore((s) => s.user);
 
-  const { mutate: createService, isPending } = useCreateBusiness();
+  const { mutateAsync: createService, isPending, isError, error } = useCreateBusiness();
 
   const methods = useForm<CreateBusinessFormValues>({
     resolver: zodResolver(createBusinessSchema),
@@ -39,6 +53,7 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
     defaultValues: {
       name: '',
       description: '',
+      phoneNumber: '',
       slug: '',
       serviceTypeId: undefined,
       durationMinutes: undefined,
@@ -47,7 +62,7 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
     },
   });
 
-  const { watch, trigger, getValues, setError } = methods;
+  const { watch, trigger, getValues, setError, clearErrors } = methods;
   const values = watch();
 
   const stepIndex = (id: string) => BUSINESS_WIZARD_STEPS.findIndex((s) => s.id === id);
@@ -56,7 +71,7 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
       activeIndex > stepIndex('basic') && values.name
         ? [
             { label: 'Nombre', value: values.name },
-            { label: 'Tipo', value: values.serviceTypeId ? `Tipo ${values.serviceTypeId}` : '—' },
+            { label: 'Tipo', value: values.serviceTypeId ? `Tipo ${values.serviceTypeId}` : '---' },
           ]
         : [],
     schedules:
@@ -64,8 +79,6 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
         ? [{ label: 'Horarios', value: `${values.schedules.length} franjas configuradas` }]
         : [],
   };
-
-  // ── Navigation ────────────────────────────────────────────────────────────
 
   const handleNext = async () => {
     const currentStepId = BUSINESS_WIZARD_STEPS[activeIndex].id;
@@ -79,17 +92,27 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
       if (!valid) return;
     }
 
-    // Validación manual del paso de horarios
     if (currentStepId === 'schedules') {
       const current = getValues('schedules') ?? [];
       const result = stepSchemas.schedules.safeParse({ schedules: current });
+
       if (!result.success) {
         setError('schedules', {
           type: 'manual',
-          message: 'Configurá al menos un horario de atención',
+          message: MINIMUM_SCHEDULES_MESSAGE,
         });
         return;
       }
+
+      if (findOverlappingScheduleDay(current) !== null) {
+        setError('schedules', {
+          type: 'manual',
+          message: OVERLAPPING_SCHEDULES_MESSAGE,
+        });
+        return;
+      }
+
+      clearErrors('schedules');
     }
 
     if (activeIndex < BUSINESS_WIZARD_STEPS.length - 1) {
@@ -97,7 +120,7 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
       return;
     }
 
-    handleSubmit();
+    await handleSubmit();
   };
 
   const handleBack = () => {
@@ -108,20 +131,33 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
     if (index < activeIndex) setActiveIndex(index);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!authUser) return;
 
     const form = getValues();
+    const schedules = form.schedules ?? [];
 
-    createService(
-      {
+    if (findOverlappingScheduleDay(schedules) !== null) {
+      setActiveIndex(stepIndex('schedules'));
+      setError('schedules', {
+        type: 'manual',
+        message: OVERLAPPING_SCHEDULES_MESSAGE,
+      });
+      return;
+    }
+
+    try {
+      const createdService = await createService({
         ...form,
         ownerId: authUser.id,
         slug: form.slug || form.name.toLowerCase().replace(/\s+/g, '-'),
-        schedules: form.schedules ?? [],
-      },
-      { onSuccess: onComplete },
-    );
+        schedules,
+      });
+
+      await onComplete(createdService);
+    } catch {
+      // El error se muestra inline desde el estado del mutation.
+    }
   };
 
   const activeStep = BUSINESS_WIZARD_STEPS[activeIndex];
@@ -153,6 +189,12 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
           onNext={handleNext}
           onCancel={onCancel}
         >
+          {isError && error && (
+            <Alert color="red" variant="light">
+              {getCreateServiceErrorMessage(error)}
+            </Alert>
+          )}
+
           {STEP_COMPONENTS[activeStep.id]}
         </WizardRightPanel>
       </Box>

@@ -3,12 +3,13 @@ import { Alert, Button, Group, Stack, TextInput } from '@mantine/core';
 import { isApiError } from 'app/api';
 import { createSecretarySchema, type CreateSecretaryFormValues } from 'features/users/schema';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import type { UserEmailDispatchResultDto } from 'shared/models';
 
 import { useInviteAdmin } from '../hooks';
 
 interface InviteAdminFormProps {
   onCancel: () => void;
-  onSuccess: () => void;
+  onSuccess: (result: UserEmailDispatchResultDto) => void;
 }
 
 const defaultValues: CreateSecretaryFormValues = {
@@ -38,13 +39,13 @@ export function InviteAdminForm({ onCancel, onSuccess }: InviteAdminFormProps) {
         lastName: values.lastName.trim(),
         email: values.email.trim(),
       },
-      {
-        onSuccess: () => {
-          reset(defaultValues);
-          onSuccess();
+        {
+          onSuccess: (result) => {
+            reset(defaultValues);
+            onSuccess(result);
+          },
         },
-      },
-    );
+      );
   };
 
   return (

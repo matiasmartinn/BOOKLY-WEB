@@ -30,12 +30,12 @@ export const useAddUnavailability = () => {
   });
 };
 
-export const useRemoveUnavailability = (unavailabilityId: number) => {
+export const useRemoveUnavailability = () => {
   const selectedService = useBusinessStore((state) => state.selectedService);
   const queryClient = useQueryClient();
 
-  return useMutation<void, ProblemDetails, void>({
-    mutationFn: () => unavailabilityService.remove(selectedService!.id, unavailabilityId),
+  return useMutation<void, ProblemDetails, number>({
+    mutationFn: (unavailabilityId) => unavailabilityService.remove(selectedService!.id, unavailabilityId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['appointments'],

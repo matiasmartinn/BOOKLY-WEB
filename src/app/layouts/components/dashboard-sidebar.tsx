@@ -171,6 +171,11 @@ const ADMIN_NAV_SECTIONS: NavSection[] = [
       { label: 'Resumen', icon: faChartPie, path: PATHS.dashboard.adminOverview },
       { label: 'Owners', icon: faUsers, path: PATHS.dashboard.adminOwners },
       { label: 'Servicios', icon: faStore, path: PATHS.dashboard.adminServices },
+      {
+        label: 'Tipos de servicio',
+        icon: faRectangleList,
+        path: PATHS.dashboard.adminServiceTypes,
+      },
     ],
   },
 ];

@@ -1,6 +1,7 @@
 import { Box } from '@mantine/core';
 import { PATHS } from 'app/router/PATHS';
 import { useNavigate } from 'react-router-dom';
+import type { BusinessDto } from 'shared/models';
 import { useAuthStore } from 'store/use-auth-store';
 import { useBusinessStore } from 'store/use-buisness-store';
 
@@ -10,13 +11,16 @@ export function BusinessWizardPage() {
   const navigate = useNavigate();
   const authUser = useAuthStore((s) => s.user);
   const loadServices = useBusinessStore((s) => s.loadServices);
+  const selectService = useBusinessStore((s) => s.selectService);
 
-  const handleComplete = async () => {
+  const handleComplete = async (createdService: BusinessDto) => {
     // Recarga la lista de servicios para que el switcher
-    // muestre el recién creado sin necesidad de re-login.
+    // muestre el reciÃ©n creado sin necesidad de re-login.
     if (authUser) {
       await loadServices(authUser);
+      await selectService(createdService.id);
     }
+
     navigate(PATHS.dashboard.service, { replace: true });
   };
 

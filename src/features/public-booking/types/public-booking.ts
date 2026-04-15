@@ -4,6 +4,7 @@ export interface PublicServiceBookingDto {
   name: string;
   ownerName?: string | null;
   description?: string | null;
+  phoneNumber?: string | null;
   placeName?: string | null;
   address?: string | null;
   googleMapsUrl?: string | null;

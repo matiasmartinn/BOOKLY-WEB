@@ -3,15 +3,15 @@ import { generatePath } from 'react-router-dom';
 
 const getWindowOrigin = () => (typeof window !== 'undefined' ? window.location.origin : undefined);
 
-export const buildPublicBookingPath = (slug: string, token: string) =>
-  generatePath(PATHS.public.booking, { slug, token });
+export const buildPublicBookingPath = (slug: string, code: string) =>
+  generatePath(PATHS.public.booking, { slug, code });
 
 export const buildPublicBookingUrl = (
   slug: string,
-  token: string,
+  code: string,
   origin = getWindowOrigin(),
 ) => {
-  const publicPath = buildPublicBookingPath(slug, token);
+  const publicPath = buildPublicBookingPath(slug, code);
 
   if (!origin) {
     return publicPath;

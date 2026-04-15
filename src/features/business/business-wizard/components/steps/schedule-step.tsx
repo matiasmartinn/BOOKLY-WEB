@@ -54,6 +54,7 @@ export function SchedulesStep() {
     setValue,
     watch,
     control,
+    clearErrors,
     formState: { errors },
   } = useFormContext<CreateBusinessFormValues>();
   const [schedules, setSchedules] = useState<SchedulesState>(buildInitial);
@@ -62,6 +63,7 @@ export function SchedulesStep() {
 
   const update = (next: SchedulesState) => {
     setSchedules(next);
+    clearErrors('schedules');
     setValue('schedules', toScheduleValues(next), { shouldValidate: true });
   };
 
@@ -179,8 +181,8 @@ export function SchedulesStep() {
 
             return (
               <Stack key={day}>
-                <Group align="flex-start" wrap="nowrap">
-                  <Box miw={120}>
+                <Group align="flex-start" wrap="nowrap" gap="md">
+                  <Box w={156} style={{ flex: '0 0 156px' }}>
                     <Switch
                       label={day}
                       checked={schedule.enabled}

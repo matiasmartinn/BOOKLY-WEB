@@ -6,6 +6,8 @@ import {
   Group,
   SimpleGrid,
   Stack,
+  Box,
+  Text,
   Textarea,
   TextInput,
 } from '@mantine/core';
@@ -139,7 +141,7 @@ export function AppointmentForm({
 
   return (
     <form id="appointment-form" onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap="xl">
+      <Stack gap="lg" style={{ minHeight: 0 }}>
         {errors.root?.message ? (
           <Alert color="red" variant="light">
             {errors.root.message}
@@ -152,62 +154,79 @@ export function AppointmentForm({
           </Alert>
         ) : null}
 
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+        <Box style={{ minHeight: 0 }}>
+          <AppointmentScheduleSection
+            availableDateSet={availableDateSet}
+            calendarDate={calendarDate}
+            dateError={errors.date?.message}
+            isAvailableDatesError={isAvailableDatesError && Boolean(selectedService)}
+            isFetchingSlots={isFetchingSlots}
+            isFormDisabled={isFormDisabled}
+            isLoadingAvailableDates={isLoadingAvailableDates}
+            isLoadingSlots={isLoadingSlots}
+            isPending={isPending}
+            isSlotsError={isSlotsError}
+            onCalendarDateChange={setCalendarDate}
+            onDateChange={handleDateChange}
+            onSlotChange={handleSlotChange}
+            selectedDate={selectedDate}
+            selectedSlot={selectedSlot}
+            slots={slots}
+          />
+        </Box>
+
+        <Stack gap="md">
+          <Stack gap={4}>
+            <Text fw={600}>Datos del cliente</Text>
+            <Text
+              size="sm"
+              style={{
+                color: 'var(--app-color-text-secondary)',
+                lineHeight: 1.5,
+              }}
+            >
+              Completa la informacion necesaria para registrar y contactar al cliente.
+            </Text>
+          </Stack>
+
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+            <TextInput
+              label="Cliente"
+              placeholder="Juan Perez"
+              withAsterisk
+              {...register('clientName')}
+              error={errors.clientName?.message}
+              disabled={isPending}
+            />
+
+            <TextInput
+              label="Telefono"
+              placeholder="3364..."
+              withAsterisk
+              {...register('clientPhone')}
+              error={errors.clientPhone?.message}
+              disabled={isPending}
+            />
+          </SimpleGrid>
+
           <TextInput
-            label="Cliente"
-            placeholder="Juan Perez"
-            withAsterisk
-            {...register('clientName')}
-            error={errors.clientName?.message}
+            label="Email"
+            placeholder="cliente@correo.com"
+            {...register('clientEmail')}
+            error={errors.clientEmail?.message}
             disabled={isPending}
           />
 
-          <TextInput
-            label="Telefono"
-            placeholder="3364..."
-            withAsterisk
-            {...register('clientPhone')}
-            error={errors.clientPhone?.message}
+          <Textarea
+            label="Notas"
+            placeholder="Observaciones del cliente"
+            minRows={3}
+            autosize
+            {...register('clientNotes')}
+            error={errors.clientNotes?.message}
             disabled={isPending}
           />
-        </SimpleGrid>
-
-        <TextInput
-          label="Email"
-          placeholder="cliente@correo.com"
-          {...register('clientEmail')}
-          error={errors.clientEmail?.message}
-          disabled={isPending}
-        />
-
-        <AppointmentScheduleSection
-          availableDateSet={availableDateSet}
-          calendarDate={calendarDate}
-          dateError={errors.date?.message}
-          isAvailableDatesError={isAvailableDatesError && Boolean(selectedService)}
-          isFetchingSlots={isFetchingSlots}
-          isFormDisabled={isFormDisabled}
-          isLoadingAvailableDates={isLoadingAvailableDates}
-          isLoadingSlots={isLoadingSlots}
-          isPending={isPending}
-          isSlotsError={isSlotsError}
-          onCalendarDateChange={setCalendarDate}
-          onDateChange={handleDateChange}
-          onSlotChange={handleSlotChange}
-          selectedDate={selectedDate}
-          selectedSlot={selectedSlot}
-          slots={slots}
-        />
-
-        <Textarea
-          label="Notas"
-          placeholder="Observaciones del cliente"
-          minRows={3}
-          autosize
-          {...register('clientNotes')}
-          error={errors.clientNotes?.message}
-          disabled={isPending}
-        />
+        </Stack>
 
         <Divider />
 

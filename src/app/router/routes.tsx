@@ -15,6 +15,7 @@ import { SettingsPage } from 'features/settings/settings-page';
 import { AdminDashboardPage } from 'features/admin/admin-dashboard-page';
 import { AdminOwnersPage } from 'features/admin/admin-owners-page';
 import { AdminServicesPage } from 'features/admin/admin-services-page';
+import { AdminServiceTypesPage } from 'features/admin/admin-service-types-page';
 import { AppointmentPage } from 'features/appoiments/appointment-page';
 import { ConfirmEmailPage } from 'features/auth/confirm-email-page/confirm-email-page';
 import { LoginForm } from 'features/auth/login-form/login-form';
@@ -88,6 +89,7 @@ export const appRoutes: RouteObject[] = [
               { path: 'admin', element: <AdminDashboardPage /> },
               { path: 'admin/owners', element: <AdminOwnersPage /> },
               { path: 'admin/services', element: <AdminServicesPage /> },
+              { path: 'admin/service-types', element: <AdminServiceTypesPage /> },
               { path: 'activity', element: <Navigate to={PATHS.dashboard.events} replace /> },
               { path: 'events', element: <EventsPage /> },
               { path: 'appointments', element: <AppointmentPage /> },

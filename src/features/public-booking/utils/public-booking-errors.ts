@@ -1,4 +1,5 @@
 import type { ProblemDetails } from 'app/api';
+import { isLegacyPublicBookingToken } from 'shared/models';
 
 import type {
   PublicBookingProblemState,
@@ -39,8 +40,26 @@ export const getPublicBookingProblemState = (
   ...publicBookingProblems[kind],
 });
 
+export const getInvalidPublicBookingProblemState = (
+  code?: string | null,
+): PublicBookingProblemState => {
+  if (isLegacyPublicBookingToken(code)) {
+    return {
+      kind: 'invalid-access',
+      title: 'Este enlace quedo desactualizado',
+      description:
+        'El enlace que recibiste usa el token anterior del servicio y ya no esta vigente.',
+      supportingText:
+        'Pidele al propietario que te comparta el nuevo enlace publico con el codigo actualizado.',
+    };
+  }
+
+  return getPublicBookingProblemState('invalid-access');
+};
+
 export const resolvePublicBookingProblemState = (
   problem?: ProblemDetails | null,
+  code?: string | null,
 ): PublicBookingProblemState | null => {
   const detail = problem?.detail?.trim();
 
@@ -49,7 +68,7 @@ export const resolvePublicBookingProblemState = (
   }
 
   if (problem.status === 404 && detail === INVALID_ACCESS_DETAIL) {
-    return getPublicBookingProblemState('invalid-access');
+    return getInvalidPublicBookingProblemState(code);
   }
 
   if (problem.status === 409 && detail === SERVICE_INACTIVE_DETAIL) {

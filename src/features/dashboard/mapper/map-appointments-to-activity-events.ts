@@ -5,10 +5,7 @@ import { compareLocalDateTime } from 'shared/utils';
 import { appointmentStatusIncludes } from '../utils';
 import type { ActivityEventViewModel } from '../viewmodel/activity-event-view-model';
 
-const resolveActorLabel = (
-  userDisplayName?: string | null,
-  userId?: number | null,
-) => {
+const resolveActorLabel = (userDisplayName?: string | null, userId?: number | null) => {
   if (userDisplayName) {
     return userDisplayName;
   }
@@ -17,7 +14,7 @@ const resolveActorLabel = (
     return `Usuario #${userId}`;
   }
 
-  return 'Sin actor registrado';
+  return 'Cliente';
 };
 
 const isCreationHistoryEvent = (item: AppointmentStatusHistoryDto) => item.oldStatus == null;
@@ -41,9 +38,7 @@ const createdEvent = (
   status: creationHistory?.newStatus ?? 'Pending',
 });
 
-const mapHistoryEventType = (
-  item: AppointmentStatusHistoryDto,
-) => {
+const mapHistoryEventType = (item: AppointmentStatusHistoryDto) => {
   if (isCreationHistoryEvent(item)) {
     return null;
   }
@@ -107,7 +102,8 @@ export const mapAppointmentsToActivityEvents = (
     });
 
   const createdEvents = appointments.map((appointment) =>
-    createdEvent(appointment, creationHistoryByAppointmentId.get(appointment.id)));
+    createdEvent(appointment, creationHistoryByAppointmentId.get(appointment.id)),
+  );
   const statusEvents = history
     .map((item) => historyEvent(item, appointmentById.get(item.appointmentId)))
     .filter((item): item is ActivityEventViewModel => item != null);

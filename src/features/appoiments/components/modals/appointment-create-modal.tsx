@@ -16,7 +16,25 @@ export function AppointmentCreateModal({
   initialDate,
 }: AppointmentCreateModalProps) {
   return (
-    <GenericModal opened={isOpen} onClose={onClose} title="Nuevo turno" size="lg">
+    <GenericModal
+      opened={isOpen}
+      onClose={onClose}
+      title="Nuevo turno"
+      size="lg"
+      styles={{
+        content: {
+          maxHeight: 'min(calc(100dvh - 2rem), 840px)',
+          display: 'flex',
+          flexDirection: 'column',
+        },
+        body: {
+          overflowY: 'auto',
+          minHeight: 0,
+          overscrollBehavior: 'contain',
+          paddingInlineEnd: 'calc(var(--mantine-spacing-xl) - var(--mantine-spacing-xs))',
+        },
+      }}
+    >
       {isOpen ? (
         <AppointmentForm
           initialValues={initialDate ? { date: initialDate } : undefined}

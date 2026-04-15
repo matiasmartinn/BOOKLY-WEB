@@ -83,6 +83,14 @@ export function BasicInfoStep() {
       />
 
       {/* Slug — readonly, generado desde el nombre */}
+      <TextInput
+        label="Telefono de contacto"
+        placeholder="Ej: +54 9 3364 000000"
+        description="Opcional. Se mostrara en el booking publico si lo completas."
+        {...register('phoneNumber')}
+        error={errors.phoneNumber?.message}
+      />
+
       {name.length > 1 && (
         <Box>
           <Text size="xs" c="dimmed" mb={4}>

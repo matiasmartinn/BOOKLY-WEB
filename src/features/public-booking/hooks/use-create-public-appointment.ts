@@ -7,18 +7,18 @@ import type { PublicCreateAppointmentDto } from '../types/public-booking';
 
 import { publicBookingQueryKeys } from './query-keys';
 
-export const useCreatePublicAppointment = (slug?: string, token?: string) => {
+export const useCreatePublicAppointment = (slug?: string, code?: string) => {
   const queryClient = useQueryClient();
 
   return useMutation<AppointmentDto, ProblemDetails, PublicCreateAppointmentDto>({
-    mutationFn: (dto) => publicBookingService.createAppointment(slug!, token!, dto),
+    mutationFn: (dto) => publicBookingService.createAppointment(slug!, code!, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [...publicBookingQueryKeys.access(slug, token), 'available-dates'],
+        queryKey: [...publicBookingQueryKeys.access(slug, code), 'available-dates'],
       });
 
       queryClient.invalidateQueries({
-        queryKey: [...publicBookingQueryKeys.access(slug, token), 'available-slots'],
+        queryKey: [...publicBookingQueryKeys.access(slug, code), 'available-slots'],
       });
     },
   });

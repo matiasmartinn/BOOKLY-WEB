@@ -131,12 +131,6 @@ export function UserProfileForm() {
           readOnly
           {...register('email')}
           error={errors.email?.message}
-          styles={{
-            input: {
-              backgroundColor: 'var(--app-color-surface-soft)',
-              color: 'var(--app-color-text-muted)',
-            },
-          }}
         />
 
         <Group justify="flex-end">

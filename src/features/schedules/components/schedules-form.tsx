@@ -13,6 +13,7 @@ import {
   type Day,
   type SchedulesFormState,
 } from '../types/schedules.types';
+import { findOverlappingScheduleDay } from '../utils/schedules.utils';
 
 import { ScheduleDayRow } from './schedule-day-row';
 
@@ -48,14 +49,17 @@ export function SchedulesForm() {
   const { data: schedulesData } = useSelectedServiceSchedules();
   const { mutate: setSchedule, isPending, isError, error } = useSaveSchedules();
   const [form, setForm] = useState<SchedulesFormState>(buildEmpty);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   useEffect(() => {
     if (schedulesData) {
       setForm(buildFromApi(schedulesData));
+      setValidationError(null);
     }
   }, [schedulesData]);
 
-  const toggle = (day: Day, enabled: boolean) =>
+  const toggle = (day: Day, enabled: boolean) => {
+    setValidationError(null);
     setForm((previous) => ({
       ...previous,
       [day]: {
@@ -68,8 +72,10 @@ export function SchedulesForm() {
           : previous[day].ranges,
       },
     }));
+  };
 
-  const updateRange = (day: Day, index: number, field: 'start' | 'end', value: string | null) =>
+  const updateRange = (day: Day, index: number, field: 'start' | 'end', value: string | null) => {
+    setValidationError(null);
     setForm((previous) => {
       const ranges = previous[day].ranges.map((range, currentIndex) =>
         currentIndex === index ? { ...range, [field]: value } : range,
@@ -77,8 +83,10 @@ export function SchedulesForm() {
 
       return { ...previous, [day]: { ...previous[day], ranges } };
     });
+  };
 
-  const addRange = (day: Day) =>
+  const addRange = (day: Day) => {
+    setValidationError(null);
     setForm((previous) => ({
       ...previous,
       [day]: {
@@ -86,8 +94,10 @@ export function SchedulesForm() {
         ranges: [...previous[day].ranges, createScheduleRange()],
       },
     }));
+  };
 
-  const removeRange = (day: Day, index: number) =>
+  const removeRange = (day: Day, index: number) => {
+    setValidationError(null);
     setForm((previous) => ({
       ...previous,
       [day]: {
@@ -95,6 +105,7 @@ export function SchedulesForm() {
         ranges: previous[day].ranges.filter((_, currentIndex) => currentIndex !== index),
       },
     }));
+  };
 
   const handleSave = () => {
     if (!selectedService) {
@@ -112,8 +123,16 @@ export function SchedulesForm() {
         })),
     );
 
+    if (findOverlappingScheduleDay(dto) !== null) {
+      setValidationError('Hay horarios superpuestos en el mismo dia.');
+      return;
+    }
+
+    setValidationError(null);
+
     setSchedule(dto, {
       onSuccess: () => {
+        setValidationError(null);
         toast.success('Los horarios se guardaron correctamente.');
       },
     });
@@ -133,6 +152,12 @@ export function SchedulesForm() {
       {!selectedService && (
         <Alert color="yellow" variant="light">
           Debes seleccionar un servicio antes de guardar horarios.
+        </Alert>
+      )}
+
+      {validationError && (
+        <Alert color="red" variant="light">
+          {validationError}
         </Alert>
       )}
 

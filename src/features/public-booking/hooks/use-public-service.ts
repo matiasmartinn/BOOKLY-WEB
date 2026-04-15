@@ -6,9 +6,9 @@ import type { PublicServiceBookingDto } from '../types/public-booking';
 
 import { publicBookingQueryKeys } from './query-keys';
 
-export const usePublicService = (slug?: string, token?: string) =>
+export const usePublicService = (slug?: string, code?: string) =>
   useQuery<PublicServiceBookingDto, ProblemDetails>({
-    queryKey: publicBookingQueryKeys.service(slug, token),
-    queryFn: () => publicBookingService.getService(slug!, token!),
-    enabled: Boolean(slug && token),
+    queryKey: publicBookingQueryKeys.service(slug, code),
+    queryFn: () => publicBookingService.getService(slug!, code!),
+    enabled: Boolean(slug && code),
   });

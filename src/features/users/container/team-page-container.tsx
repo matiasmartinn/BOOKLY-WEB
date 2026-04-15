@@ -4,7 +4,7 @@ import { useOwnerSecretaries } from 'features/users/hooks';
 import { useState } from 'react';
 import { GenericModal } from 'shared/components';
 import { PageCard } from 'shared/layout';
-import type { BusinessDto, SecretaryDto } from 'shared/models';
+import type { BusinessDto, SecretaryDto, UserEmailDispatchResultDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
 import { useAuthStore } from 'store/use-auth-store';
 import { useBusinessStore } from 'store/use-buisness-store';
@@ -42,9 +42,15 @@ export function TeamPageContainer() {
     }
   };
 
-  const handleCreateSuccess = async () => {
+  const handleCreateSuccess = async (result: UserEmailDispatchResultDto) => {
     createHandlers.close();
-    toast.success('Secretario/a creado correctamente.');
+    if (result.emailDispatch.emailSent) {
+      toast.success(result.emailDispatch.message);
+    } else {
+      toast.error(result.emailDispatch.message, {
+        title: 'Secretario/a creado con advertencia',
+      });
+    }
     await syncSelectedService();
   };
 
@@ -145,8 +151,8 @@ export function TeamPageContainer() {
             ownerId={authUser.id}
             serviceId={selectedService.id}
             onCancel={createHandlers.close}
-            onSuccess={() => {
-              void handleCreateSuccess();
+            onSuccess={(result) => {
+              void handleCreateSuccess(result);
             }}
           />
         ) : null}

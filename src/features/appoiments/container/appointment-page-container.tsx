@@ -4,7 +4,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { buildServicePermissions } from 'app/layouts/dashboard-navigation';
 import { getAppointmentStatusLabel } from 'features/dashboard/utils';
 import { useMemo, useState } from 'react';
-import { PageCard, PageShell } from 'shared/layout';
+import { PageCard } from 'shared/layout';
 import { useAppToast } from 'shared/ui/toast';
 import { formatDateOnly, getCurrentBusinessDateOnly } from 'shared/utils';
 import { useAuthStore } from 'store/use-auth-store';
@@ -22,7 +22,6 @@ import {
 import { useAppointmentsByDay } from '../hooks';
 import { mapAppointmentListToViewModel } from '../mapper/map-appointment-to-viewmodel';
 import type { AppointmentViewModel } from '../viewmodel';
-
 
 export function AppointmentPageContainer() {
   const authUser = useAuthStore((s) => s.user);
@@ -196,106 +195,95 @@ export function AppointmentPageContainer() {
 
   return (
     <>
-      <PageShell
-        title="Turnos"
-        description="Operacion diaria del servicio seleccionado, centrada en el dia y en acciones rapidas sobre cada turno."
-        actions={
-          canCreateAppointments ? (
-            <Button
-              onClick={() => {
-                createHandlers.open();
-              }}
-              disabled={!selectedService || !selectedDate}
-            >
-              Agregar turno
-            </Button>
-          ) : null
-        }
-      >
-        <Stack gap="md">
-          {!selectedService && (
-            <Alert color="yellow" variant="light">
-              Selecciona un servicio desde el sidebar para operar turnos del dia.
-            </Alert>
-          )}
+      <Stack gap="md">
+        {!selectedService && (
+          <Alert color="yellow" variant="light">
+            Selecciona un servicio desde el sidebar para operar turnos del dia.
+          </Alert>
+        )}
 
-          {selectedService && !canViewAppointments && (
-            <Alert color="blue" variant="light">
-              No cuentas con permiso para ver los turnos de este servicio. Solo se muestran las
-              acciones habilitadas para tu perfil.
-            </Alert>
-          )}
+        {selectedService && !canViewAppointments && (
+          <Alert color="blue" variant="light">
+            No cuentas con permiso para ver los turnos de este servicio. Solo se muestran las
+            acciones habilitadas para tu perfil.
+          </Alert>
+        )}
 
-          <PageCard>
-            <Stack gap="md">
-              <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
-                <Stack gap={4}>
-                  <Text fw={600}>Operacion diaria</Text>
-                  <Text size="sm" c="dimmed">
-                    Mostrando {totalAppointments} turnos para {dayLabel}.
-                  </Text>
-                </Stack>
-              </Group>
+        <PageCard>
+          <Stack gap="md">
+            <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
+              <Stack gap={4}>
+                <Text fw={600}>Operacion diaria</Text>
+                <Text size="sm" c="dimmed">
+                  Mostrando {totalAppointments} turnos para {dayLabel}.
+                </Text>
+              </Stack>
 
-              <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
-                <DatePickerInput
-                  label="Fecha"
-                  placeholder="Selecciona un dia"
-                  value={selectedDate}
-                  onChange={setSelectedDate}
-                  valueFormat="DD/MM/YYYY"
-                  clearable={false}
-                  disabled={!selectedService}
-                  styles={{
-                    day: {
-                      color: 'var(--mantine-color-text)',
-                    },
-                    weekday: {
-                      color: 'var(--mantine-color-text)',
-                    },
-                  }}
-                />
+              {canCreateAppointments ? (
+                <Button onClick={createHandlers.open} disabled={!selectedService || !selectedDate}>
+                  Agregar turno
+                </Button>
+              ) : null}
+            </Group>
 
-                <Select
-                  label="Estado"
-                  placeholder="Todos los estados"
-                  data={statusOptions}
-                  value={selectedStatus}
-                  onChange={setSelectedStatus}
-                  clearable
-                  searchable
-                  disabled={!selectedService || !canViewAppointments}
-                />
-              </SimpleGrid>
-            </Stack>
-          </PageCard>
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
+              <DatePickerInput
+                label="Fecha"
+                placeholder="Selecciona un dia"
+                value={selectedDate}
+                onChange={setSelectedDate}
+                valueFormat="DD/MM/YYYY"
+                clearable={false}
+                disabled={!selectedService}
+                styles={{
+                  day: {
+                    color: 'var(--mantine-color-text)',
+                  },
+                  weekday: {
+                    color: 'var(--mantine-color-text)',
+                  },
+                }}
+              />
 
-          <PageCard>
-            <AppointmentTable
-              appointmentData={appointmentData}
-              isError={isError}
-              isLoading={isLoading}
-              isFetching={isFetching}
-              onRefetch={() => {
-                void refetch();
-              }}
-              onEdit={handleEdit}
-              onReschedule={handleReschedule}
-              onCancel={handleCancel}
-              onMarkAsAttended={handleAttended}
-              onMarkAsNoShow={handleNoShow}
-              permissions={actionPermissions}
-              emptyMessage={
-                selectedService && selectedDate
-                  ? canViewAppointments
-                    ? `No hay turnos para ${formatDateOnly(selectedDate)}.`
-                    : 'No tienes permiso para ver los turnos del servicio seleccionado.'
-                  : 'Selecciona un servicio para ver los turnos del dia.'
-              }
-            />
-          </PageCard>
-        </Stack>
-      </PageShell>
+              <Select
+                label="Estado"
+                placeholder="Todos los estados"
+                data={statusOptions}
+                value={selectedStatus}
+                onChange={setSelectedStatus}
+                clearable
+                searchable
+                disabled={!selectedService || !canViewAppointments}
+              />
+            </SimpleGrid>
+          </Stack>
+        </PageCard>
+
+        <PageCard>
+          <AppointmentTable
+            appointmentData={appointmentData}
+            isError={isError}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            onRefetch={() => {
+              void refetch();
+            }}
+            onEdit={handleEdit}
+            onReschedule={handleReschedule}
+            onCancel={handleCancel}
+            onMarkAsAttended={handleAttended}
+            onMarkAsNoShow={handleNoShow}
+            permissions={actionPermissions}
+            emptyMessage={
+              selectedService && selectedDate
+                ? canViewAppointments
+                  ? `No hay turnos para ${formatDateOnly(selectedDate)}.`
+                  : 'No tienes permiso para ver los turnos del servicio seleccionado.'
+                : 'Selecciona un servicio para ver los turnos del dia.'
+            }
+          />
+        </PageCard>
+      </Stack>
 
       <AppointmentCreateModal
         isOpen={createOpened}

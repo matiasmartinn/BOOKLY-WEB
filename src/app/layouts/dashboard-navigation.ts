@@ -25,6 +25,7 @@ const ADMIN_PATHS = new Set<string>([
   PATHS.dashboard.adminOverview,
   PATHS.dashboard.adminOwners,
   PATHS.dashboard.adminServices,
+  PATHS.dashboard.adminServiceTypes,
 ]);
 
 export function normalizeUserRole(role?: string): UserRole {

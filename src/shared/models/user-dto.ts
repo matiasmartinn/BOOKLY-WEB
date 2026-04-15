@@ -12,6 +12,16 @@ export interface UserDto {
   serviceIds: number[];
 }
 
+export interface EmailDispatchResultDto {
+  emailSent: boolean;
+  message: string;
+}
+
+export interface UserEmailDispatchResultDto {
+  user: UserDto;
+  emailDispatch: EmailDispatchResultDto;
+}
+
 export interface SecretaryDto {
   id: number;
   firstName: string;

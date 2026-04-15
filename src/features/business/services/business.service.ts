@@ -1,11 +1,17 @@
 import { apiClient } from 'app/api';
 import type { CreateServiceScheduleDto } from 'features/schedules/services/schedules.service';
-import type { BusinessDto, ServicePublicBookingDto } from 'shared/models';
+import {
+  normalizeServiceDto,
+  normalizeServicePublicBookingDto,
+  type ServiceApiDto,
+  type ServicePublicBookingApiDto,
+} from 'shared/models';
 
 export interface CreateBusinessDto {
   name: string;
   ownerId: number;
   description?: string;
+  phoneNumber?: string;
   placeName?: string;
   address?: string;
   googleMapsUrl?: string;
@@ -21,6 +27,7 @@ export interface UpdateBusinessDto {
   name?: string;
   slug?: string;
   description?: string;
+  phoneNumber?: string;
   placeName?: string;
   address?: string;
   googleMapsUrl?: string;
@@ -37,27 +44,42 @@ export interface SetBusinessSecretariesDto {
 
 export const businessService = {
   getByOwner: (ownerId: number) =>
-    apiClient.get<BusinessDto[]>('/services', { params: { ownerId } }).then((r) => r.data),
+    apiClient
+      .get<ServiceApiDto[]>('/services', { params: { ownerId } })
+      .then((response) => response.data.map(normalizeServiceDto)),
 
-  getById: (id: number) => apiClient.get<BusinessDto>(`/services/${id}`).then((r) => r.data),
+  getById: (id: number) =>
+    apiClient.get<ServiceApiDto>(`/services/${id}`).then((response) => normalizeServiceDto(response.data)),
 
   create: (payload: CreateBusinessDto) =>
-    apiClient.post<BusinessDto>('/services', payload).then((r) => r.data),
+    apiClient
+      .post<ServiceApiDto>('/services', payload)
+      .then((response) => normalizeServiceDto(response.data)),
 
   update: (id: number, payload: UpdateBusinessDto) =>
-    apiClient.put<BusinessDto>(`/services/${id}`, payload).then((r) => r.data),
+    apiClient
+      .put<ServiceApiDto>(`/services/${id}`, payload)
+      .then((response) => normalizeServiceDto(response.data)),
 
   getPublicBooking: (id: number) =>
-    apiClient.get<ServicePublicBookingDto>(`/services/${id}/public-booking`).then((r) => r.data),
+    apiClient
+      .get<ServicePublicBookingApiDto>(`/services/${id}/public-booking`)
+      .then((response) => normalizeServicePublicBookingDto(response.data)),
 
   enablePublicBooking: (id: number) =>
-    apiClient.post<ServicePublicBookingDto>(`/services/${id}/public-booking/enable`).then((r) => r.data),
+    apiClient
+      .post<ServicePublicBookingApiDto>(`/services/${id}/public-booking/enable`)
+      .then((response) => normalizeServicePublicBookingDto(response.data)),
 
   disablePublicBooking: (id: number) =>
-    apiClient.post<ServicePublicBookingDto>(`/services/${id}/public-booking/disable`).then((r) => r.data),
+    apiClient
+      .post<ServicePublicBookingApiDto>(`/services/${id}/public-booking/disable`)
+      .then((response) => normalizeServicePublicBookingDto(response.data)),
 
   regeneratePublicBooking: (id: number) =>
-    apiClient.post<ServicePublicBookingDto>(`/services/${id}/public-booking/regenerate`).then((r) => r.data),
+    apiClient
+      .post<ServicePublicBookingApiDto>(`/services/${id}/public-booking/regenerate`)
+      .then((response) => normalizeServicePublicBookingDto(response.data)),
 
   delete: (id: number) => apiClient.delete<void>(`/services/${id}`).then((r) => r.data),
 
@@ -67,5 +89,7 @@ export const businessService = {
     apiClient.patch<void>(`/services/${id}/deactivate`).then((r) => r.data),
 
   setSecretaries: (id: number, payload: SetBusinessSecretariesDto) =>
-    apiClient.put<BusinessDto>(`/services/${id}/secretaries`, payload).then((r) => r.data),
+    apiClient
+      .put<ServiceApiDto>(`/services/${id}/secretaries`, payload)
+      .then((response) => normalizeServiceDto(response.data)),
 };

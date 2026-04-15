@@ -8,6 +8,7 @@ import { businessService } from '../services/business.service';
 export interface CreateBusinessPayload extends CreateBusinessFormValues {
   ownerId: number;
   slug?: string;
+  phoneNumber?: string;
   placeName?: string;
   address?: string;
   googleMapsUrl?: string;
@@ -22,6 +23,7 @@ export const useCreateBusiness = () => {
         name: payload.name,
         ownerId: payload.ownerId,
         description: payload.description,
+        phoneNumber: payload.phoneNumber,
         placeName: payload.placeName,
         address: payload.address,
         googleMapsUrl: payload.googleMapsUrl,

@@ -15,7 +15,10 @@ import { useParams } from 'react-router-dom';
 import { PublicBookingForm, PublicBookingStatusView } from '../components';
 import { usePublicService } from '../hooks';
 import type { PublicBookingProblemState } from '../types/public-booking';
-import { getPublicBookingProblemState, resolvePublicBookingProblemState } from '../utils';
+import {
+  getInvalidPublicBookingProblemState,
+  resolvePublicBookingProblemState,
+} from '../utils';
 
 const getModeLabel = (mode: string) => {
   switch (mode.trim().toLowerCase()) {
@@ -57,22 +60,22 @@ function PublicBookingSkeleton() {
 }
 
 export function PublicBookingPageContainer() {
-  const { slug, token } = useParams<{ slug: string; token: string }>();
+  const { slug, code } = useParams<{ slug: string; code: string }>();
   const [terminalState, setTerminalState] = useState<PublicBookingProblemState | null>(null);
-  const invalidAccessState = useMemo(() => getPublicBookingProblemState('invalid-access'), []);
+  const invalidAccessState = useMemo(() => getInvalidPublicBookingProblemState(code), [code]);
 
-  const serviceQuery = usePublicService(slug, token);
+  const serviceQuery = usePublicService(slug, code);
   const initialProblem = useMemo(
-    () => resolvePublicBookingProblemState(serviceQuery.error),
-    [serviceQuery.error],
+    () => resolvePublicBookingProblemState(serviceQuery.error, code),
+    [code, serviceQuery.error],
   );
   const resolvedProblem = terminalState ?? initialProblem;
 
   useEffect(() => {
     setTerminalState(null);
-  }, [slug, token]);
+  }, [code, slug]);
 
-  if (!slug || !token) {
+  if (!slug || !code) {
     return (
       <Container size="sm">
         <PublicBookingStatusView
@@ -215,6 +218,22 @@ export function PublicBookingPageContainer() {
                   </Stack>
                 ) : null}
 
+                {service.phoneNumber ? (
+                  <Stack gap={4}>
+                    <Text
+                      size="xs"
+                      fw={700}
+                      c="dimmed"
+                      style={{ letterSpacing: '0.06em', textTransform: 'uppercase' }}
+                    >
+                      Telefono
+                    </Text>
+                    <Anchor href={`tel:${service.phoneNumber}`} fw={600} c="inherit">
+                      {service.phoneNumber}
+                    </Anchor>
+                  </Stack>
+                ) : null}
+
                 {locationLabel ? (
                   <Stack gap={4}>
                     <Text
@@ -257,7 +276,7 @@ export function PublicBookingPageContainer() {
               <PublicBookingForm
                 service={service}
                 slug={slug}
-                token={token}
+                code={code}
                 onTerminalError={setTerminalState}
               />
             </Stack>

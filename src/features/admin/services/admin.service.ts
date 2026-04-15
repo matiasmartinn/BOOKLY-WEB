@@ -1,5 +1,5 @@
 import { apiClient } from 'app/api';
-import type { UserDto } from 'shared/models';
+import type { UserEmailDispatchResultDto } from 'shared/models';
 
 import type {
   AdminDashboardDto,
@@ -18,7 +18,7 @@ const buildQueryParams = (query?: object) =>
   );
 
 const inviteAdmin = (dto: InviteAdminDto) =>
-  apiClient.post<UserDto>('/admins/invite', dto).then((response) => response.data);
+  apiClient.post<UserEmailDispatchResultDto>('/admins/invite', dto).then((response) => response.data);
 
 const getDashboard = (query?: AdminDashboardQueryDto) =>
   apiClient

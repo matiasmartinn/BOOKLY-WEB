@@ -7,6 +7,15 @@ import { persist } from 'zustand/middleware';
 
 import { useBusinessStore } from './use-buisness-store';
 
+function isAccessTokenExpired(session: AuthSession | null): boolean {
+  if (!session?.accessTokenExpiresAt) {
+    return true;
+  }
+
+  const expiresAt = Date.parse(session.accessTokenExpiresAt);
+  return Number.isNaN(expiresAt) || expiresAt <= Date.now();
+}
+
 interface AuthStore {
   session: AuthSession | null;
   user: UserModel | null;
@@ -15,6 +24,7 @@ interface AuthStore {
   login: (dto: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<AuthSession | null>;
+  restoreSession: () => Promise<void>;
   clearSession: () => void;
   setUser: (user: UserModel | null) => void;
   finishHydration: () => void;
@@ -72,6 +82,31 @@ export const useAuthStore = create<AuthStore>()(
         });
 
         return authResult.session;
+      },
+
+      restoreSession: async () => {
+        try {
+          const { session, user } = get();
+
+          if (!session || !user) {
+            get().clearSession();
+            return;
+          }
+
+          if (!isAccessTokenExpired(session)) {
+            set({ isAuthenticated: true });
+            return;
+          }
+
+          const refreshedSession = await get().refreshSession();
+          if (!refreshedSession) {
+            get().clearSession();
+          }
+        } catch {
+          get().clearSession();
+        } finally {
+          get().finishHydration();
+        }
       },
 
       clearSession: () => {
@@ -135,7 +170,11 @@ export const useAuthStore = create<AuthStore>()(
         };
       },
       onRehydrateStorage: () => (state) => {
-        state?.finishHydration();
+        if (!state) {
+          return;
+        }
+
+        void state.restoreSession();
       },
     },
   ),

@@ -1,3 +1,4 @@
+import type { QueryClient } from '@tanstack/react-query';
 import type { AdminDashboardQueryDto, AdminOwnersQueryDto, AdminServicesQueryDto } from '../models';
 
 export const adminDashboardQueryKey = (query?: AdminDashboardQueryDto) =>
@@ -34,3 +35,10 @@ export const adminServicesQueryKey = (query?: AdminServicesQueryDto) =>
         query.page ?? 1,
         query.pageSize ?? 20,
       ] as const);
+
+export const adminServiceTypesQueryKey = () => ['admin', 'service-types'] as const;
+
+export const invalidateAdminServiceTypeQueries = (queryClient: QueryClient) => {
+  queryClient.invalidateQueries({ queryKey: adminServiceTypesQueryKey() });
+  queryClient.invalidateQueries({ queryKey: ['service-types'] });
+};

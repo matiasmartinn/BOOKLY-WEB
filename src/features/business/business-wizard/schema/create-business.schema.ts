@@ -26,6 +26,8 @@ export const createBusinessSchema = z.object({
 
   description: z.string().max(500, 'La descripción no puede superar 500 caracteres').optional(),
 
+  phoneNumber: z.string().max(50, 'El telefono no puede superar 50 caracteres').optional(),
+
   slug: z
     .string()
     .regex(/^[a-z0-9-]+$/, 'Solo letras minúsculas, números y guiones')
@@ -59,6 +61,7 @@ export const stepSchemas = {
   basic: z.object({
     name: createBusinessSchema.shape.name,
     serviceTypeId: createBusinessSchema.shape.serviceTypeId,
+    phoneNumber: createBusinessSchema.shape.phoneNumber,
   }),
   schedules: z.object({
     durationMinutes: createBusinessSchema.shape.durationMinutes,

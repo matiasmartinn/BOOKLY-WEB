@@ -1,4 +1,9 @@
 import type { ScheduleDto } from './schedule-dto';
+import type { PublicBookingAccessFields } from './public-booking-access';
+import {
+  resolvePublicBookingCode,
+  resolvePublicBookingCodeUpdatedAt,
+} from './public-booking-access';
 
 export enum SecretaryPermission {
   ViewAppointments = 1,
@@ -21,6 +26,7 @@ export interface ServiceDto {
   ownerId: number;
   slug: string;
   description?: string | null;
+  phoneNumber?: string | null;
   placeName?: string | null;
   address?: string | null;
   googleMapsUrl?: string | null;
@@ -31,9 +37,19 @@ export interface ServiceDto {
   isActive: boolean;
   price?: number | null;
   isPublicBookingEnabled: boolean;
-  publicBookingToken: string;
-  publicBookingTokenUpdateAt?: string | null;
+  publicBookingCode: string;
+  publicBookingCodeUpdatedAt?: string | null;
   secretaryIds: Array<number | null>;
   secretaryPermissions: ServiceSecretaryPermissionsDto[];
   schedules: Array<ScheduleDto | null>;
 }
+
+export interface ServiceApiDto
+  extends Omit<ServiceDto, 'publicBookingCode' | 'publicBookingCodeUpdatedAt'>,
+    PublicBookingAccessFields {}
+
+export const normalizeServiceDto = (service: ServiceApiDto): ServiceDto => ({
+  ...service,
+  publicBookingCode: resolvePublicBookingCode(service),
+  publicBookingCodeUpdatedAt: resolvePublicBookingCodeUpdatedAt(service),
+});

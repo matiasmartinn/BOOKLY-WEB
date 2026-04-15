@@ -18,10 +18,26 @@ export function ModalHeader({ title, description, eyebrow, meta }: ModalHeaderPr
           </Text>
         ) : null}
 
-        {title ? <Title order={3}>{title}</Title> : null}
+        {title ? (
+          <Title
+            order={3}
+            style={{
+              color: 'var(--app-color-text-primary)',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            {title}
+          </Title>
+        ) : null}
 
         {description ? (
-          <Text size="sm" c="dimmed">
+          <Text
+            size="sm"
+            style={{
+              color: 'var(--app-color-text-secondary)',
+              lineHeight: 1.55,
+            }}
+          >
             {description}
           </Text>
         ) : null}

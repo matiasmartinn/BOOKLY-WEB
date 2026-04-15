@@ -48,3 +48,29 @@ export const buildToApi = (
           day: DAY_VALUE[schedule.day],
         })),
     );
+
+export const findOverlappingScheduleDay = (
+  schedules: Array<Pick<CreateServiceScheduleDto, 'day' | 'startTime' | 'endTime'>>,
+): number | null => {
+  const schedulesByDay = schedules.reduce<Record<number, typeof schedules>>((acc, schedule) => {
+    acc[schedule.day] = [...(acc[schedule.day] ?? []), schedule];
+    return acc;
+  }, {});
+
+  for (const [dayValue, daySchedules] of Object.entries(schedulesByDay)) {
+    const orderedSchedules = [...daySchedules].sort((left, right) =>
+      left.startTime.localeCompare(right.startTime),
+    );
+
+    for (let index = 0; index < orderedSchedules.length - 1; index += 1) {
+      const current = orderedSchedules[index];
+      const next = orderedSchedules[index + 1];
+
+      if (current.endTime > next.startTime) {
+        return Number(dayValue);
+      }
+    }
+  }
+
+  return null;
+};

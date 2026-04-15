@@ -26,8 +26,8 @@ export const ScheduleDayRow = memo(function ScheduleDayRow({
   const { enabled, ranges } = schedule;
 
   return (
-    <Group align="flex-start" wrap="nowrap">
-      <Box miw={120}>
+    <Group align="flex-start" wrap="nowrap" gap="md">
+      <Box w={156} style={{ flex: '0 0 156px' }}>
         <Switch
           label={DAY_LABELS[day]}
           checked={enabled}
