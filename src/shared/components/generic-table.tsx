@@ -15,7 +15,7 @@ import {
   LoadingOverlay,
   UnstyledButton,
 } from '@mantine/core';
-import { useMemo, useState, useRef, type ReactNode, type CSSProperties } from 'react';
+import { useEffect, useMemo, useState, useRef, type ReactNode, type CSSProperties } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -74,6 +74,7 @@ export interface GenericTableProps<T> {
   showPaginator?: boolean;
   pageSize?: number;
   pageSizeOptions?: number[];
+  resetPageKey?: string | number | null;
 
   // Server-side pagination (opcional, toma precedencia)
   serverPagination?: {
@@ -199,6 +200,7 @@ export function GenericTable<T>({
   showPaginator = false,
   pageSize: pageSizeProp = 10,
   pageSizeOptions = [5, 10, 20, 50],
+  resetPageKey,
 
   serverPagination,
 
@@ -234,6 +236,7 @@ export function GenericTable<T>({
   // ── Search state ──────────────────────────────────────────────────────────
   const [globalFilter, setGlobalFilter] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetPageKeyRef = useRef(resetPageKey);
 
   const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -307,6 +310,36 @@ export function GenericTable<T>({
     }
   };
 
+  useEffect(() => {
+    if (!showPaginator || activePage <= totalPages) {
+      return;
+    }
+
+    if (serverPagination) {
+      serverPagination.onPageChange(1);
+    } else {
+      setCurrentPage(1);
+    }
+  }, [activePage, serverPagination, showPaginator, totalPages]);
+
+  useEffect(() => {
+    if (!showPaginator) {
+      resetPageKeyRef.current = resetPageKey;
+      return;
+    }
+
+    if (resetPageKeyRef.current === resetPageKey) {
+      return;
+    }
+
+    resetPageKeyRef.current = resetPageKey;
+    if (serverPagination) {
+      serverPagination.onPageChange(1);
+    } else {
+      setCurrentPage(1);
+    }
+  }, [resetPageKey, serverPagination, showPaginator]);
+
   const handlePageSizeChange = (value: string | null) => {
     if (!value) return;
     const size = Number(value);
@@ -372,7 +405,7 @@ export function GenericTable<T>({
           </Table.Tr>
         );
       }),
-    [paginatedData, rowKey, visibleColumns, rowClassName, onRowClick],
+    [paginatedData, rowKey, visibleColumns, rowClassName, onRowClick, columnOfActions],
   );
 
   const totalColumns = visibleColumns.length + (columnOfActions ? 1 : 0);

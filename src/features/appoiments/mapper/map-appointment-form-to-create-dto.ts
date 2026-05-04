@@ -10,8 +10,9 @@ export const createDefaultAppointmentFormValues = (): Partial<AppointmentFormVal
   clientPhone: '',
   clientEmail: '',
   clientNotes: '',
-  date: undefined,
+  date: null,
   slot: '',
+  additionalFields: {},
 });
 
 export const mapAppointmentViewModelToFormValues = (
@@ -24,6 +25,7 @@ export const mapAppointmentViewModelToFormValues = (
     clientNotes: appointment.clientNotes ?? '',
     date: extractDateOnly(appointment.startDateTime),
     slot: normalizeLocalDateTime(appointment.startDateTime) ?? appointment.startDateTime,
+    additionalFields: {},
   };
 };
 

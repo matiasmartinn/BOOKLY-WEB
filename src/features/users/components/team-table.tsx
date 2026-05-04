@@ -49,7 +49,7 @@ export function TeamTable({
       showPaginator
       pageSize={10}
       minWidth={980}
-      emptyMessage="Todavia no hay secretarios/as registrados."
+      emptyMessage="Todavía no invitaste secretarios. Agregá uno para delegar la gestión de turnos."
       searchPlaceholder="Buscar por nombre o email"
       searchFn={(row, query) => {
         const value = query.toLowerCase();

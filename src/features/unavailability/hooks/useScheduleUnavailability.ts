@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { mapUnavailabilityListToViewModel } from '../adapter/unavailability.adapter';
 import { unavailabilityService } from '../services/unavailability.service';

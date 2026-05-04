@@ -23,6 +23,7 @@ export interface SubscriptionPlanOptionApiDto {
 const DEFAULT_PLAN_LIMITS: SubscriptionPlanLimitsDto = {
   maxServices: null,
   maxSecretaries: null,
+  allowsExtraFields: false,
 };
 
 const getSchemaErrorMessage = (issues: { message?: string }[]) => {
@@ -45,6 +46,10 @@ const normalizePlan = (plan?: Partial<SubscriptionPlanDto> | null): Subscription
         typeof limits?.maxSecretaries === 'number' || limits?.maxSecretaries === null
           ? limits.maxSecretaries
           : DEFAULT_PLAN_LIMITS.maxSecretaries,
+      allowsExtraFields:
+        typeof limits?.allowsExtraFields === 'boolean'
+          ? limits.allowsExtraFields
+          : DEFAULT_PLAN_LIMITS.allowsExtraFields,
     },
   };
 };

@@ -7,10 +7,10 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ActionIcon, Group, Tooltip } from '@mantine/core';
+import type { TableColumn } from 'shared/components/generic-table';
 import { GenericTable, type SortState } from 'shared/components/generic-table';
 import { compareLocalDateTime } from 'shared/utils';
 
-import { appointmentColumns } from '../defaults';
 import {
   getAppointmentActionVisibility,
   type AppointmentActionPermissions,
@@ -48,6 +48,7 @@ const appointmentSortFn = (
 
 interface AppointmentTableProps {
   appointmentData: AppointmentViewModel[];
+  columns: TableColumn<AppointmentViewModel>[];
   isLoading: boolean;
   isFetching: boolean;
   onRefetch: () => void;
@@ -59,10 +60,12 @@ interface AppointmentTableProps {
   onMarkAsNoShow: (row: AppointmentViewModel) => void;
   permissions: AppointmentActionPermissions;
   emptyMessage?: string;
+  resetPageKey?: string;
 }
 
 export function AppointmentTable({
   appointmentData,
+  columns,
   isLoading,
   isFetching,
   onRefetch,
@@ -74,6 +77,7 @@ export function AppointmentTable({
   onMarkAsNoShow,
   permissions,
   emptyMessage,
+  resetPageKey,
 }: AppointmentTableProps) {
   const hasVisibleActions =
     permissions.canEdit ||
@@ -84,12 +88,13 @@ export function AppointmentTable({
   return (
     <GenericTable<AppointmentViewModel>
       data={appointmentData}
-      columns={appointmentColumns}
+      columns={columns}
       rowKey="id"
       defaultSort={{ columnKey: 'dateLabel', direction: 'asc' }}
       sortFn={appointmentSortFn}
       showPaginator
       pageSize={10}
+      resetPageKey={resetPageKey}
       pageSizeOptions={[5, 10, 20, 50]}
       showSearch
       searchPlaceholder="Buscar por cliente, telefono o email..."
@@ -103,6 +108,9 @@ export function AppointmentTable({
           row.dateLabel,
           row.timeLabel,
           row.status,
+          ...row.extraFields
+            .map((field) => field.value)
+            .filter((value) => value && value !== '-'),
         ].some((field) => field.toLowerCase().includes(value));
       }}
       loading={isLoading}
@@ -111,7 +119,7 @@ export function AppointmentTable({
       isRequestError={isError}
       titleRefetchMessage="Error al cargar los turnos del dia."
       onHandleTableRefetch={onRefetch}
-      minWidth={900}
+      minWidth={Math.max(900, columns.length * 160)}
       columnOfActions={
         hasVisibleActions
           ? {
@@ -166,33 +174,49 @@ export function AppointmentTable({
                       </Tooltip>
                     )}
 
-                    {actions.canMarkAsAttended && (
-                      <Tooltip label="Marcar asistio" withArrow>
-                        <ActionIcon
-                          color="green"
-                          variant="subtle"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onMarkAsAttended(row);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faCircleCheck} />
-                        </ActionIcon>
+                    {actions.canShowMarkAsAttended && (
+                      <Tooltip
+                        label={actions.markAttendanceDisabledReason ?? 'Marcar asistió'}
+                        withArrow
+                      >
+                        <div>
+                          <ActionIcon
+                            color="green"
+                            variant="subtle"
+                            disabled={!actions.canMarkAsAttended}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (actions.canMarkAsAttended) {
+                                onMarkAsAttended(row);
+                              }
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faCircleCheck} />
+                          </ActionIcon>
+                        </div>
                       </Tooltip>
                     )}
 
-                    {actions.canMarkAsNoShow && (
-                      <Tooltip label="Marcar no asistio" withArrow>
-                        <ActionIcon
-                          color="orange"
-                          variant="subtle"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onMarkAsNoShow(row);
-                          }}
-                        >
-                          <FontAwesomeIcon icon={faCircleXmark} />
-                        </ActionIcon>
+                    {actions.canShowMarkAsNoShow && (
+                      <Tooltip
+                        label={actions.markAttendanceDisabledReason ?? 'Marcar no asistió'}
+                        withArrow
+                      >
+                        <div>
+                          <ActionIcon
+                            color="orange"
+                            variant="subtle"
+                            disabled={!actions.canMarkAsNoShow}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (actions.canMarkAsNoShow) {
+                                onMarkAsNoShow(row);
+                              }
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faCircleXmark} />
+                          </ActionIcon>
+                        </div>
                       </Tooltip>
                     )}
                   </Group>

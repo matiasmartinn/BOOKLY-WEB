@@ -1,10 +1,5 @@
 import { z } from 'zod';
 
-const emptyToUndefined = (value: string) => {
-  const trimmed = value.trim();
-  return trimmed === '' ? undefined : trimmed;
-};
-
 export const updateAppointmentFormSchema = z.object({
   clientName: z
     .string()
@@ -15,14 +10,17 @@ export const updateAppointmentFormSchema = z.object({
   clientPhone: z
     .string()
     .trim()
-    .min(1, 'El teléfono es obligatorio.')
-    .max(30, 'El teléfono no puede superar los 30 caracteres.'),
+    .min(1, 'El telefono es obligatorio.')
+    .max(30, 'El telefono no puede superar los 30 caracteres.'),
 
   clientEmail: z
     .string()
     .trim()
-    .transform(emptyToUndefined)
-    .pipe(z.email('El email no es válido.')),
+    .min(1, 'El email es obligatorio.')
+    .max(255, 'El email no puede superar los 255 caracteres.')
+    .email('El email no es valido.'),
+
+  clientNotes: z.string().max(1000, 'Las notas no pueden superar 1000 caracteres.').optional(),
 });
 
 export type UpdateAppointmentFormValues = z.infer<typeof updateAppointmentFormSchema>;

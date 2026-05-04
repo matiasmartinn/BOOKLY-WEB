@@ -1,3 +1,12 @@
+export interface AppointmentDynamicColumnViewModel {
+  key: string;
+  label: string;
+}
+
+export interface AppointmentExtraFieldViewModel extends AppointmentDynamicColumnViewModel {
+  value: string;
+}
+
 export interface AppointmentViewModel {
   id: number;
   clientName: string;
@@ -11,4 +20,5 @@ export interface AppointmentViewModel {
   createdOn: string;
   dateLabel: string;
   timeLabel: string;
+  extraFields: AppointmentExtraFieldViewModel[];
 }

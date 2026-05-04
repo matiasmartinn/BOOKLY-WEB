@@ -7,6 +7,7 @@ export interface UserDto {
   role: string;
   isActive: boolean;
   emailConfirmed: boolean;
+  status?: string | null;
   createdAt: string;
   lastLoginAt?: string | null;
   serviceIds: number[];
@@ -30,6 +31,7 @@ export interface SecretaryDto {
   email: string;
   isActive: boolean;
   emailConfirmed: boolean;
+  status?: string | null;
   serviceIds: number[];
 }
 

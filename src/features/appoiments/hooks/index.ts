@@ -1,6 +1,6 @@
 export * from './appointments.hooks';
 export * from './use-appointment-available-dates';
-export * from './use-appointment-available-slosts';
+export * from './use-appointment-available-slots';
 export * from './use-cancel-appointment';
 export * from './use-create-appointment';
 export * from './use-get-appointments';

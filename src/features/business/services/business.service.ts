@@ -14,7 +14,6 @@ export interface CreateBusinessDto {
   phoneNumber?: string;
   placeName?: string;
   address?: string;
-  googleMapsUrl?: string;
   slug?: string;
   serviceTypeId: number;
   durationMinutes: number;
@@ -30,8 +29,6 @@ export interface UpdateBusinessDto {
   phoneNumber?: string;
   placeName?: string;
   address?: string;
-  googleMapsUrl?: string;
-  serviceTypeId?: number;
   durationMinutes?: number;
   capacity?: number;
   mode?: number;

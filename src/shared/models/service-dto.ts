@@ -1,3 +1,4 @@
+import type { DynamicFieldDefinitionDto } from './dynamic-field-dto';
 import type { ScheduleDto } from './schedule-dto';
 import type { PublicBookingAccessFields } from './public-booking-access';
 import {
@@ -29,7 +30,6 @@ export interface ServiceDto {
   phoneNumber?: string | null;
   placeName?: string | null;
   address?: string | null;
-  googleMapsUrl?: string | null;
   serviceTypeId: number;
   durationMinutes: number;
   capacity: number;
@@ -39,6 +39,8 @@ export interface ServiceDto {
   isPublicBookingEnabled: boolean;
   publicBookingCode: string;
   publicBookingCodeUpdatedAt?: string | null;
+  allowsExtraFields: boolean;
+  fieldDefinitions: DynamicFieldDefinitionDto[];
   secretaryIds: Array<number | null>;
   secretaryPermissions: ServiceSecretaryPermissionsDto[];
   schedules: Array<ScheduleDto | null>;

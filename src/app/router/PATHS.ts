@@ -28,6 +28,7 @@ export const PATHS = {
     history: '/dashboard/history',
     metrics: '/dashboard/metrics',
     service: '/dashboard/business',
+    servicePublicBooking: '/dashboard/business/:serviceId/public-booking',
     unavailability: '/dashboard/unavailability',
     status: '/dashboard/status',
     team: '/dashboard/team',

@@ -2,6 +2,7 @@ export * from './appointment-dto';
 export * from './appointment-metrics-dto';
 export * from './business-dto';
 export * from './client-dto';
+export * from './dynamic-field-dto';
 export * from './public-booking-access';
 export * from './schedule-dto';
 export * from './service-public-booking-dto';

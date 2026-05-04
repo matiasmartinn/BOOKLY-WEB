@@ -3,7 +3,7 @@ export * from './appointment-cancel-form';
 export * from './appointment-edit-form';
 export * from './appointment-reschedule-form';
 export * from './appointment-table';
-export * from './appoitnment-form';
+export * from './appointment-form';
 export * from './modals/appointment-attended-modal';
 export * from './modals/appointment-cancel-modal';
 export * from './modals/appointment-create-modal';

@@ -4,5 +4,7 @@ export * from './admin-status-form';
 export * from './admin-owners-table';
 export * from './admin-services-table';
 export * from './admin-service-types-table';
+export * from './admin-service-type-fields-table';
 export * from './admin-service-type-form';
+export * from './admin-service-type-field-form';
 export * from './invite-admin-form';

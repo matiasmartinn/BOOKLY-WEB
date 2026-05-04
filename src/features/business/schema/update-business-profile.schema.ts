@@ -4,17 +4,15 @@ import { createBusinessSchema } from '../business-wizard/schema';
 
 export const updateBusinessProfileSchema = z.object({
   name: createBusinessSchema.shape.name,
-  slug: z
-    .string()
-    .trim()
-    .min(1, 'Ingresa el slug del enlace publico')
-    .regex(/^[a-z0-9-]+$/, 'Solo letras minusculas, numeros y guiones'),
   description: createBusinessSchema.shape.description,
   phoneNumber: createBusinessSchema.shape.phoneNumber,
-  serviceTypeId: createBusinessSchema.shape.serviceTypeId,
+  durationMinutes: z
+    .number('Ingresa una duracion')
+    .int()
+    .min(1, 'La duracion debe ser mayor a 0')
+    .max(1440, 'La duracion no puede superar 1440 minutos'),
   placeName: z.string().optional(),
   address: z.string().optional(),
-  googleMapsUrl: z.string().optional(),
 });
 
 export type UpdateBusinessProfileFormValues = z.infer<typeof updateBusinessProfileSchema>;

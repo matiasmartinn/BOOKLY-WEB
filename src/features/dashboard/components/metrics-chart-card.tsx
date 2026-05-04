@@ -36,11 +36,12 @@ export function MetricsChartCard({
       style={{
         backgroundColor: backgroundColor ?? appColorVars.surface,
         borderColor: appColorVars.border,
+        boxShadow: '0 14px 30px rgba(15, 23, 42, 0.05)',
       }}
     >
       <Stack gap={gap}>
         <Stack gap={4}>
-          <Text fw={600} size={titleSize}>
+          <Text fw={700} size={titleSize} c={appColorVars.textPrimary}>
             {title}
           </Text>
           {description ? (
@@ -52,7 +53,16 @@ export function MetricsChartCard({
 
         <Box h={chartHeight}>{children}</Box>
 
-        {footer}
+        {footer ? (
+          <Box
+            pt="xs"
+            style={{
+              borderTop: `1px solid ${appColorVars.border}`,
+            }}
+          >
+            {footer}
+          </Box>
+        ) : null}
       </Stack>
     </Paper>
   );

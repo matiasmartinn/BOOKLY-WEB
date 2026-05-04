@@ -8,9 +8,10 @@ import { PageCard } from 'shared/layout';
 import { useAppToast } from 'shared/ui/toast';
 import { formatDateOnly, getCurrentBusinessDateOnly } from 'shared/utils';
 import { useAuthStore } from 'store/use-auth-store';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { AppointmentTable } from '../components/appointment-table';
+import { buildAppointmentColumns } from '../defaults';
 import {
   AppointmentCreateModal,
   AppointmentEditModal,
@@ -20,7 +21,10 @@ import {
   AppointmentNoShowModal,
 } from '../components/modals';
 import { useAppointmentsByDay } from '../hooks';
-import { mapAppointmentListToViewModel } from '../mapper/map-appointment-to-viewmodel';
+import {
+  getVisibleAppointmentDynamicColumns,
+  mapAppointmentListToViewModel,
+} from '../mapper/map-appointment-to-viewmodel';
 import type { AppointmentViewModel } from '../viewmodel';
 
 export function AppointmentPageContainer() {
@@ -56,16 +60,32 @@ export function AppointmentPageContainer() {
   }, [canViewAppointments, selectedDate, selectedService]);
 
   const { data = [], isLoading, isFetching, refetch, isError } = useAppointmentsByDay(dayQuery);
+  const dynamicColumns = useMemo(
+    () => getVisibleAppointmentDynamicColumns(selectedService),
+    [selectedService],
+  );
 
   const appointmentData = useMemo(() => {
-    const mappedAppointments = mapAppointmentListToViewModel(data);
+    const mappedAppointments = mapAppointmentListToViewModel(
+      data,
+      selectedService?.allowsExtraFields ? selectedService.fieldDefinitions : [],
+    );
 
     if (!selectedStatus) {
       return mappedAppointments;
     }
 
     return mappedAppointments.filter((appointment) => appointment.status === selectedStatus);
-  }, [data, selectedStatus]);
+  }, [data, selectedService, selectedStatus]);
+
+  const appointmentColumns = useMemo(
+    () => buildAppointmentColumns(dynamicColumns),
+    [dynamicColumns],
+  );
+  const filtersKey = useMemo(
+    () => [selectedService?.id ?? '', selectedDate ?? '', selectedStatus ?? ''].join('|'),
+    [selectedDate, selectedService?.id, selectedStatus],
+  );
 
   const statusOptions = useMemo(() => {
     const statuses = [...new Set(data.map((appointment) => appointment.status).filter(Boolean))];
@@ -262,6 +282,7 @@ export function AppointmentPageContainer() {
         <PageCard>
           <AppointmentTable
             appointmentData={appointmentData}
+            columns={appointmentColumns}
             isError={isError}
             isLoading={isLoading}
             isFetching={isFetching}
@@ -274,12 +295,13 @@ export function AppointmentPageContainer() {
             onMarkAsAttended={handleAttended}
             onMarkAsNoShow={handleNoShow}
             permissions={actionPermissions}
+            resetPageKey={filtersKey}
             emptyMessage={
               selectedService && selectedDate
                 ? canViewAppointments
-                  ? `No hay turnos para ${formatDateOnly(selectedDate)}.`
+                  ? `No tenés turnos para ${formatDateOnly(selectedDate)}. Podés compartir tu link público o crear un turno manual.`
                   : 'No tienes permiso para ver los turnos del servicio seleccionado.'
-                : 'Selecciona un servicio para ver los turnos del dia.'
+                : 'Selecciona un servicio para ver los turnos del día.'
             }
           />
         </PageCard>

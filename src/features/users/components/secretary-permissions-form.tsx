@@ -13,7 +13,7 @@ import {
   type SecretaryDto,
   type ServiceSecretaryPermissionsDto,
 } from 'shared/models';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 interface SecretaryPermissionsFormProps {
   ownerId: number;

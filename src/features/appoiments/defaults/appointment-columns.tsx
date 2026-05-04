@@ -2,9 +2,9 @@ import { Badge } from '@mantine/core';
 import { getAppointmentStatusColor, getAppointmentStatusLabel } from 'features/dashboard/utils';
 import type { TableColumn } from 'shared/components/generic-table';
 
-import type { AppointmentViewModel } from '../viewmodel';
+import type { AppointmentDynamicColumnViewModel, AppointmentViewModel } from '../viewmodel';
 
-export const appointmentColumns: TableColumn<AppointmentViewModel>[] = [
+const appointmentBaseColumns: TableColumn<AppointmentViewModel>[] = [
   {
     key: 'dateLabel',
     title: 'Fecha',
@@ -51,4 +51,17 @@ export const appointmentColumns: TableColumn<AppointmentViewModel>[] = [
     sortable: true,
     render: (row) => `${row.durationMinutes} min`,
   },
+];
+
+export const buildAppointmentColumns = (
+  dynamicColumns: AppointmentDynamicColumnViewModel[] = [],
+): TableColumn<AppointmentViewModel>[] => [
+  ...appointmentBaseColumns,
+  ...dynamicColumns.map<TableColumn<AppointmentViewModel>>((dynamicColumn) => ({
+    key: `extra-field-${dynamicColumn.key}`,
+    title: dynamicColumn.label,
+    width: 180,
+    render: (row) =>
+      row.extraFields.find((field) => field.key === dynamicColumn.key)?.value ?? '-',
+  })),
 ];

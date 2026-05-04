@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { GenericModal } from 'shared/components';
 import { PageCard } from 'shared/layout';
 import { useAppToast } from 'shared/ui/toast';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { UnavailabilitiesForm, UnavailabilityTable } from '../components';
 import { useRemoveUnavailability } from '../hooks';
@@ -73,7 +73,10 @@ export function UnavailabilitiesPageContainer() {
         )}
 
         <PageCard>
-          <UnavailabilityTable onDelete={handleOpenDelete} />
+          <UnavailabilityTable
+            onDelete={handleOpenDelete}
+            resetPageKey={selectedService?.id ?? null}
+          />
         </PageCard>
       </Stack>
 

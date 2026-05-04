@@ -5,7 +5,7 @@ import { isApiError } from 'app/api';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { SelectDayTimePicker } from 'shared/ui/components';
 import { compareDateOnly } from 'shared/utils';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { useAddUnavailability } from '../hooks';
 import { unavailabilityFormSchema, type UnavailabilityFormValues } from '../schema';
@@ -28,7 +28,7 @@ const defaultValues: UnavailabilityFormValues = {
 export function UnavailabilitiesForm({
   onCancel,
   onSuccess,
-  submitLabel = 'Guardar excepcion',
+  submitLabel = 'Guardar excepción',
 }: UnavailabilitiesFormProps) {
   const selectedService = useBusinessStore((s) => s.selectedService);
   const {
@@ -59,7 +59,7 @@ export function UnavailabilitiesForm({
     if (!selectedService) {
       setError('root', {
         type: 'manual',
-        message: 'Selecciona un servicio antes de cargar una excepcion.',
+        message: 'Seleccioná un servicio antes de cargar una excepción.',
       });
       return;
     }
@@ -71,6 +71,7 @@ export function UnavailabilitiesForm({
         startTime: values.isFullDay ? null : values.startTime,
         endTime: values.isFullDay ? null : values.endTime,
         reason: values.reason.trim() || null,
+        cancelAffectedAppointments: true,
       },
       {
         onSuccess,
@@ -89,9 +90,14 @@ export function UnavailabilitiesForm({
 
         {isError && error && (
           <Alert color="red" variant="light">
-            {isApiError(error) ? error.detail : 'No se pudo guardar la excepcion.'}
+            {isApiError(error) ? error.detail : 'No se pudo guardar la excepción.'}
           </Alert>
         )}
+
+        <Alert color="yellow" variant="light">
+          Al crear esta inhabilitación, los turnos existentes dentro del rango seleccionado serán
+          cancelados automáticamente.
+        </Alert>
 
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
           <Controller
@@ -139,8 +145,8 @@ export function UnavailabilitiesForm({
         </SimpleGrid>
 
         <Switch
-          label="Todo el dia"
-          description="Si lo desactivas, podras bloquear una franja horaria puntual."
+          label="Todo el día"
+          description="Si lo desactivás, podrás bloquear una franja horaria puntual."
           checked={isFullDay}
           onChange={(event) => {
             const checked = event.currentTarget.checked;

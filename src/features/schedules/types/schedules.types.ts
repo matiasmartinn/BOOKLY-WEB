@@ -30,6 +30,8 @@ export const DAY_VALUE: Record<Day, number> = {
   Sabado: 6,
 };
 
+export const MAX_SCHEDULE_RANGES_PER_DAY = 3;
+
 const createRangeId = () =>
   globalThis.crypto?.randomUUID?.() ??
   `range-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -38,6 +40,7 @@ export type Range = {
   id: string;
   start: string | null;
   end: string | null;
+  capacity: number;
 };
 
 export type Schedule = {
@@ -60,8 +63,10 @@ export type SchedulesFormValues = {
 export const createScheduleRange = (
   start: string | null = '09:00',
   end: string | null = '18:00',
+  capacity = 1,
 ): Range => ({
   id: createRangeId(),
   start,
   end,
+  capacity,
 });

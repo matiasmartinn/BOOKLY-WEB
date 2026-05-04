@@ -9,9 +9,10 @@ import type { UnavailabilityViewModel } from '../viewmodel';
 
 interface UnavailabilityTableProps {
   onDelete?: (row: UnavailabilityViewModel) => void;
+  resetPageKey?: string | number | null;
 }
 
-export function UnavailabilityTable({ onDelete }: UnavailabilityTableProps) {
+export function UnavailabilityTable({ onDelete, resetPageKey }: UnavailabilityTableProps) {
   const { data = [], isLoading, isFetching, refetch, isError } = useScheduleUnavailability();
 
   return (
@@ -22,6 +23,7 @@ export function UnavailabilityTable({ onDelete }: UnavailabilityTableProps) {
       defaultSort={{ columnKey: 'dateLabel', direction: 'asc' }}
       showPaginator
       pageSize={10}
+      resetPageKey={resetPageKey}
       pageSizeOptions={[5, 10, 20, 50]}
       showSearch
       searchPlaceholder="Buscar por fecha, motivo..."

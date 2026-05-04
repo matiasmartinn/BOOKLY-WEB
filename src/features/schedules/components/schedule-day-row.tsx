@@ -1,16 +1,22 @@
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ActionIcon, Box, Group, Stack, Switch } from '@mantine/core';
+import { ActionIcon, Box, Button, Group, NumberInput, Stack, Switch, Text } from '@mantine/core';
 import { memo } from 'react';
 import { SelectDayTimePicker } from 'shared/ui/components';
 
-import { DAY_LABELS, type Day, type Schedule } from '../types/schedules.types';
+import {
+  DAY_LABELS,
+  MAX_SCHEDULE_RANGES_PER_DAY,
+  type Day,
+  type Schedule,
+} from '../types/schedules.types';
 
 type Props = {
   day: Day;
   schedule: Schedule;
   onToggle: (day: Day, enabled: boolean) => void;
   onUpdateRange: (day: Day, index: number, field: 'start' | 'end', value: string | null) => void;
+  onUpdateCapacity: (day: Day, index: number, capacity: number) => void;
   onAddRange: (day: Day) => void;
   onRemoveRange: (day: Day, index: number) => void;
 };
@@ -20,10 +26,12 @@ export const ScheduleDayRow = memo(function ScheduleDayRow({
   schedule,
   onToggle,
   onUpdateRange,
+  onUpdateCapacity,
   onAddRange,
   onRemoveRange,
 }: Props) {
   const { enabled, ranges } = schedule;
+  const canAddRange = ranges.length < MAX_SCHEDULE_RANGES_PER_DAY;
 
   return (
     <Group align="flex-start" wrap="nowrap" gap="md">
@@ -37,29 +45,56 @@ export const ScheduleDayRow = memo(function ScheduleDayRow({
 
       {enabled && (
         <Stack gap={8} flex={1}>
+          <Text size="xs" c="dimmed">
+            Cupo: reservas permitidas en ese horario.
+          </Text>
+
           {ranges.map((range, i) => (
-            <Group key={range.id} align="center" wrap="nowrap">
+            <Group key={range.id} align="flex-start" wrap="wrap" gap="sm">
               <SelectDayTimePicker
                 startValue={range.start}
                 endValue={range.end}
                 onStartChange={(value) => onUpdateRange(day, i, 'start', value)}
                 onEndChange={(value) => onUpdateRange(day, i, 'end', value)}
-                onRemove={i > 0 ? () => onRemoveRange(day, i) : undefined}
               />
 
-              {i === 0 && (
+              <NumberInput
+                aria-label={`Cupo para ${DAY_LABELS[day]}`}
+                placeholder="Cupo"
+                min={1}
+                value={range.capacity}
+                onChange={(value) =>
+                  onUpdateCapacity(day, i, typeof value === 'number' && value > 0 ? value : 1)
+                }
+                w={90}
+              />
+
+              {i > 0 && (
                 <ActionIcon
                   variant="light"
-                  color="brand"
+                  color="red"
                   size="lg"
-                  onClick={() => onAddRange(day)}
-                  aria-label={`Agregar franja para ${DAY_LABELS[day]}`}
+                  onClick={() => onRemoveRange(day, i)}
+                  aria-label={`Eliminar franja para ${DAY_LABELS[day]}`}
                 >
-                  <FontAwesomeIcon icon={faPlus} />
+                  <FontAwesomeIcon icon={faTrash} />
                 </ActionIcon>
               )}
             </Group>
           ))}
+
+          <Group>
+            <Button
+              variant="subtle"
+              color="brand"
+              size="xs"
+              leftSection={<FontAwesomeIcon icon={faPlus} />}
+              onClick={() => onAddRange(day)}
+              disabled={!canAddRange}
+            >
+              {canAddRange ? 'Agregar horario' : 'Maximo 3 horarios'}
+            </Button>
+          </Group>
         </Stack>
       )}
     </Group>

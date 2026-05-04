@@ -24,8 +24,8 @@ export function AppointmentAttendedForm({
   const handleSubmit = () => {
     markAsAttended(undefined, {
       onSuccess,
-      onError: (error) => {
-        toast.error(error.detail);
+      onError: () => {
+        toast.error('Ocurrio un error. Intenta nuevamente.');
       },
     });
   };

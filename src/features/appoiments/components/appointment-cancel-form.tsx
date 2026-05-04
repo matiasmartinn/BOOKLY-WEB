@@ -18,6 +18,8 @@ const defaultValues: CancelAppointmentFormValues = {
   reason: '',
 };
 
+const APPOINTMENT_CANCEL_ERROR_MESSAGE = 'Ocurrio un error. Intenta nuevamente.';
+
 export function AppointmentCancelForm({
   appointment,
   onCancel,
@@ -39,7 +41,6 @@ export function AppointmentCancelForm({
     mutate: cancelAppointment,
     isPending,
     isError: isSubmitError,
-    error,
   } = useCancelAppointment(appointment.id);
 
   const onSubmit: SubmitHandler<CancelAppointmentFormValues> = (values) => {
@@ -72,9 +73,9 @@ export function AppointmentCancelForm({
           </Alert>
         )}
 
-        {isSubmitError && error && (
+        {isSubmitError && (
           <Alert color="red" variant="light">
-            {error.detail}
+            {APPOINTMENT_CANCEL_ERROR_MESSAGE}
           </Alert>
         )}
 

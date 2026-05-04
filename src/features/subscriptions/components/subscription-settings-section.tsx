@@ -1,7 +1,10 @@
 import { Alert, Badge, Button, Grid, Group, Skeleton, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useEffect } from 'react';
 import { PageCard } from 'shared/layout';
 import { useAppToast } from 'shared/ui/toast';
+import { useAuthStore } from 'store/use-auth-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { useOwnerSubscription } from '../hooks';
 import {
@@ -20,12 +23,11 @@ interface SubscriptionSettingsSectionProps {
 }
 
 export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSectionProps) {
-  if (ownerId == null) {
-    return null;
-  }
-
   const [opened, { open, close }] = useDisclosure(false);
   const toast = useAppToast();
+  const authUser = useAuthStore((state) => state.user);
+  const services = useBusinessStore((state) => state.services);
+  const refreshServices = useBusinessStore((state) => state.refreshServices);
 
   const {
     data: subscription,
@@ -33,10 +35,30 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
     isFetching,
     isError,
     error,
-  } = useOwnerSubscription(ownerId);
+  } = useOwnerSubscription(ownerId, ownerId != null);
+
+  useEffect(() => {
+    if (ownerId == null || !authUser || authUser.id !== ownerId) {
+      return;
+    }
+
+    void refreshServices(authUser);
+  }, [authUser, ownerId, refreshServices]);
+
+  if (ownerId == null) {
+    return null;
+  }
 
   const currentPlanName = getSubscriptionPlanDisplayName(subscription?.currentPlan);
   const currentPlanLimits = getSubscriptionPlanLimits(subscription?.currentPlan?.limits);
+  const usedServices = services.filter((service) => service.isActive).length;
+  const usedSecretaries = new Set(
+    services
+      .flatMap((service) => service.secretaryIds)
+      .filter(
+        (secretaryId): secretaryId is number => typeof secretaryId === 'number' && secretaryId > 0,
+      ),
+  ).size;
 
   const openModal = () => {
     open();
@@ -71,13 +93,6 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
             </Stack>
           ) : subscription ? (
             <Stack gap="lg">
-              {!subscription.isPersisted && (
-                <Alert color="blue" variant="light">
-                  El owner ya tiene un plan efectivo disponible aunque todavia no exista una fila de
-                  suscripcion persistida.
-                </Alert>
-              )}
-
               <Grid gutter="xl" align="flex-start">
                 <Grid.Col span={{ base: 12, md: 7 }}>
                   <Stack gap="md">
@@ -98,12 +113,18 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
 
                     <Stack gap={6}>
                       <Text size="sm">
-                        Servicios maximos:{' '}
+                        Servicios usados: {usedServices} /{' '}
                         {formatSubscriptionLimitValue(currentPlanLimits.maxServices)}
                       </Text>
                       <Text size="sm">
-                        Secretarios maximos:{' '}
+                        Secretarios: {usedSecretaries} /{' '}
                         {formatSubscriptionLimitValue(currentPlanLimits.maxSecretaries)}
+                      </Text>
+                      <Text size="sm">
+                        Campos personalizados:{' '}
+                        {currentPlanLimits.allowsExtraFields
+                          ? 'disponibles en tu plan'
+                          : 'no disponibles en tu plan'}
                       </Text>
                     </Stack>
                   </Stack>

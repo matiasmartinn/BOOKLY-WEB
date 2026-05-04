@@ -7,7 +7,7 @@ import { PageCard } from 'shared/layout';
 import type { BusinessDto, SecretaryDto, UserEmailDispatchResultDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
 import { useAuthStore } from 'store/use-auth-store';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import {
   CreateSecretaryForm,

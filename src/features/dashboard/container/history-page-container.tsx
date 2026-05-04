@@ -1,13 +1,4 @@
-import {
-  Alert,
-  Button,
-  Group,
-  Paper,
-  Select,
-  SimpleGrid,
-  Stack,
-  Text,
-} from '@mantine/core';
+import { Button, Group, Paper, Select, SimpleGrid, Stack, Text } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useSearchAppointments } from 'features/appoiments/hooks';
 import { useOwnerBusinesses } from 'features/business/hooks';
@@ -74,6 +65,17 @@ export function HistoryPageContainer() {
   const { data: secretaries = [] } = useOwnerSecretaries(authUser?.id);
 
   const hasInvalidRange = Boolean(fromDate && toDate && compareDateOnly(fromDate, toDate) > 0);
+  const filtersKey = useMemo(
+    () =>
+      [
+        fromDate ?? '',
+        toDate ?? '',
+        selectedStatus ?? '',
+        selectedServiceId ?? '',
+        selectedSecretaryId ?? '',
+      ].join('|'),
+    [fromDate, selectedSecretaryId, selectedServiceId, selectedStatus, toDate],
+  );
 
   const searchQuery = useMemo(() => {
     if (!authUser || hasInvalidRange) {
@@ -171,7 +173,6 @@ export function HistoryPageContainer() {
   }, [appointments, selectedStatus]);
 
   const totalResults = historyRows.length;
-  const servicesInvolved = new Set(historyRows.map((item) => item.serviceId)).size;
   const cancellations = historyRows.filter((item) =>
     appointmentStatusIncludes(item.status, 'CANCEL'),
   ).length;
@@ -189,12 +190,6 @@ export function HistoryPageContainer() {
 
   return (
     <Stack gap="sm">
-      {!authUser && (
-        <Alert color="red" variant="light">
-          No se pudo identificar la cuenta para consultar el historico.
-        </Alert>
-      )}
-
       {authUser && (
         <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="sm">
           <CompactHistoryStat
@@ -214,12 +209,6 @@ export function HistoryPageContainer() {
             value={isLoading ? '...' : String(noShow)}
             accentColor="var(--mantine-color-red-5)"
             backgroundColor="var(--mantine-color-red-0)"
-          />
-          <CompactHistoryStat
-            label="Servicios"
-            value={isLoading ? '...' : String(servicesInvolved)}
-            accentColor="var(--mantine-color-blue-5)"
-            backgroundColor="var(--mantine-color-blue-0)"
           />
         </SimpleGrid>
       )}
@@ -324,6 +313,7 @@ export function HistoryPageContainer() {
           fetching={isFetching}
           isError={isError}
           onRefetch={refetch}
+          filtersKey={filtersKey}
         />
       </Paper>
     </Stack>

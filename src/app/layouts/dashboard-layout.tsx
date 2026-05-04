@@ -1,10 +1,10 @@
-import { AppShell, Burger, Group, Text } from '@mantine/core';
+import { Alert, AppShell, Burger, Group, Stack, Text } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { usersService } from 'features/users/services/users.service';
 import { useEffect, useMemo, useRef } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useAuthStore } from 'store/use-auth-store';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import {
   DashboardSidebar,
@@ -21,7 +21,14 @@ export function DashboardLayout() {
 
   const authUser = useAuthStore((state) => state.user);
   const setAuthUser = useAuthStore((state) => state.setUser);
-  const { services, selectedService, selectService, refreshServices } = useBusinessStore();
+  const {
+    services,
+    selectedService,
+    selectService,
+    refreshServices,
+    errorMessage,
+    clearError,
+  } = useBusinessStore();
   const isRefreshingSecretaryContext = useRef(false);
 
   const sidebarRole = normalizeUserRole(authUser?.role);
@@ -51,6 +58,7 @@ export function DashboardLayout() {
         isRefreshingSecretaryContext.current = false;
       }
     };
+
     const handleWindowFocus = () => {
       void refreshSecretaryContext();
     };
@@ -127,8 +135,16 @@ export function DashboardLayout() {
         />
       </AppShell.Navbar>
 
-      <AppShell.Main>
-        <Outlet />
+      <AppShell.Main style={{ width: '100%', minWidth: 0 }}>
+        <Stack gap="md" w="100%" style={{ minWidth: 0 }}>
+          {errorMessage ? (
+            <Alert color="red" variant="light" withCloseButton onClose={clearError}>
+              {errorMessage}
+            </Alert>
+          ) : null}
+
+          <Outlet />
+        </Stack>
       </AppShell.Main>
     </AppShell>
   );

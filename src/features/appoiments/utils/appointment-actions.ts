@@ -14,6 +14,8 @@ export interface AppointmentActionPermissions {
   canMarkAttendance: boolean;
 }
 
+export const APPOINTMENT_NOT_STARTED_MESSAGE = 'El turno todavía no inició.';
+
 const canTransitionFromStatus = (status: string) =>
   appointmentStatusIncludes(
     status,
@@ -48,7 +50,13 @@ export const getAppointmentActionVisibility = (
     canEdit: permissions.canEdit,
     canReschedule: permissions.canReschedule && canTransition && !started,
     canCancel: permissions.canCancel && canTransition && !started,
-    canMarkAsAttended: permissions.canMarkAttendance && canTransition,
-    canMarkAsNoShow: permissions.canMarkAttendance && canTransition,
+    canShowMarkAsAttended: permissions.canMarkAttendance && canTransition,
+    canShowMarkAsNoShow: permissions.canMarkAttendance && canTransition,
+    canMarkAsAttended: permissions.canMarkAttendance && canTransition && started,
+    canMarkAsNoShow: permissions.canMarkAttendance && canTransition && started,
+    markAttendanceDisabledReason:
+      permissions.canMarkAttendance && canTransition && !started
+        ? APPOINTMENT_NOT_STARTED_MESSAGE
+        : null,
   };
 };

@@ -10,6 +10,7 @@ interface ActivityTableProps {
   fetching?: boolean;
   isError?: boolean;
   onRefetch?: () => void;
+  resetPageKey?: string | number | null;
 }
 
 const activitySortFn = (a: ActivityEventViewModel, b: ActivityEventViewModel, sort: SortState) => {
@@ -43,6 +44,7 @@ export function ActivityTable({
   fetching = false,
   isError = false,
   onRefetch,
+  resetPageKey,
 }: ActivityTableProps) {
   return (
     <GenericTable
@@ -59,6 +61,7 @@ export function ActivityTable({
       showSearch
       showPaginator
       pageSize={10}
+      resetPageKey={resetPageKey}
       minWidth={1120}
       emptyMessage="Todavia no hay eventos para mostrar."
       searchPlaceholder="Buscar por cliente, evento, actor o fecha"

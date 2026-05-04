@@ -5,7 +5,7 @@ import type { UserModel } from 'shared/models';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import { useBusinessStore } from './use-buisness-store';
+import { useBusinessStore } from './use-business-store';
 
 function isAccessTokenExpired(session: AuthSession | null): boolean {
   if (!session?.accessTokenExpiresAt) {

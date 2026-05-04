@@ -3,8 +3,10 @@ import type {
   SubscriptionPlanLimitsDto,
   SubscriptionPlanDto,
 } from 'shared/models';
+import { parseDateOnlyParts } from 'shared/utils';
 
 const subscriptionDateFormatter = new Intl.DateTimeFormat('es-AR', {
+  timeZone: 'America/Argentina/Buenos_Aires',
   day: '2-digit',
   month: '2-digit',
   year: 'numeric',
@@ -13,6 +15,7 @@ const subscriptionDateFormatter = new Intl.DateTimeFormat('es-AR', {
 const DEFAULT_SUBSCRIPTION_PLAN_LIMITS: SubscriptionPlanLimitsDto = {
   maxServices: null,
   maxSecretaries: null,
+  allowsExtraFields: false,
 };
 
 export const formatSubscriptionDate = (value?: string | null) => {
@@ -20,8 +23,10 @@ export const formatSubscriptionDate = (value?: string | null) => {
     return 'Sin fecha informada';
   }
 
-  const normalizedValue = value.includes('T') ? value : `${value}T00:00:00`;
-  const parsedDate = new Date(normalizedValue);
+  const dateOnlyParts = parseDateOnlyParts(value);
+  const parsedDate = dateOnlyParts
+    ? new Date(Date.UTC(dateOnlyParts.year, dateOnlyParts.month - 1, dateOnlyParts.day, 12, 0, 0))
+    : new Date(value);
 
   if (Number.isNaN(parsedDate.getTime())) {
     return 'Sin fecha informada';
@@ -49,6 +54,10 @@ export const getSubscriptionPlanLimits = (
     typeof limits?.maxSecretaries === 'number' || limits?.maxSecretaries === null
       ? limits.maxSecretaries
       : DEFAULT_SUBSCRIPTION_PLAN_LIMITS.maxSecretaries,
+  allowsExtraFields:
+    typeof limits?.allowsExtraFields === 'boolean'
+      ? limits.allowsExtraFields
+      : DEFAULT_SUBSCRIPTION_PLAN_LIMITS.allowsExtraFields,
 });
 
 export const getSubscriptionPlanDisplayName = (plan?: Partial<SubscriptionPlanDto> | null) => {
@@ -77,7 +86,7 @@ export const formatPlanLimitsSummary = (limits?: Partial<SubscriptionPlanLimitsD
 
   return `Servicios: ${formatSubscriptionLimitValue(safeLimits.maxServices)} | Secretarios: ${formatSubscriptionLimitValue(
     safeLimits.maxSecretaries,
-  )}`;
+  )} | Campos personalizados: ${safeLimits.allowsExtraFields ? 'disponibles' : 'no disponibles'}`;
 };
 
 export const getSubscriptionStatusLabel = (subscription: SubscriptionDto) => {

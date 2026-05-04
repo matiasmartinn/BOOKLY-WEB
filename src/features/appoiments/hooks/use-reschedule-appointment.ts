@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { AppointmentDto } from 'shared/models/appointment-dto';
 import { normalizeLocalDateTime } from 'shared/utils';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { appointmentService } from '../services';
 

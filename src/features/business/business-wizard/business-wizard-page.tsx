@@ -3,7 +3,7 @@ import { PATHS } from 'app/router/PATHS';
 import { useNavigate } from 'react-router-dom';
 import type { BusinessDto } from 'shared/models';
 import { useAuthStore } from 'store/use-auth-store';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { BusinessWizardContainer } from './container';
 
@@ -15,7 +15,7 @@ export function BusinessWizardPage() {
 
   const handleComplete = async (createdService: BusinessDto) => {
     // Recarga la lista de servicios para que el switcher
-    // muestre el reciÃ©n creado sin necesidad de re-login.
+    // muestre el recién creado sin necesidad de re-login.
     if (authUser) {
       await loadServices(authUser);
       await selectService(createdService.id);

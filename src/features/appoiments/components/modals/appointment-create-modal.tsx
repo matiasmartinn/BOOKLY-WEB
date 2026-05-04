@@ -1,6 +1,6 @@
 import { GenericModal } from 'shared/components';
 
-import { AppointmentForm } from '../appoitnment-form';
+import { AppointmentForm } from '../appointment-form';
 
 interface AppointmentCreateModalProps {
   isOpen: boolean;

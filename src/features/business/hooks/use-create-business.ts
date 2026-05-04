@@ -11,29 +11,33 @@ export interface CreateBusinessPayload extends CreateBusinessFormValues {
   phoneNumber?: string;
   placeName?: string;
   address?: string;
-  googleMapsUrl?: string;
 }
 
 export const useCreateBusiness = () => {
   const queryClient = useQueryClient();
 
   return useMutation<BusinessDto, ProblemDetails, CreateBusinessPayload>({
-    mutationFn: (payload) =>
-      businessService.create({
+    mutationFn: (payload) => {
+      const scheduleCapacity = Math.max(
+        1,
+        ...(payload.schedules ?? []).map((schedule) => schedule.capacity ?? 1),
+      );
+
+      return businessService.create({
         name: payload.name,
         ownerId: payload.ownerId,
         description: payload.description,
         phoneNumber: payload.phoneNumber,
         placeName: payload.placeName,
         address: payload.address,
-        googleMapsUrl: payload.googleMapsUrl,
         slug: payload.slug,
         serviceTypeId: payload.serviceTypeId!,
         durationMinutes: payload.durationMinutes!,
-        capacity: payload.schedules?.[0]?.capacity ?? 1,
+        capacity: scheduleCapacity,
         price: payload.price,
         schedules: payload.schedules ?? [],
-      }),
+      });
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['services', variables.ownerId] });
       queryClient.invalidateQueries({ queryKey: ['services'] });

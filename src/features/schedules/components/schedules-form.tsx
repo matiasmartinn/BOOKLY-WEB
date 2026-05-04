@@ -3,14 +3,16 @@ import { isApiError } from 'app/api';
 import { useEffect, useState } from 'react';
 import type { ScheduleDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { useSelectedServiceSchedules, useSaveSchedules } from '../hooks';
 import {
   DAY_ARRAY,
   DAY_VALUE,
+  MAX_SCHEDULE_RANGES_PER_DAY,
   createScheduleRange,
   type Day,
+  type Range,
   type SchedulesFormState,
 } from '../types/schedules.types';
 import { findOverlappingScheduleDay } from '../utils/schedules.utils';
@@ -31,7 +33,11 @@ const buildFromApi = (data: ScheduleDto[]): SchedulesFormState => {
     }
 
     state[day].ranges.push(
-      createScheduleRange(schedule.startTime.slice(0, 5), schedule.endTime.slice(0, 5)),
+      createScheduleRange(
+        schedule.startTime.slice(0, 5),
+        schedule.endTime.slice(0, 5),
+        schedule.capacity,
+      ),
     );
   }
 
@@ -42,6 +48,12 @@ const buildEmpty = (): SchedulesFormState =>
   Object.fromEntries(
     DAY_ARRAY.map((day) => [day, { enabled: false, ranges: [createScheduleRange()] }]),
   ) as SchedulesFormState;
+
+const createNextRange = (ranges: Range[]) => {
+  const previousRange = ranges.at(-1);
+
+  return createScheduleRange(previousRange?.end ?? null, null, previousRange?.capacity ?? 1);
+};
 
 export function SchedulesForm() {
   const selectedService = useBusinessStore((s) => s.selectedService);
@@ -85,15 +97,34 @@ export function SchedulesForm() {
     });
   };
 
+  const updateCapacity = (day: Day, index: number, capacity: number) => {
+    setValidationError(null);
+    setForm((previous) => {
+      const ranges = previous[day].ranges.map((range, currentIndex) =>
+        currentIndex === index ? { ...range, capacity } : range,
+      );
+
+      return { ...previous, [day]: { ...previous[day], ranges } };
+    });
+  };
+
   const addRange = (day: Day) => {
     setValidationError(null);
-    setForm((previous) => ({
-      ...previous,
-      [day]: {
-        ...previous[day],
-        ranges: [...previous[day].ranges, createScheduleRange()],
-      },
-    }));
+    setForm((previous) => {
+      const ranges = previous[day].ranges;
+
+      if (ranges.length >= MAX_SCHEDULE_RANGES_PER_DAY) {
+        return previous;
+      }
+
+      return {
+        ...previous,
+        [day]: {
+          ...previous[day],
+          ranges: [...ranges, createNextRange(ranges)],
+        },
+      };
+    });
   };
 
   const removeRange = (day: Day, index: number) => {
@@ -118,7 +149,7 @@ export function SchedulesForm() {
         .map((range) => ({
           startTime: range.start!,
           endTime: range.end!,
-          capacity: 1,
+          capacity: range.capacity,
           day: DAY_VALUE[day],
         })),
     );
@@ -140,20 +171,14 @@ export function SchedulesForm() {
 
   return (
     <Stack gap="sm">
-      <Stack gap={4}>
+      <Stack gap={2}>
         <Text fw={600}>Configuracion semanal</Text>
-        <Text size="sm" c="dimmed">
-          {selectedService
-            ? `Servicio activo: ${selectedService.name}. Define los dias y franjas disponibles para reservas.`
-            : 'Selecciona un servicio desde el sidebar para poder gestionar sus horarios.'}
-        </Text>
+        {!selectedService && (
+          <Text size="sm" c="dimmed">
+            Selecciona un servicio desde el sidebar para poder gestionar sus horarios.
+          </Text>
+        )}
       </Stack>
-
-      {!selectedService && (
-        <Alert color="yellow" variant="light">
-          Debes seleccionar un servicio antes de guardar horarios.
-        </Alert>
-      )}
 
       {validationError && (
         <Alert color="red" variant="light">
@@ -174,6 +199,7 @@ export function SchedulesForm() {
           schedule={form[day]}
           onToggle={toggle}
           onUpdateRange={updateRange}
+          onUpdateCapacity={updateCapacity}
           onAddRange={addRange}
           onRemoveRange={removeRange}
         />

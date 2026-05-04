@@ -1,7 +1,7 @@
 import { Alert, Stack } from '@mantine/core';
 import { useAppointmentHistoryByService, useGetAppointments } from 'features/appoiments/hooks';
 import { PageCard } from 'shared/layout';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { ActivityTable } from '../components';
 import { mapAppointmentsToActivityEvents } from '../mapper/map-appointments-to-activity-events';
@@ -50,6 +50,7 @@ export function ActivityPageContainer() {
           loading={isLoading}
           fetching={isFetching}
           isError={isError}
+          resetPageKey={selectedService?.id ?? null}
           onRefetch={() => {
             void refetchAppointments();
             void refetchHistory();

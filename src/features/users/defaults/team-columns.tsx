@@ -2,6 +2,25 @@ import { Badge } from '@mantine/core';
 import type { TableColumn } from 'shared/components/generic-table';
 import type { SecretaryDto } from 'shared/models';
 
+const getSecretaryStatusMeta = (secretary: SecretaryDto) => {
+  const normalizedStatus = secretary.status?.trim().toLowerCase();
+
+  switch (normalizedStatus) {
+    case 'pendingemailconfirmation':
+      return { label: 'Email pendiente', color: 'yellow' };
+    case 'pendinginvitationacceptance':
+      return { label: 'Invitación pendiente', color: 'yellow' };
+    case 'active':
+      return { label: 'Activo', color: 'green' };
+    case 'inactive':
+      return { label: 'Dado de baja', color: 'gray' };
+    default:
+      return secretary.isActive
+        ? { label: 'Activo', color: 'green' }
+        : { label: 'Dado de baja', color: 'gray' };
+  }
+};
+
 export const teamColumns = (selectedServiceId?: number): TableColumn<SecretaryDto>[] => [
   {
     key: 'fullName',
@@ -20,11 +39,15 @@ export const teamColumns = (selectedServiceId?: number): TableColumn<SecretaryDt
     title: 'Estado',
     accessor: 'isActive',
     sortable: true,
-    render: (row) => (
-      <Badge color={row.isActive ? 'green' : 'gray'} variant="light">
-        {row.isActive ? 'Activo' : 'Dado de baja'}
-      </Badge>
-    ),
+    render: (row) => {
+      const status = getSecretaryStatusMeta(row);
+
+      return (
+        <Badge color={status.color} variant="light">
+          {status.label}
+        </Badge>
+      );
+    },
   },
   {
     key: 'type',

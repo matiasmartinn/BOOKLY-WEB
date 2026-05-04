@@ -19,7 +19,7 @@ import {
   getCurrentBusinessDateOnly,
   getCurrentBusinessDateTime,
 } from 'shared/utils';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { DashboardStatCard, QuickActionCard } from '../components';
 import { appointmentStatusIncludes } from '../utils';

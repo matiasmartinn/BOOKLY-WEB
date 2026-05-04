@@ -1,14 +1,4 @@
-import {
-  Anchor,
-  Badge,
-  Container,
-  Paper,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Text,
-  Title,
-} from '@mantine/core';
+import { Anchor, Badge, Container, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -248,14 +238,6 @@ export function PublicBookingPageContainer() {
                   </Stack>
                 ) : null}
               </SimpleGrid>
-
-              {service.googleMapsUrl ? (
-                <div>
-                  <Anchor href={service.googleMapsUrl} target="_blank" rel="noreferrer" fw={600}>
-                    Ver ubicacion en Google Maps
-                  </Anchor>
-                </div>
-              ) : null}
             </Stack>
           </Paper>
 

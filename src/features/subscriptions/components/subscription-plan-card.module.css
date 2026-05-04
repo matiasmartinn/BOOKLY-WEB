@@ -1,0 +1,55 @@
+.card {
+  height: 100%;
+  min-height: 176px;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.cardBody {
+  height: 100%;
+}
+
+.planFree {
+  background-color: var(--app-color-surface);
+}
+
+.planPro {
+  border-color: var(--app-color-brand-outline);
+  background-color: rgba(99, 102, 241, 0.03);
+}
+
+.planMax {
+  border-color: rgba(124, 92, 255, 0.2);
+  background-color: rgba(124, 92, 255, 0.06);
+}
+
+.current {
+  border-color: var(--mantine-color-brand-5);
+  background-color: var(--app-color-brand-soft);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.14);
+}
+
+.limits {
+  display: -webkit-box;
+  min-height: 42px;
+  overflow: hidden;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.actionButton {
+  margin-top: auto;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .interactive:hover {
+    transform: translateY(-3px);
+    border-color: var(--app-color-brand-outline);
+    background-color: var(--app-color-surface-hover);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+  }
+}

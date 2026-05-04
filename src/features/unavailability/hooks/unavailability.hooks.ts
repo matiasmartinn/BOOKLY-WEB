@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { unavailabilityService, type CreateUnavailabilityDto } from '../services/unavailability.service';
 

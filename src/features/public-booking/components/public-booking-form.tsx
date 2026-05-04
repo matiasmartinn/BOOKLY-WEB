@@ -11,9 +11,15 @@ import {
 } from '@mantine/core';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import { DynamicFieldsSection } from 'shared/components';
 import type { AppointmentDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
-import { formatDateTime, normalizeLocalDateTime } from 'shared/utils';
+import {
+  formatDateTime,
+  getActiveDynamicFieldDefinitions,
+  mapAdditionalFieldsToFieldValues,
+  normalizeLocalDateTime,
+} from 'shared/utils';
 
 import {
   useCreatePublicAppointment,
@@ -46,18 +52,34 @@ export function PublicBookingForm({
   const toast = useAppToast();
   const [calendarDate, setCalendarDate] = useState<string | null>(null);
   const [createdAppointment, setCreatedAppointment] = useState<AppointmentDto | null>(null);
+  const fieldDefinitions = useMemo(
+    () => getActiveDynamicFieldDefinitions(service.fieldDefinitions ?? []),
+    [service.fieldDefinitions],
+  );
+  const canUseDynamicFields = Boolean(service.allowsExtraFields && fieldDefinitions.length > 0);
+  const schema = useMemo(
+    () =>
+      createPublicAppointmentSchema({
+        canUseDynamicFields,
+        fieldDefinitions,
+      }),
+    [canUseDynamicFields, fieldDefinitions],
+  );
 
   const {
+    control,
     register,
     handleSubmit,
     watch,
     clearErrors,
+    getValues,
     reset,
     setError,
     setValue,
+    unregister,
     formState: { errors, submitCount },
   } = useForm<PublicAppointmentFormValues>({
-    resolver: zodResolver(createPublicAppointmentSchema),
+    resolver: zodResolver(schema),
     mode: 'onTouched',
     defaultValues: createPublicAppointmentDefaultValues(),
   });
@@ -103,6 +125,15 @@ export function PublicBookingForm({
     resetFormState();
     setCreatedAppointment(null);
   }, [resetFormState, service.serviceId]);
+
+  useEffect(() => {
+    unregister('additionalFields');
+    reset({
+      ...getValues(),
+      additionalFields: {},
+    });
+    clearErrors('additionalFields');
+  }, [canUseDynamicFields, clearErrors, getValues, reset, service.serviceId, unregister]);
 
   useEffect(() => {
     const terminalProblem =
@@ -158,6 +189,9 @@ export function PublicBookingForm({
         clientEmail: values.clientEmail.trim(),
         clientNotes: values.clientNotes?.trim() || undefined,
         startDateTime: normalizeLocalDateTime(values.slot) ?? values.slot,
+        fieldValues: canUseDynamicFields
+          ? mapAdditionalFieldsToFieldValues(values.additionalFields, fieldDefinitions)
+          : undefined,
       });
 
       setCreatedAppointment(appointment);
@@ -281,6 +315,16 @@ export function PublicBookingForm({
             disabled={isPending}
           />
         </Stack>
+
+        {canUseDynamicFields ? (
+          <DynamicFieldsSection
+            control={control}
+            errors={errors}
+            fieldDefinitions={fieldDefinitions}
+            disabled={isPending}
+            description="Completa estos datos adicionales si aplican para este tipo de servicio."
+          />
+        ) : null}
 
         <Button type="submit" loading={isPending} fullWidth>
           Confirmar turno

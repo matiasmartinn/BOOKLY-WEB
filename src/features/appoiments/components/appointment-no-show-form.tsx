@@ -23,8 +23,8 @@ export function AppointmentNoShowForm({
   const handleSubmit = () => {
     markAsNoShow(undefined, {
       onSuccess,
-      onError: (error) => {
-        toast.error(error.detail);
+      onError: () => {
+        toast.error('Ocurrio un error. Intenta nuevamente.');
       },
     });
   };

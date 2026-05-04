@@ -7,6 +7,7 @@ export interface CreateUnavailabilityDto {
   startTime?: string | null;
   endTime?: string | null;
   reason?: string | null;
+  cancelAffectedAppointments: true;
 }
 
 export const unavailabilityService = {

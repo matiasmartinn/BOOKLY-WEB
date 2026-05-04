@@ -3,7 +3,7 @@ import { Alert, Button, Divider, Group, Stack } from '@mantine/core';
 import { useMemo, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { extractDateOnly, normalizeLocalDateTime } from 'shared/utils';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import {
   useAppointmentAvailableDates,
@@ -12,7 +12,6 @@ import {
 } from '../hooks';
 import { rescheduleAppointmentFormSchema, type RescheduleAppointmentFormValues } from '../schema';
 import type { AppointmentViewModel } from '../viewmodel';
-
 
 import { AppointmentScheduleSection } from './appointment-schedule-section';
 
@@ -27,6 +26,8 @@ const defaultValues: RescheduleAppointmentFormValues = {
   date: null,
   slot: '',
 };
+
+const APPOINTMENT_RESCHEDULE_ERROR_MESSAGE = 'Ocurrio un error. Intenta nuevamente.';
 
 export function AppointmentRescheduleForm({
   appointment,
@@ -77,7 +78,6 @@ export function AppointmentRescheduleForm({
     mutate: rescheduleAppointment,
     isPending,
     isError: isSubmitError,
-    error,
   } = useRescheduleAppointment(appointment.id);
 
   const availableDateSet = useMemo(
@@ -138,9 +138,9 @@ export function AppointmentRescheduleForm({
           </Alert>
         ) : null}
 
-        {isSubmitError && error ? (
+        {isSubmitError ? (
           <Alert color="red" variant="light">
-            {error.detail}
+            {APPOINTMENT_RESCHEDULE_ERROR_MESSAGE}
           </Alert>
         ) : null}
 

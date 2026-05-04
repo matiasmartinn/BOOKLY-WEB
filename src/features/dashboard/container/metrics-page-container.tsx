@@ -48,8 +48,10 @@ const percentageFormatter = new Intl.NumberFormat('es-AR', {
 
 const STATUS_VISUALS = {
   total: {
-    accentColor: appChartColorVars.primary,
-    accentBackground: appColorVars.brandSoft,
+    label: 'Total turnos',
+    color: 'var(--mantine-color-brand-4)',
+    strongColor: 'var(--mantine-color-brand-6)',
+    softColor: appColorVars.brandSoft,
   },
   attended: {
     label: 'Asistido',
@@ -68,8 +70,8 @@ const STATUS_VISUALS = {
   },
   pending: {
     label: 'Pendiente',
-    color: appChartColorVars.primary,
-    softColor: appColorVars.brandSoft,
+    color: 'var(--mantine-color-info-6)',
+    softColor: appColorVars.infoSoft,
   },
 } as const;
 
@@ -91,6 +93,12 @@ const CHART_LABEL_STYLE = {
   fill: appColorVars.textSecondary,
   fontSize: 12,
   fontWeight: 600,
+} as const;
+
+const LEGEND_BADGE_STYLE = {
+  cursor: 'default',
+  border: `1px solid ${appColorVars.border}`,
+  textTransform: 'none',
 } as const;
 
 const VERTICAL_BAR_RADIUS: [number, number, number, number] = [8, 8, 0, 0];
@@ -284,12 +292,8 @@ export function MetricsPageContainer() {
     }));
   }, [metrics]);
 
-  const busiestWeekdayBadges = useMemo(
-    () =>
-      [...weekdayChartData]
-        .filter((item) => item.totalAppointments > 0)
-        .sort((a, b) => b.totalAppointments - a.totalAppointments || a.dayOfWeek - b.dayOfWeek)
-        .slice(0, 3),
+  const weekdayBadges = useMemo(
+    () => weekdayChartData.filter((item) => item.totalAppointments > 0),
     [weekdayChartData],
   );
 
@@ -385,10 +389,10 @@ export function MetricsPageContainer() {
         </Stack>
       )}
 
-      <Box maw={980} mx="auto" w="100%">
+      <Box w="100%">
         <Paper
           radius="lg"
-          p="xs"
+          p="md"
           withBorder
           shadow="xs"
           style={{
@@ -396,7 +400,7 @@ export function MetricsPageContainer() {
             backgroundColor: appColorVars.surface,
           }}
         >
-          <SimpleGrid cols={{ base: 1, md: 2, lg: 4 }} spacing="sm" verticalSpacing="sm">
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="sm" verticalSpacing="sm">
             <DatePickerInput
               label="Desde"
               placeholder="Fecha inicial"
@@ -434,28 +438,29 @@ export function MetricsPageContainer() {
               styles={compactFieldStyles}
             />
 
-            <Group justify="flex-end" align="flex-end" gap="xs" wrap="wrap" h="100%">
+            <Stack gap={6} justify="flex-end" h="100%">
               {isFetching && (
-                <Badge color="brand" variant="light" radius="sm">
+                <Badge color="brand" variant="light" radius="sm" w="fit-content" tt="none">
                   Actualizando
                 </Badge>
               )}
 
-              <Button variant="default" size="sm" onClick={resetFilters}>
+              <Button variant="light" size="sm" onClick={resetFilters} fullWidth>
                 Ultimos 30 dias
               </Button>
-            </Group>
+            </Stack>
           </SimpleGrid>
         </Paper>
       </Box>
 
       <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="md" verticalSpacing="md">
         <MetricsKpiCard
-          label="Total turnos"
+          label={STATUS_VISUALS.total.label}
           value={isLoading ? '...' : formatNumber(metrics?.totalAppointments ?? 0)}
           meta={comparisonLabel ?? 'Comparacion con periodo anterior'}
-          accentColor={STATUS_VISUALS.total.accentColor}
-          accentBackground={STATUS_VISUALS.total.accentBackground}
+          metaMuted={Boolean(metrics && metrics.percentageChange == null)}
+          accentColor={STATUS_VISUALS.total.color}
+          accentBackground={STATUS_VISUALS.total.softColor}
         />
         <MetricsKpiCard
           label={STATUS_VISUALS.attended.label}
@@ -493,9 +498,11 @@ export function MetricsPageContainer() {
                   key={item.date}
                   variant="light"
                   radius="sm"
+                  tt="none"
                   style={{
-                    backgroundColor: appColorVars.brandSoft,
-                    color: appChartColorVars.primaryStrong,
+                    ...LEGEND_BADGE_STYLE,
+                    backgroundColor: STATUS_VISUALS.total.softColor,
+                    color: STATUS_VISUALS.total.strongColor,
                   }}
                 >
                   {formatShortLocalDateOnly(item.date)}: {formatNumber(item.totalAppointments)}
@@ -551,8 +558,8 @@ export function MetricsPageContainer() {
               />
               <Bar
                 dataKey="totalAppointments"
-                fill={appChartColorVars.primary}
-                stroke={appChartColorVars.primaryStrong}
+                fill={STATUS_VISUALS.total.color}
+                stroke={STATUS_VISUALS.total.strongColor}
                 strokeWidth={1}
                 radius={VERTICAL_BAR_RADIUS}
                 barSize={dayChartBarSize}
@@ -580,19 +587,21 @@ export function MetricsPageContainer() {
           padding="sm"
           shadow="sm"
           footer={
-            busiestWeekdayBadges.length > 0 ? (
+            weekdayBadges.length > 0 ? (
               <Group gap="xs" wrap="wrap">
-                {busiestWeekdayBadges.map((item) => (
+                {weekdayBadges.map((item) => (
                   <Badge
                     key={item.dayOfWeek}
                     variant="light"
                     radius="sm"
+                    tt="none"
                     style={{
+                      ...LEGEND_BADGE_STYLE,
                       backgroundColor: item.isPeak
                         ? appColorVars.brandSoft
                         : appColorVars.surfaceSoft,
                       color: item.isPeak
-                        ? appChartColorVars.primaryStrong
+                        ? STATUS_VISUALS.total.strongColor
                         : appColorVars.textSecondary,
                     }}
                   >
@@ -644,13 +653,13 @@ export function MetricsPageContainer() {
                         item.totalAppointments === 0
                           ? appColorVars.surfaceSoft
                           : item.isPeak
-                            ? appChartColorVars.primaryStrong
-                            : appChartColorVars.primary
+                            ? STATUS_VISUALS.total.strongColor
+                            : STATUS_VISUALS.total.color
                       }
                       stroke={
                         item.totalAppointments === 0
                           ? appColorVars.borderSoft
-                          : appChartColorVars.primaryStrong
+                          : STATUS_VISUALS.total.strongColor
                       }
                       strokeWidth={item.isPeak ? 2 : 1}
                     />
@@ -681,7 +690,12 @@ export function MetricsPageContainer() {
                     key={item.name}
                     variant="light"
                     radius="sm"
-                    style={{ backgroundColor: item.softColor, color: item.color }}
+                    tt="none"
+                    style={{
+                      ...LEGEND_BADGE_STYLE,
+                      backgroundColor: item.softColor,
+                      color: item.color,
+                    }}
                   >
                     {item.name}: {formatPercentage(item.value)}
                   </Badge>

@@ -1,26 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { AppointmentDto } from 'shared/models/appointment-dto';
-import { normalizeLocalDateTime } from 'shared/utils';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
-import type { AppointmentFormValues } from '../schema';
-import { appointmentService } from '../services';
+import { appointmentService, type CreateAppointmentDto } from '../services';
 
 export const useCreateAppointment = () => {
   const selectedService = useBusinessStore((s) => s.selectedService);
   const queryClient = useQueryClient();
 
-  return useMutation<AppointmentDto, ProblemDetails, AppointmentFormValues>({
-    mutationFn: (values) =>
-      appointmentService.create({
-        serviceId: selectedService!.id,
-        clientName: values.clientName.trim(),
-        clientPhone: values.clientPhone.trim(),
-        clientEmail: values.clientEmail.trim(),
-        clientNotes: values.clientNotes?.trim() || undefined,
-        startDateTime: normalizeLocalDateTime(values.slot) ?? values.slot,
-      }),
+  return useMutation<AppointmentDto, ProblemDetails, CreateAppointmentDto>({
+    mutationFn: (dto) => appointmentService.create(dto),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['appointments', selectedService?.id],

@@ -1,17 +1,23 @@
-import { Alert, Badge, Group, Stack, Text } from '@mantine/core';
+import { Alert, Badge, Button, Group, Stack, Text } from '@mantine/core';
+import { PATHS } from 'app/router/PATHS';
+import { useNavigate } from 'react-router-dom';
 import { PageCard } from 'shared/layout';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { BusinessProfileForm } from '../components/business-profile-form';
 
 export function BusinessPageContainer() {
+  const navigate = useNavigate();
+  const services = useBusinessStore((state) => state.services);
   const selectedService = useBusinessStore((state) => state.selectedService);
 
   return (
     <Stack gap="md">
       {!selectedService && (
         <Alert color="yellow" variant="light">
-          Selecciona un servicio desde el sidebar para editar su configuracion principal.
+          {services.length === 0
+            ? 'Todavía no creaste ningún servicio. Creá tu primer servicio para empezar a recibir turnos.'
+            : 'Selecciona un servicio desde el sidebar para editar su configuración principal.'}
         </Alert>
       )}
 
@@ -56,14 +62,30 @@ export function BusinessPageContainer() {
                 </Text>
               </Stack>
 
-              <Badge
-                color={selectedService.isActive ? 'green' : 'yellow'}
-                variant="light"
-                size="lg"
-                radius="sm"
-              >
-                {selectedService.isActive ? 'Servicio activo' : 'Servicio inactivo'}
-              </Badge>
+              <Group gap="sm" wrap="wrap" justify="flex-end">
+                <Badge
+                  color={selectedService.isActive ? 'green' : 'yellow'}
+                  variant="light"
+                  size="lg"
+                  radius="sm"
+                >
+                  {selectedService.isActive ? 'Servicio activo' : 'Servicio inactivo'}
+                </Badge>
+
+                <Button
+                  variant="light"
+                  onClick={() =>
+                    navigate(
+                      PATHS.dashboard.servicePublicBooking.replace(
+                        ':serviceId',
+                        String(selectedService.id),
+                      ),
+                    )
+                  }
+                >
+                  Gestionar reserva publica
+                </Button>
+              </Group>
             </Group>
 
             <BusinessProfileForm service={selectedService} />

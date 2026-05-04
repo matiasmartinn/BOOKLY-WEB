@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import { getMonthDateOnlyRange } from 'shared/utils';
-import { useBusinessStore } from 'store/use-buisness-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { appointmentService } from '../services';
 

@@ -1,4 +1,6 @@
-import { Group, Stack, Switch, Box, ActionIcon, Text, NumberInput, Divider } from '@mantine/core';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ActionIcon, Box, Button, Divider, Group, NumberInput, Stack, Switch, Text } from '@mantine/core';
 import { useState } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import { SelectDayTimePicker } from 'shared/ui/components';
@@ -16,7 +18,7 @@ const DAY_ARRAY = [
 ] as const;
 
 type Day = (typeof DAY_ARRAY)[number];
-type Range = { start: string | null; end: string | null };
+type Range = { start: string | null; end: string | null; capacity: number };
 type DaySchedule = { enabled: boolean; ranges: Range[] };
 type SchedulesState = Record<Day, DaySchedule>;
 
@@ -31,8 +33,9 @@ const DAY_TO_NUMBER: Record<Day, number> = {
 };
 
 const DURATION_PRESETS = [15, 30, 45, 60, 90, 120];
-const DEFAULT_RANGE: Range = { start: '09:00', end: '18:00' };
-const EMPTY_RANGE: Range = { start: null, end: null };
+const DEFAULT_RANGE: Range = { start: '09:00', end: '18:00', capacity: 1 };
+const EMPTY_RANGE: Range = { start: null, end: null, capacity: 1 };
+const MAX_RANGES_PER_DAY = 3;
 
 const buildInitial = (): SchedulesState =>
   DAY_ARRAY.reduce((acc, day) => {
@@ -45,9 +48,24 @@ function toScheduleValues(state: SchedulesState): ScheduleValue[] {
     if (!state[day].enabled) return [];
     return state[day].ranges
       .filter((r) => r.start && r.end)
-      .map((r) => ({ day: DAY_TO_NUMBER[day], startTime: r.start!, endTime: r.end!, capacity: 1 }));
+      .map((r) => ({
+        day: DAY_TO_NUMBER[day],
+        startTime: r.start!,
+        endTime: r.end!,
+        capacity: r.capacity,
+      }));
   });
 }
+
+const createNextRange = (ranges: Range[]): Range => {
+  const previousRange = ranges.at(-1);
+
+  return {
+    start: previousRange?.end ?? null,
+    end: null,
+    capacity: previousRange?.capacity ?? DEFAULT_RANGE.capacity,
+  };
+};
 
 export function SchedulesStep() {
   const {
@@ -83,11 +101,24 @@ export function SchedulesStep() {
     update({ ...schedules, [day]: { ...schedules[day], ranges } });
   };
 
-  const addRange = (day: Day) =>
+  const updateCapacity = (day: Day, index: number, capacity: number) => {
+    const ranges = [...schedules[day].ranges];
+    ranges[index] = { ...ranges[index], capacity };
+    update({ ...schedules, [day]: { ...schedules[day], ranges } });
+  };
+
+  const addRange = (day: Day) => {
+    const ranges = schedules[day].ranges;
+
+    if (ranges.length >= MAX_RANGES_PER_DAY) {
+      return;
+    }
+
     update({
       ...schedules,
-      [day]: { ...schedules[day], ranges: [...schedules[day].ranges, { ...DEFAULT_RANGE }] },
+      [day]: { ...schedules[day], ranges: [...ranges, createNextRange(ranges)] },
     });
+  };
 
   const removeRange = (day: Day, index: number) => {
     const ranges = schedules[day].ranges.filter((_, i) => i !== index);
@@ -177,7 +208,7 @@ export function SchedulesStep() {
         <Stack gap="sm">
           {DAY_ARRAY.map((day) => {
             const schedule = schedules[day];
-            const [firstRange, ...extraRanges] = schedule.ranges;
+            const canAddRange = schedule.ranges.length < MAX_RANGES_PER_DAY;
 
             return (
               <Stack key={day}>
@@ -192,38 +223,54 @@ export function SchedulesStep() {
 
                   {schedule.enabled && (
                     <Stack gap={8} flex={1}>
-                      <Group align="flex-start" wrap="nowrap">
-                        <SelectDayTimePicker
-                          startValue={firstRange.start}
-                          endValue={firstRange.end}
-                          onStartChange={(v) => updateRange(day, 0, 'start', v)}
-                          onEndChange={(v) => updateRange(day, 0, 'end', v)}
-                        />
-                        <ActionIcon
-                          variant="light"
-                          color="brand"
-                          size="lg"
-                          onClick={() => addRange(day)}
-                          aria-label="Agregar franja"
-                        >
-                          +
-                        </ActionIcon>
-                      </Group>
+                      <Text size="xs" c="dimmed">
+                        Cupo: reservas permitidas en ese horario.
+                      </Text>
 
-                      {extraRanges.length > 0 && (
-                        <Stack gap={8}>
-                          {extraRanges.map((range, i) => (
-                            <SelectDayTimePicker
-                              key={`${day}-${i + 1}`}
-                              startValue={range.start}
-                              endValue={range.end}
-                              onStartChange={(v) => updateRange(day, i + 1, 'start', v)}
-                              onEndChange={(v) => updateRange(day, i + 1, 'end', v)}
-                              onRemove={() => removeRange(day, i + 1)}
-                            />
-                          ))}
-                        </Stack>
-                      )}
+                      {schedule.ranges.map((range, i) => (
+                        <Group key={`${day}-${i}`} align="flex-start" wrap="wrap" gap="sm">
+                          <SelectDayTimePicker
+                            startValue={range.start}
+                            endValue={range.end}
+                            onStartChange={(v) => updateRange(day, i, 'start', v)}
+                            onEndChange={(v) => updateRange(day, i, 'end', v)}
+                          />
+                          <NumberInput
+                            aria-label={`Cupo para ${day}`}
+                            placeholder="Cupo"
+                            min={1}
+                            value={range.capacity}
+                            onChange={(value) =>
+                              updateCapacity(day, i, typeof value === 'number' && value > 0 ? value : 1)
+                            }
+                            w={90}
+                          />
+                          {i > 0 && (
+                            <ActionIcon
+                              variant="light"
+                              color="red"
+                              size="lg"
+                              onClick={() => removeRange(day, i)}
+                              aria-label="Eliminar franja"
+                            >
+                              <FontAwesomeIcon icon={faTrash} />
+                            </ActionIcon>
+                          )}
+                        </Group>
+                      ))}
+
+                      <Group>
+                        <Button
+                          variant="subtle"
+                          color="brand"
+                          size="xs"
+                          leftSection={<FontAwesomeIcon icon={faPlus} />}
+                          onClick={() => addRange(day)}
+                          disabled={!canAddRange}
+                        >
+                          {canAddRange ? 'Agregar horario' : 'Maximo 3 horarios'}
+                        </Button>
+                      </Group>
                     </Stack>
                   )}
                 </Group>

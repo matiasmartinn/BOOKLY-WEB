@@ -1,4 +1,5 @@
 import { formatDateOnly } from 'shared/utils';
+import { ServiceTypeFieldType } from 'shared/models';
 
 import type {
   AdminOwnerAccountStatus,
@@ -32,6 +33,21 @@ const SUBSCRIPTION_STATUS_META: Record<AdminSubscriptionStatus, BadgeMeta> = {
   expired: { label: 'Vencida', color: 'red' },
   implicit_free: { label: 'Free', color: 'gray' },
 };
+
+const SERVICE_TYPE_FIELD_TYPE_LABELS: Record<ServiceTypeFieldType, string> = {
+  [ServiceTypeFieldType.Text]: 'Texto',
+  [ServiceTypeFieldType.MultilineText]: 'Texto largo',
+  [ServiceTypeFieldType.Number]: 'Numero',
+  [ServiceTypeFieldType.Date]: 'Fecha',
+  [ServiceTypeFieldType.Select]: 'Seleccion',
+  [ServiceTypeFieldType.Checkbox]: 'Booleano',
+};
+
+export const ADMIN_SERVICE_TYPE_FIELD_TYPE_OPTIONS = [
+  { value: String(ServiceTypeFieldType.Text), label: 'Texto' },
+  { value: String(ServiceTypeFieldType.Number), label: 'Numero' },
+  { value: String(ServiceTypeFieldType.Checkbox), label: 'Booleano' },
+];
 
 export const formatAdminNumber = (value?: number | null) => numberFormatter.format(value ?? 0);
 
@@ -67,3 +83,6 @@ export const getServiceStatusMeta = (status: AdminServiceStatus): BadgeMeta =>
 
 export const getSubscriptionStatusMeta = (status: AdminSubscriptionStatus): BadgeMeta =>
   SUBSCRIPTION_STATUS_META[status];
+
+export const getServiceTypeFieldTypeLabel = (fieldType: number) =>
+  SERVICE_TYPE_FIELD_TYPE_LABELS[fieldType as ServiceTypeFieldType] ?? 'Desconocido';

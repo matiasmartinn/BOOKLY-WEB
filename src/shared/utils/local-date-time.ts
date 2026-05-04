@@ -16,10 +16,12 @@ const businessNowFormatter = new Intl.DateTimeFormat('en-CA', {
   hourCycle: 'h23',
 });
 const shortLocalDateFormatter = new Intl.DateTimeFormat(UI_DATE_LOCALE, {
+  timeZone: BUSINESS_TIME_ZONE,
   day: '2-digit',
   month: 'short',
 });
 const longLocalDateFormatter = new Intl.DateTimeFormat(UI_DATE_LOCALE, {
+  timeZone: BUSINESS_TIME_ZONE,
   day: '2-digit',
   month: 'short',
   year: 'numeric',
@@ -45,6 +47,9 @@ const buildDateOnly = ({ year, month, day }: DateOnlyParts) =>
   `${year}-${pad2(month)}-${pad2(day)}`;
 
 const buildNativeDate = ({ year, month, day }: DateOnlyParts) => new Date(year, month - 1, day);
+
+const buildBusinessDateForFormatting = ({ year, month, day }: DateOnlyParts) =>
+  new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
 const buildTimeOnly = (
   { hour, minute, second }: TimeOnlyParts,
@@ -283,13 +288,13 @@ export const formatLocalDateOnly = (value?: string | null) => {
 };
 
 export const formatShortLocalDateOnly = (value?: string | null) => {
-  const date = toDateOnlyDate(value);
-  return date ? shortLocalDateFormatter.format(date) : value ?? '';
+  const parts = parseDateOnlyParts(value) ?? parseLocalDateTimeParts(value);
+  return parts ? shortLocalDateFormatter.format(buildBusinessDateForFormatting(parts)) : value ?? '';
 };
 
 export const formatLongLocalDateOnly = (value?: string | null) => {
-  const date = toDateOnlyDate(value);
-  return date ? longLocalDateFormatter.format(date) : value ?? '';
+  const parts = parseDateOnlyParts(value) ?? parseLocalDateTimeParts(value);
+  return parts ? longLocalDateFormatter.format(buildBusinessDateForFormatting(parts)) : value ?? '';
 };
 
 export const formatLocalDateOnlyRange = (

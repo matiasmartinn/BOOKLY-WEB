@@ -26,16 +26,17 @@ export const buildFromApi = (data: ScheduleModel[]): SchedulesFormValues['schedu
       ranges:
         existing.length > 0
           ? existing.map((schedule) =>
-              createScheduleRange(schedule.startTime.slice(0, 5), schedule.endTime.slice(0, 5)),
+              createScheduleRange(
+                schedule.startTime.slice(0, 5),
+                schedule.endTime.slice(0, 5),
+                schedule.capacity,
+              ),
             )
           : [createScheduleRange(null, null)],
     };
   });
 
-export const buildToApi = (
-  schedules: SchedulesFormValues['schedules'],
-  capacity = 1,
-): CreateServiceScheduleDto[] =>
+export const buildToApi = (schedules: SchedulesFormValues['schedules']): CreateServiceScheduleDto[] =>
   schedules
     .filter((schedule) => schedule.enabled)
     .flatMap((schedule) =>
@@ -44,7 +45,7 @@ export const buildToApi = (
         .map((range) => ({
           startTime: range.start!,
           endTime: range.end!,
-          capacity,
+          capacity: range.capacity,
           day: DAY_VALUE[schedule.day],
         })),
     );

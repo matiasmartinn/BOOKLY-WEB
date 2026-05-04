@@ -16,9 +16,6 @@ export function AppointmentRescheduleModal({
   onClose,
   onSuccess,
 }: AppointmentRescheduleModalProps) {
-  {
-    `Reprogramar turno de ${appointment?.clientName}`;
-  }
   return (
     <GenericModal
       opened={isOpen}

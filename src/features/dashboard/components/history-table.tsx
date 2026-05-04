@@ -11,6 +11,7 @@ interface HistoryTableProps {
   fetching?: boolean;
   isError?: boolean;
   onRefetch?: () => void;
+  filtersKey?: string;
 }
 
 const historySortFn = (
@@ -62,6 +63,7 @@ export function HistoryTable({
   fetching = false,
   isError = false,
   onRefetch,
+  filtersKey,
 }: HistoryTableProps) {
   return (
     <GenericTable
@@ -80,6 +82,7 @@ export function HistoryTable({
       searchFn={historySearchFn}
       showPaginator
       pageSize={10}
+      resetPageKey={filtersKey}
       minWidth={1180}
       emptyMessage="No hay turnos historicos que coincidan con los filtros seleccionados."
     />

@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Group, Loader, Paper, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
+import { Alert, Button, Group, Loader, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
 import { isApiError } from 'app/api';
 import { GenericModal } from 'shared/components';
 import type { SubscriptionPlanOptionDto } from 'shared/models';
@@ -12,15 +12,7 @@ import {
   useOwnerSubscriptionPlans,
   useRenewSubscription,
 } from '../hooks';
-import {
-  formatSubscriptionDate,
-  formatSubscriptionLimitValue,
-  formatSubscriptionValidity,
-  getSubscriptionPlanDisplayName,
-  getSubscriptionPlanLimits,
-  getSubscriptionStatusColor,
-  getSubscriptionStatusLabel,
-} from '../utils/subscription.utils';
+import { formatSubscriptionDate } from '../utils/subscription.utils';
 
 import { SubscriptionPlanCard } from './subscription-plan-card';
 
@@ -65,8 +57,6 @@ export function SubscriptionManagementModal({
   const isMutating =
     cancelMutation.isPending || renewMutation.isPending || changePlanMutation.isPending;
 
-  const currentPlanName = getSubscriptionPlanDisplayName(subscription?.currentPlan);
-  const currentPlanLimits = getSubscriptionPlanLimits(subscription?.currentPlan?.limits);
   const visibleError =
     (!canManageSubscription
       ? 'No se pudo resolver la cuenta para gestionar la suscripcion.'
@@ -166,130 +156,26 @@ export function SubscriptionManagementModal({
           </Alert>
         )}
 
-        {canManageSubscription && isLoadingSubscription ? (
-          <Stack gap="sm">
-            <Skeleton h={20} radius="sm" />
-            <Skeleton h={72} radius="md" />
-          </Stack>
-        ) : canManageSubscription && subscription ? (
-          <Paper withBorder radius="md" p="md">
-            <Stack gap="md">
-              <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
-                <Stack gap={4}>
-                  <Group gap="xs" wrap="wrap">
-                    <Text fw={600}>Plan actual</Text>
-                    <Badge color={getSubscriptionStatusColor(subscription)} variant="light">
-                      {getSubscriptionStatusLabel(subscription)}
-                    </Badge>
-                    {!subscription.isPersisted && (
-                      <Badge color="blue" variant="light">
-                        Efectivo
-                      </Badge>
-                    )}
-                    {isFetchingSubscription && (
-                      <Badge color="brand" variant="light">
-                        Actualizando
-                      </Badge>
-                    )}
-                  </Group>
-
-                  <Text size="lg" fw={700}>
-                    {currentPlanName}
-                  </Text>
-
-                  <Text size="sm" c="dimmed">
-                    Vigencia: {formatSubscriptionValidity(subscription)}
-                  </Text>
-                </Stack>
-
-                <Group gap="xs">
-                  {subscription.canRenew && (
-                    <Button
-                      onClick={() => void handleRenewSubscription()}
-                      loading={renewMutation.isPending}
-                    >
-                      Renovar
-                    </Button>
-                  )}
-
-                  {subscription.canCancel && (
-                    <Button
-                      color="red"
-                      variant="light"
-                      onClick={() => void handleCancelSubscription()}
-                      loading={cancelMutation.isPending}
-                    >
-                      Cancelar suscripcion
-                    </Button>
-                  )}
-                </Group>
-              </Group>
-
-              {subscription.pendingCancellation && subscription.endDate && (
-                <Alert color="yellow" variant="light">
-                  La suscripcion quedara cancelada al cierre del periodo actual:{' '}
-                  {formatSubscriptionDate(subscription.endDate)}.
-                </Alert>
-              )}
-
-              {subscription.isExpired && (
-                <Alert color="red" variant="light">
-                  La suscripcion esta vencida. Puedes renovarla o elegir un nuevo plan pago para
-                  generar una nueva vigencia mensual.
-                </Alert>
-              )}
-
-              <SimpleGrid cols={{ base: 1, sm: 2 }}>
-                <Stack gap={4}>
-                  <Text size="sm">
-                    Inicio:{' '}
-                    {subscription.startDate
-                      ? formatSubscriptionDate(subscription.startDate)
-                      : 'Sin fecha informada'}
-                  </Text>
-                  <Text size="sm">
-                    Fin:{' '}
-                    {subscription.isOpenEnded
-                      ? 'Sin vencimiento'
-                      : subscription.endDate
-                        ? formatSubscriptionDate(subscription.endDate)
-                        : 'Sin fecha informada'}
-                  </Text>
-                </Stack>
-
-                <Stack gap={4}>
-                  <Text size="sm">
-                    Servicios: {formatSubscriptionLimitValue(currentPlanLimits.maxServices)}
-                  </Text>
-                  <Text size="sm">
-                    Secretarios: {formatSubscriptionLimitValue(currentPlanLimits.maxSecretaries)}
-                  </Text>
-                </Stack>
-              </SimpleGrid>
-            </Stack>
-          </Paper>
-        ) : !canManageSubscription ? (
+        {!canManageSubscription && (
           <Alert color="yellow" variant="light">
             Espera a que se resuelva la cuenta antes de gestionar la suscripcion.
-          </Alert>
-        ) : (
-          <Alert color="yellow" variant="light">
-            No hay suscripcion disponible para esta cuenta.
           </Alert>
         )}
 
         <Stack gap="sm">
           <Group justify="space-between" align="center" wrap="wrap" gap="sm">
             <Stack gap={2}>
-              <Text fw={600}>Catalogo de planes</Text>
+              <Text fw={600}>Planes disponibles</Text>
             </Stack>
 
-            {canManageSubscription && isFetchingPlans && !isLoadingPlans && <Loader size="sm" />}
+            {canManageSubscription &&
+              (isFetchingSubscription || isFetchingPlans) &&
+              !isLoadingPlans && <Loader size="sm" />}
           </Group>
 
           {!canManageSubscription ? (
             <Alert color="yellow" variant="light">
-              No se puede cargar el catalogo mientras la cuenta no este disponible.
+              No se pueden cargar los planes mientras la cuenta no este disponible.
             </Alert>
           ) : isLoadingPlans ? (
             <Stack gap="sm">
@@ -301,7 +187,7 @@ export function SubscriptionManagementModal({
               No hay planes disponibles para esta cuenta en este momento.
             </Alert>
           ) : (
-            <Stack gap="sm">
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md" verticalSpacing="md">
               {plans.map((plan) => (
                 <SubscriptionPlanCard
                   key={plan.key || String(plan.code)}
@@ -312,9 +198,56 @@ export function SubscriptionManagementModal({
                   }}
                 />
               ))}
-            </Stack>
+            </SimpleGrid>
           )}
         </Stack>
+
+        {canManageSubscription && isLoadingSubscription ? (
+          <Skeleton h={40} radius="md" />
+        ) : subscription ? (
+          <Stack gap="sm">
+            {subscription.pendingCancellation && subscription.endDate && (
+              <Alert color="yellow" variant="light">
+                La suscripcion quedara cancelada al cierre del periodo actual:{' '}
+                {formatSubscriptionDate(subscription.endDate)}.
+              </Alert>
+            )}
+
+            {subscription.isExpired && (
+              <Alert color="red" variant="light">
+                La suscripcion esta vencida. Puedes renovarla o elegir un nuevo plan pago.
+              </Alert>
+            )}
+
+            {(subscription.canRenew || subscription.canCancel) && (
+              <Group justify="flex-end" gap="xs" wrap="wrap">
+                {subscription.canCancel && (
+                  <Button
+                    color="red"
+                    variant="light"
+                    onClick={() => void handleCancelSubscription()}
+                    loading={cancelMutation.isPending}
+                  >
+                    Cancelar suscripcion
+                  </Button>
+                )}
+
+                {subscription.canRenew && (
+                  <Button
+                    onClick={() => void handleRenewSubscription()}
+                    loading={renewMutation.isPending}
+                  >
+                    Renovar
+                  </Button>
+                )}
+              </Group>
+            )}
+          </Stack>
+        ) : canManageSubscription ? (
+          <Alert color="yellow" variant="light">
+            No hay suscripcion disponible para esta cuenta.
+          </Alert>
+        ) : null}
       </Stack>
     </GenericModal>
   );

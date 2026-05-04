@@ -9,6 +9,7 @@ import { EventsPage } from 'features/dashboard/activity-page';
 import { HistoryPage } from 'features/dashboard/history-page';
 import { MetricsPage } from 'features/dashboard/metrics-page';
 import { BusinessPage } from 'features/business/business-page';
+import { BusinessPublicBookingPage } from 'features/business/business-public-booking-page';
 import { BusinessStatusPage } from 'features/business/business-status-page';
 import { TeamPage } from 'features/users/team-page';
 import { SettingsPage } from 'features/settings/settings-page';
@@ -97,6 +98,7 @@ export const appRoutes: RouteObject[] = [
               { path: 'history', element: <HistoryPage /> },
               { path: 'metrics', element: <MetricsPage /> },
               { path: 'business', element: <BusinessPage /> },
+              { path: 'business/:serviceId/public-booking', element: <BusinessPublicBookingPage /> },
               { path: 'unavailability', element: <UnavailabilitiesPage /> },
               { path: 'status', element: <BusinessStatusPage /> },
               { path: 'team', element: <TeamPage /> },

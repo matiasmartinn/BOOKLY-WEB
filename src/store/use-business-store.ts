@@ -4,37 +4,20 @@ import { create } from 'zustand';
 
 type BusinessContextUser = Pick<UserModel, 'id' | 'role' | 'serviceIds'>;
 
+const BUSINESS_ERROR_MESSAGE = 'Ocurrio un error. Intenta nuevamente.';
+
 interface BusinessStore {
   services: BusinessDto[];
   selectedService: BusinessDto | null;
   isLoading: boolean;
   isLoadingDetail: boolean;
   initialized: boolean;
-  /**
-   * Carga el listado liviano de servicios del owner.
-   * Una vez que llega, pre-selecciona el primero automáticamente
-   * fetcheando su detalle completo.
-   */
+  errorMessage: string | null;
   loadServices: (user: BusinessContextUser) => Promise<void>;
-
-  /**
-   * Cambia el servicio activo.
-   * Fetchea el detalle completo vía GET /services/{id} antes de setearlo,
-   * para que el dashboard siempre trabaje con datos frescos.
-   */
   selectService: (id: number) => Promise<void>;
-
-  /**
-   * Sincroniza servicios sin disparar el loader global del dashboard.
-   * Se usa para refrescos silenciosos del contexto actual.
-   */
   refreshServices: (user: BusinessContextUser) => Promise<void>;
-
-  /**
-   * Actualización local luego de un PUT — evita re-fetchear toda la lista.
-   */
   updateService: (updated: BusinessDto) => void;
-
+  clearError: () => void;
   clear: () => void;
 }
 
@@ -44,6 +27,7 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
   isLoading: false,
   isLoadingDetail: false,
   initialized: false,
+  errorMessage: null,
 
   refreshServices: async (user) => {
     try {
@@ -56,12 +40,12 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
           services.find((service) => service.id === currentSelectedServiceId)?.id ?? services[0]?.id;
 
         if (!nextSelectedServiceId) {
-          set({ services, selectedService: null });
+          set({ services, selectedService: null, errorMessage: null });
           return;
         }
 
         const selectedService = await businessService.getById(nextSelectedServiceId);
-        set({ services, selectedService });
+        set({ services, selectedService, errorMessage: null });
         return;
       }
 
@@ -69,7 +53,7 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
         const serviceIds = Array.from(new Set(user.serviceIds)).filter((id) => id > 0);
 
         if (serviceIds.length === 0) {
-          set({ services: [], selectedService: null });
+          set({ services: [], selectedService: null, errorMessage: null });
           return;
         }
 
@@ -82,25 +66,30 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
           orderedServices[0] ??
           null;
 
-        set({ services: orderedServices, selectedService: nextSelectedService });
+        set({
+          services: orderedServices,
+          selectedService: nextSelectedService,
+          errorMessage: null,
+        });
         return;
       }
 
-      set({ services: [], selectedService: null });
+      set({ services: [], selectedService: null, errorMessage: null });
     } catch {
-      // Silent refreshes should not reset the current dashboard state on transient failures.
+      set({ errorMessage: BUSINESS_ERROR_MESSAGE });
     }
   },
 
   loadServices: async (user) => {
-    set({ isLoading: true, initialized: false });
+    set({ isLoading: true, initialized: false, errorMessage: null });
+
     try {
       const normalizedRole = user.role.trim().toLowerCase();
       const currentSelectedServiceId = get().selectedService?.id;
 
       if (normalizedRole === 'owner') {
         const services = await businessService.getByOwner(user.id);
-        set({ services, isLoading: false, initialized: true });
+        set({ services, isLoading: false, initialized: true, errorMessage: null });
 
         if (services.length > 0) {
           const nextSelectedServiceId =
@@ -117,7 +106,13 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
         const serviceIds = Array.from(new Set(user.serviceIds)).filter((id) => id > 0);
 
         if (serviceIds.length === 0) {
-          set({ services: [], selectedService: null, isLoading: false, initialized: true });
+          set({
+            services: [],
+            selectedService: null,
+            isLoading: false,
+            initialized: true,
+            errorMessage: null,
+          });
           return;
         }
 
@@ -135,32 +130,47 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
           selectedService: nextSelectedService,
           isLoading: false,
           initialized: true,
+          errorMessage: null,
         });
         return;
       }
 
-      set({ services: [], selectedService: null, isLoading: false, initialized: true });
+      set({
+        services: [],
+        selectedService: null,
+        isLoading: false,
+        initialized: true,
+        errorMessage: null,
+      });
     } catch {
-      set({ services: [], selectedService: null, isLoading: false, initialized: true });
+      set({
+        isLoading: false,
+        initialized: true,
+        errorMessage: BUSINESS_ERROR_MESSAGE,
+      });
     }
   },
 
   selectService: async (id) => {
-    set({ isLoadingDetail: true });
+    set({ isLoadingDetail: true, errorMessage: null });
+
     try {
       const detail = await businessService.getById(id);
-      set({ selectedService: detail, isLoadingDetail: false });
+      set({ selectedService: detail, isLoadingDetail: false, errorMessage: null });
     } catch {
-      set({ isLoadingDetail: false });
+      set({ isLoadingDetail: false, errorMessage: BUSINESS_ERROR_MESSAGE });
     }
   },
 
   updateService: (updated) => {
     set((state) => ({
-      services: state.services.map((s) => (s.id === updated.id ? updated : s)),
+      services: state.services.map((service) => (service.id === updated.id ? updated : service)),
       selectedService: state.selectedService?.id === updated.id ? updated : state.selectedService,
+      errorMessage: null,
     }));
   },
+
+  clearError: () => set({ errorMessage: null }),
 
   clear: () =>
     set({
@@ -169,5 +179,6 @@ export const useBusinessStore = create<BusinessStore>((set, get) => ({
       isLoading: false,
       isLoadingDetail: false,
       initialized: false,
+      errorMessage: null,
     }),
 }));

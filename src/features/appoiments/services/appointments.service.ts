@@ -14,12 +14,19 @@ export interface CreateAppointmentDto {
   clientEmail: string;
   startDateTime: string;
   clientNotes?: string;
+  fieldValues?: CreateAppointmentFieldValueDto[];
+}
+
+export interface CreateAppointmentFieldValueDto {
+  fieldDefinitionId: number;
+  value: string;
 }
 
 export interface UpdateAppointmentDto {
   clientName: string;
   clientPhone: string;
   clientEmail: string;
+  clientNotes?: string;
 }
 
 export interface RescheduleAppointmentDto {

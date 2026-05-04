@@ -12,8 +12,8 @@ export interface PageProps {
 
 export function Page({ title, description, actions, children }: PageProps) {
   return (
-    <Container fluid px={0}>
-      <Stack gap="lg">
+    <Container fluid px={0} m={0} w="100%" style={{ minWidth: 0 }}>
+      <Stack gap="lg" w="100%" style={{ minWidth: 0 }}>
         <PageHeader title={title} description={description} actions={actions} />
 
         {children}

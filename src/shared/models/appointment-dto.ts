@@ -1,3 +1,8 @@
+export interface AppointmentFieldValueDto {
+  fieldDefinitionId: number;
+  value: string;
+}
+
 export interface AppointmentDto {
   id: number;
   serviceId: number;
@@ -12,6 +17,7 @@ export interface AppointmentDto {
   clientNotes?: string | null;
   cancelReason?: string | null;
   createdOn: string;
+  fieldValues: AppointmentFieldValueDto[];
 }
 
 export interface AppointmentListItemDto {
@@ -32,6 +38,7 @@ export interface AppointmentListItemDto {
   clientNotes?: string | null;
   cancelReason?: string | null;
   createdOn: string;
+  fieldValues: AppointmentFieldValueDto[];
 }
 
 export interface AppointmentSummaryDto {
