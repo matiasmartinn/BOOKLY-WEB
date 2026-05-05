@@ -57,9 +57,11 @@ export function AppointmentEditForm({
     },
   });
 
-  const { mutate: updateAppointment, isPending, isError: isSubmitError } = useUpdateAppointment(
-    appointment.id,
-  );
+  const {
+    mutate: updateAppointment,
+    isPending,
+    isError: isSubmitError,
+  } = useUpdateAppointment(appointment.id);
 
   const onSubmit: SubmitHandler<UpdateAppointmentFormValues> = (values) => {
     if (!appointment.id) {
@@ -73,7 +75,7 @@ export function AppointmentEditForm({
     updateAppointment(
       {
         ...values,
-        clientNotes: canEditClientNotes ? values.clientNotes : appointment.clientNotes ?? '',
+        clientNotes: canEditClientNotes ? values.clientNotes : (appointment.clientNotes ?? ''),
       },
       { onSuccess },
     );
@@ -141,20 +143,15 @@ export function AppointmentEditForm({
 
         {appointment.extraFields.length > 0 ? (
           <Stack gap="sm">
-            <Stack gap={4}>
-              <Text fw={600}>Campos adicionales</Text>
-              <Text size="sm" c="dimmed">
-                Valores cargados para este turno segun el tipo de servicio.
-              </Text>
-            </Stack>
-
             <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
               {appointment.extraFields.map((field) => (
                 <Stack key={field.key} gap={2}>
-                  <Text size="sm" c="dimmed">
+                  <Text size="md" fw={600}>
                     {field.label}
                   </Text>
-                  <Text size="sm">{field.value}</Text>
+                  <Text size="sm" c="dimmed">
+                    {field.value}
+                  </Text>
                 </Stack>
               ))}
             </SimpleGrid>

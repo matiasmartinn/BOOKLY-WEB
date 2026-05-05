@@ -4,11 +4,15 @@ import type { ServiceTypeDto } from 'shared/models';
 export interface CreateServiceTypeDto {
   name: string;
   description?: string;
+  colorHex: string;
+  iconKey?: string | null;
 }
 
 export interface UpdateServiceTypeDto {
   name?: string;
   description?: string;
+  colorHex?: string;
+  iconKey?: string | null;
 }
 
 export interface CreateServiceTypeFieldDto {

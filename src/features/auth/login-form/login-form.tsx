@@ -1,13 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Alert,
-  Anchor,
-  Button,
-  PasswordInput,
-  Stack,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { Alert, Anchor, Button, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
 import { isApiError } from 'app/api';
 import { PATHS } from 'app/router';
 import { AuthFormWrapper } from 'features/auth/components';
@@ -17,7 +9,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from 'store/use-auth-store';
 
 import { loginSchema, type LoginRequest } from './login.schema';
-
 
 function getRedirectTarget(state: unknown): string {
   if (typeof state !== 'object' || state === null || !('from' in state)) {
@@ -40,23 +31,29 @@ function getRedirectTarget(state: unknown): string {
 function getLoginErrorMessage(error: unknown) {
   if (isApiError(error)) {
     if (error.status === 0) {
-      return 'No pudimos conectar con el servidor. Verifica tu conexion e intenta nuevamente.';
+      return 'No pudimos conectar con el servidor. Verifica tu conexión e intenta nuevamente.';
     }
 
     if (error.status === 401) {
-      return error.detail || 'No pudimos iniciar sesion en este momento. Intenta nuevamente.';
+      return error.detail || 'No pudimos iniciar sesión en este momento. Intenta nuevamente.';
     }
 
-    return error.detail || 'No pudimos iniciar sesion en este momento. Intenta nuevamente.';
+    return error.detail || 'No pudimos iniciar sesión en este momento. Intenta nuevamente.';
   }
 
-  return 'No pudimos iniciar sesion en este momento. Intenta nuevamente.';
+  return 'No pudimos iniciar sesión en este momento. Intenta nuevamente.';
 }
 
 export function LoginForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const login = useAuthStore((s) => s.login);
+  const locationState = location.state as {
+    from?: unknown;
+    message?: string;
+    emailSent?: boolean;
+  } | null;
+
   const [isPending, setIsPending] = useState(false);
 
   const {
@@ -75,7 +72,7 @@ export function LoginForm() {
 
     try {
       await login(data);
-      navigate(getRedirectTarget(location.state), { replace: true });
+      navigate(getRedirectTarget(locationState), { replace: true });
     } catch (error) {
       setError('root', { message: getLoginErrorMessage(error) });
     } finally {
@@ -101,6 +98,12 @@ export function LoginForm() {
           {...register('password')}
           error={errors.password?.message}
         />
+
+        {locationState?.message ? (
+          <Alert color={locationState.emailSent ? 'green' : 'orange'} variant="light">
+            {locationState.message}
+          </Alert>
+        ) : null}
 
         {errors.root ? (
           <Alert color="red" variant="light">

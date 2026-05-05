@@ -1,5 +1,7 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Badge, Stack, Text } from '@mantine/core';
 import type { TableColumn } from 'shared/components';
+import { getServiceTypeColor, getServiceTypeIcon, getServiceTypeSoftColor } from 'shared/utils';
 
 import type { AdminServiceListItemDto } from '../models';
 import {
@@ -77,9 +79,22 @@ export const adminServiceColumns: TableColumn<AdminServiceListItemDto>[] = [
   {
     key: 'serviceTypeName',
     title: 'Tipo',
-    width: 90,
+    width: 150,
     textAlign: 'center',
-    render: (row) => `${row.serviceTypeName}`,
+    render: (row) => {
+      const color = getServiceTypeColor(row.serviceTypeColorHex);
+
+      return (
+        <Badge
+          variant="light"
+          radius="sm"
+          leftSection={<FontAwesomeIcon icon={getServiceTypeIcon(row.serviceTypeIconKey)} />}
+          style={{ backgroundColor: getServiceTypeSoftColor(color), color }}
+        >
+          {row.serviceTypeName}
+        </Badge>
+      );
+    },
   },
   {
     key: 'createdAt',

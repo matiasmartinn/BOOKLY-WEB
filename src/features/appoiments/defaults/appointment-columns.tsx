@@ -43,13 +43,24 @@ const appointmentBaseColumns: TableColumn<AppointmentViewModel>[] = [
     ),
   },
   {
-    key: 'durationMinutes',
-    title: 'Duracion',
-    accessor: 'durationMinutes',
-    textAlign: 'center',
-    width: 100,
+    key: 'clientNotes',
+    title: 'notas',
+    accessor: 'clientNotes',
     sortable: true,
-    render: (row) => `${row.durationMinutes} min`,
+    render: (row) => (
+      <span
+        title={row.clientNotes ?? ''}
+        style={{
+          display: 'block',
+          maxWidth: '100%',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {row.clientNotes || '-'}
+      </span>
+    ),
   },
 ];
 
@@ -61,7 +72,6 @@ export const buildAppointmentColumns = (
     key: `extra-field-${dynamicColumn.key}`,
     title: dynamicColumn.label,
     width: 180,
-    render: (row) =>
-      row.extraFields.find((field) => field.key === dynamicColumn.key)?.value ?? '-',
+    render: (row) => row.extraFields.find((field) => field.key === dynamicColumn.key)?.value ?? '-',
   })),
 ];

@@ -12,9 +12,8 @@ import {
 import { isApiError } from 'app/api';
 import { PATHS } from 'app/router';
 import { AuthFormWrapper } from 'features/auth/components';
-import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useRegister } from '../auth.hooks';
 
@@ -33,7 +32,7 @@ function getRegisterErrorMessage(error: unknown) {
 }
 
 export function RegisterForm() {
-  const [feedback, setFeedback] = useState<{ message: string; color: string } | null>(null);
+  const navigate = useNavigate();
 
   const {
     clearErrors,
@@ -56,13 +55,14 @@ export function RegisterForm() {
     };
 
     clearErrors('root');
-    setFeedback(null);
 
     try {
       const response = await mutateAsync(dto);
-      setFeedback({
-        message: response.emailDispatch.message,
-        color: response.emailDispatch.emailSent ? 'green' : 'orange',
+      navigate(PATHS.auth.login, {
+        state: {
+          message: response.emailDispatch.message,
+          emailSent: response.emailDispatch.emailSent,
+        },
       });
     } catch (error) {
       setError('root', { message: getRegisterErrorMessage(error) });
@@ -118,13 +118,6 @@ export function RegisterForm() {
           {...register('confirmPassword')}
           error={errors.confirmPassword?.message}
         />
-
-        {feedback ? (
-          <Alert color={feedback.color === 'green' ? 'green' : 'orange'} variant="light">
-            {feedback.message}
-          </Alert>
-        ) : null}
-
         {errors.root ? (
           <Alert color="red" variant="light">
             {errors.root.message}

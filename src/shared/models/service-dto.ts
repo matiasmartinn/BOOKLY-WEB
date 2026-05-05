@@ -31,6 +31,8 @@ export interface ServiceDto {
   placeName?: string | null;
   address?: string | null;
   serviceTypeId: number;
+  serviceTypeColorHex?: string | null;
+  serviceTypeIconKey?: string | null;
   durationMinutes: number;
   capacity: number;
   mode: string;

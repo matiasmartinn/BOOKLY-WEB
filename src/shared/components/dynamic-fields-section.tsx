@@ -1,4 +1,4 @@
-import { Checkbox, Select, Stack, Text, TextInput, Textarea } from '@mantine/core';
+import { Checkbox, Select, Stack, TextInput, Textarea } from '@mantine/core';
 import { useMemo } from 'react';
 import {
   Controller,
@@ -15,8 +15,6 @@ interface DynamicFieldsSectionProps<TFieldValues extends FieldValues = FieldValu
   errors?: FieldErrors<TFieldValues>;
   fieldDefinitions: DynamicFieldDefinitionDto[];
   disabled?: boolean;
-  title?: string;
-  description?: string;
 }
 
 export function DynamicFieldsSection<TFieldValues extends FieldValues = FieldValues>({
@@ -24,8 +22,6 @@ export function DynamicFieldsSection<TFieldValues extends FieldValues = FieldVal
   errors,
   fieldDefinitions,
   disabled = false,
-  title = 'Campos adicionales',
-  description,
 }: DynamicFieldsSectionProps<TFieldValues>) {
   const orderedFields = useMemo(
     () =>
@@ -41,15 +37,6 @@ export function DynamicFieldsSection<TFieldValues extends FieldValues = FieldVal
 
   return (
     <Stack gap="md">
-      <Stack gap={4}>
-        <Text fw={600}>{title}</Text>
-        {description ? (
-          <Text size="sm" c="dimmed">
-            {description}
-          </Text>
-        ) : null}
-      </Stack>
-
       {orderedFields.map((fieldDefinition) => {
         const fieldName = `additionalFields.${fieldDefinition.key}` as Path<TFieldValues>;
         const fieldError = additionalFieldErrors[fieldDefinition.key]?.message;

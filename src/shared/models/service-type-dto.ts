@@ -35,6 +35,8 @@ export interface ServiceTypeDto {
   id: number;
   name: string;
   description?: string | null;
+  colorHex: string;
+  iconKey?: string | null;
   isActive: boolean;
   fieldDefinitions?: ServiceTypeFieldDefinitionDto[] | null;
 }

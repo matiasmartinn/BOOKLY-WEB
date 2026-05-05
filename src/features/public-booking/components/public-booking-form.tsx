@@ -322,7 +322,6 @@ export function PublicBookingForm({
             errors={errors}
             fieldDefinitions={fieldDefinitions}
             disabled={isPending}
-            description="Completa estos datos adicionales si aplican para este tipo de servicio."
           />
         ) : null}
 

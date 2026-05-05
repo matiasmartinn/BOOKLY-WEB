@@ -34,7 +34,10 @@ export interface AdminTimeSeriesPointDto {
 }
 
 export interface AdminServiceTypeUsageItemDto {
+  serviceTypeId: number;
   serviceTypeName: string;
+  colorHex: string;
+  iconKey?: string | null;
   total: number;
 }
 
@@ -108,6 +111,8 @@ export interface AdminServiceListItemDto {
   ownerPlan: AdminPlanDto;
   serviceTypeId: number;
   serviceTypeName: string;
+  serviceTypeColorHex?: string | null;
+  serviceTypeIconKey?: string | null;
   price?: number | null;
 }
 

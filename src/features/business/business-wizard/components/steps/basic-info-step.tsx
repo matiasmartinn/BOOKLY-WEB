@@ -1,10 +1,11 @@
-import { Stack, TextInput, Textarea, Select, Text, Box } from '@mantine/core';
+import { Stack, TextInput, Textarea, Select, Text, Box, Group, ThemeIcon } from '@mantine/core';
 import { useServiceTypes } from 'features/service-types/hooks';
 import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { getServiceTypeColor, getServiceTypeIcon } from 'shared/utils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import type { CreateBusinessFormValues } from '../../schema';
-
 
 function toSlug(value: string): string {
   return value
@@ -34,11 +35,14 @@ export function BasicInfoStep() {
   };
 
   const { data: businessTypesData, isLoading } = useServiceTypes();
+
   const businessTypeOptions = useMemo(
     () =>
       businessTypesData?.map((type) => ({
         value: String(type.id),
         label: type.name,
+        iconKey: type.iconKey,
+        colorHex: type.colorHex,
       })) ?? [],
     [businessTypesData],
   );
@@ -62,6 +66,30 @@ export function BasicInfoStep() {
         value={serviceTypeId ? String(serviceTypeId) : null}
         disabled={isLoading}
         error={errors.serviceTypeId?.message}
+        renderOption={({ option }) => {
+          const item = option as (typeof businessTypeOptions)[number];
+
+          const icon = getServiceTypeIcon(item.iconKey);
+          const color = getServiceTypeColor(item.colorHex);
+
+          return (
+            <Group gap="sm" wrap="nowrap">
+              <ThemeIcon
+                size="sm"
+                radius="xl"
+                variant="light"
+                style={{
+                  color,
+                  backgroundColor: `${color}1A`,
+                }}
+              >
+                <FontAwesomeIcon icon={icon} size="xs" />
+              </ThemeIcon>
+
+              <Text size="sm">{item.label}</Text>
+            </Group>
+          );
+        }}
         onChange={(val) =>
           setValue('serviceTypeId', val ? Number(val) : undefined!, {
             shouldValidate: true,

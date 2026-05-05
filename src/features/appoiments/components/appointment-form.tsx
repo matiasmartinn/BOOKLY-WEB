@@ -282,7 +282,6 @@ export function AppointmentForm({
             errors={errors}
             fieldDefinitions={fieldDefinitions}
             disabled={isPending}
-            description="Estos datos adicionales dependen de la configuracion del tipo de servicio."
           />
         ) : null}
 

@@ -1,6 +1,8 @@
-import { Badge, Text } from '@mantine/core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Badge, Group, Text, ThemeIcon } from '@mantine/core';
 import type { TableColumn } from 'shared/components';
 import type { ServiceTypeDto } from 'shared/models';
+import { getServiceTypeColor, getServiceTypeIcon, getServiceTypeSoftColor } from 'shared/utils';
 
 export const adminServiceTypeColumns: TableColumn<ServiceTypeDto>[] = [
   {
@@ -9,7 +11,23 @@ export const adminServiceTypeColumns: TableColumn<ServiceTypeDto>[] = [
     accessor: 'name',
     sortable: true,
     width: 260,
-    render: (row) => <Text fw={600}>{row.name}</Text>,
+    render: (row) => {
+      const color = getServiceTypeColor(row.colorHex);
+
+      return (
+        <Group gap="sm" wrap="nowrap">
+          <ThemeIcon
+            size="sm"
+            radius="sm"
+            variant="light"
+            style={{ backgroundColor: getServiceTypeSoftColor(color), color }}
+          >
+            <FontAwesomeIcon icon={getServiceTypeIcon(row.iconKey)} size="sm" />
+          </ThemeIcon>
+          <Text fw={600}>{row.name}</Text>
+        </Group>
+      );
+    },
   },
   {
     key: 'description',

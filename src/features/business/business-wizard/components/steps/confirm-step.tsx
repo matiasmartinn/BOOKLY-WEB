@@ -1,18 +1,9 @@
-import { faStore, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faStore, type IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Stack, Text, Group, Box, ThemeIcon, Divider } from '@mantine/core';
+import { Box, Divider, Group, Stack, Text, ThemeIcon } from '@mantine/core';
 import { useFormContext } from 'react-hook-form';
 
 import type { CreateBusinessFormValues } from '../../schema';
-
-const SERVICE_TYPE_LABELS: Record<number, string> = {
-  1: 'Peluquería & Barbería',
-  2: 'Manicura & Pedicura',
-  3: 'Centro de Estética',
-  4: 'Profesional de la Salud',
-  5: 'Psicología',
-  6: 'Otro',
-};
 
 function formatDuration(minutes: number): string {
   if (minutes < 60) return `${minutes} minutos`;
@@ -40,7 +31,7 @@ function SummaryRow({ label, value }: SummaryRowProps) {
 }
 
 interface SummaryCardProps {
-  icon: typeof faStore;
+  icon: IconDefinition;
   title: string;
   rows: { label: string; value: string }[];
 }
@@ -73,9 +64,14 @@ function SummaryCard({ icon, title, rows }: SummaryCardProps) {
   );
 }
 
-export function ConfirmStep() {
+interface ConfirmStepProps {
+  serviceTypeName?: string;
+}
+
+export function ConfirmStep({ serviceTypeName }: ConfirmStepProps) {
   const { watch } = useFormContext<CreateBusinessFormValues>();
   const values = watch();
+  const serviceTypeSummary = values.serviceTypeId ? (serviceTypeName ?? 'Tipo no disponible') : '—';
 
   return (
     <Stack gap="lg">
@@ -90,7 +86,7 @@ export function ConfirmStep() {
           { label: 'Nombre', value: values.name ?? '—' },
           {
             label: 'Tipo',
-            value: values.serviceTypeId ? (SERVICE_TYPE_LABELS[values.serviceTypeId] ?? '—') : '—',
+            value: serviceTypeSummary,
           },
           { label: 'Descripción', value: values.description || 'Sin descripción' },
           { label: 'Telefono', value: values.phoneNumber || 'Sin telefono' },

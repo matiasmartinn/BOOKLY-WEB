@@ -29,6 +29,7 @@ import {
 import { GenericModal } from 'shared/components';
 import { appChartColorVars, appChartTooltipStyles, appColorVars } from 'shared/ui/theme/theme';
 import { useAppToast } from 'shared/ui/toast';
+import { getServiceTypeColor, SERVICE_TYPE_DEFAULT_COLOR_HEX } from 'shared/utils';
 
 import {
   AdminChartCard,
@@ -171,7 +172,11 @@ export function AdminDashboardPageContainer() {
   );
 
   const serviceTypeUsageChartData = useMemo(
-    () => sortedServiceTypeUsage.slice(0, MAX_SERVICE_TYPE_CHART_ITEMS),
+    () =>
+      sortedServiceTypeUsage.slice(0, MAX_SERVICE_TYPE_CHART_ITEMS).map((item) => ({
+        ...item,
+        color: getServiceTypeColor(item.colorHex),
+      })),
     [sortedServiceTypeUsage],
   );
 
@@ -429,10 +434,17 @@ export function AdminDashboardPageContainer() {
                   <Bar
                     dataKey="total"
                     name="Servicios"
-                    fill={CHART_COLORS.services}
+                    fill={SERVICE_TYPE_DEFAULT_COLOR_HEX}
                     radius={HORIZONTAL_BAR_RADIUS}
                     barSize={18}
-                  />
+                  >
+                    {serviceTypeUsageChartData.map((item) => (
+                      <Cell
+                        key={`${item.serviceTypeId}-${item.serviceTypeName}`}
+                        fill={item.color}
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             )}

@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Box } from '@mantine/core';
 import { isApiError } from 'app/api';
-import { useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { findOverlappingScheduleDay } from 'features/schedules/utils/schedules.utils';
+import { useServiceTypes } from 'features/service-types/hooks';
 import type { BusinessDto } from 'shared/models';
 import { useAuthStore } from 'store/use-auth-store';
 
@@ -17,7 +18,6 @@ import { createBusinessSchema, stepSchemas, type CreateBusinessFormValues } from
 const STEP_COMPONENTS: Partial<Record<string, ReactNode>> = {
   basic: <BasicInfoStep />,
   schedules: <SchedulesStep />,
-  confirm: <ConfirmStep />,
 };
 
 const STEP_VALIDATION_KEYS: Partial<Record<string, keyof typeof stepSchemas>> = {
@@ -46,6 +46,7 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
   const authUser = useAuthStore((s) => s.user);
 
   const { mutateAsync: createService, isPending, isError, error } = useCreateBusiness();
+  const { data: serviceTypes = [] } = useServiceTypes();
 
   const methods = useForm<CreateBusinessFormValues>({
     resolver: zodResolver(createBusinessSchema),
@@ -64,6 +65,10 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
 
   const { watch, trigger, getValues, setError, clearErrors } = methods;
   const values = watch();
+  const selectedServiceTypeName = useMemo(
+    () => serviceTypes.find((serviceType) => serviceType.id === values.serviceTypeId)?.name,
+    [serviceTypes, values.serviceTypeId],
+  );
 
   const stepIndex = (id: string) => BUSINESS_WIZARD_STEPS.findIndex((s) => s.id === id);
   const summaries: Record<string, { label: string; value: string }[]> = {
@@ -71,7 +76,12 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
       activeIndex > stepIndex('basic') && values.name
         ? [
             { label: 'Nombre', value: values.name },
-            { label: 'Tipo', value: values.serviceTypeId ? `Tipo ${values.serviceTypeId}` : '---' },
+            {
+              label: 'Tipo',
+              value: values.serviceTypeId
+                ? (selectedServiceTypeName ?? 'Tipo no disponible')
+                : '---',
+            },
           ]
         : [],
     schedules:
@@ -195,7 +205,11 @@ export function BusinessWizardContainer({ onComplete, onCancel }: BusinessWizard
             </Alert>
           )}
 
-          {STEP_COMPONENTS[activeStep.id]}
+          {activeStep.id === 'confirm' ? (
+            <ConfirmStep serviceTypeName={selectedServiceTypeName} />
+          ) : (
+            STEP_COMPONENTS[activeStep.id]
+          )}
         </WizardRightPanel>
       </Box>
     </FormProvider>
