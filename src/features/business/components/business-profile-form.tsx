@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
-  Box,
   Button,
   Group,
   NumberInput,
@@ -35,6 +34,7 @@ const mapBusinessToFormValues = (service: BusinessDto): UpdateBusinessProfileFor
   description: service.description ?? '',
   phoneNumber: service.phoneNumber ?? '',
   durationMinutes: service.durationMinutes,
+  price: service.price ?? undefined,
   placeName: service.placeName ?? '',
   address: service.address ?? '',
 });
@@ -76,6 +76,7 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
         description: values.description?.trim() ?? '',
         phoneNumber: values.phoneNumber?.trim() ?? '',
         durationMinutes: values.durationMinutes,
+        price: values.price ?? (service.price != null ? null : undefined),
         placeName: values.placeName?.trim() ?? '',
         address: values.address?.trim() ?? '',
       });
@@ -97,32 +98,31 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
           </Alert>
         )}
 
-        <FormSection title="Datos principales" description="Configura la informacion base del servicio.">
+        <FormSection
+          title="Datos principales"
+          description="Configura la informacion base del servicio."
+        >
           <Stack gap="lg">
-            <Group align="flex-start" wrap="wrap" gap="md">
-              <Box style={{ flex: '1.7 1 320px' }}>
-                <TextInput
-                  label="Nombre del servicio"
-                  placeholder="Ej: Peluqueria Nico"
-                  size="md"
-                  withAsterisk
-                  {...register('name')}
-                  error={errors.name?.message}
-                  disabled={isPending}
-                />
-              </Box>
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+              <TextInput
+                label="Nombre del servicio"
+                placeholder="Ej: Peluqueria Nico"
+                size="md"
+                withAsterisk
+                {...register('name')}
+                error={errors.name?.message}
+                disabled={isPending}
+              />
 
-              <Box style={{ flex: '1 1 240px' }}>
-                <TextInput
-                  label="Tipo de servicio"
-                  size="md"
-                  value={currentServiceTypeLabel}
-                  readOnly
-                />
-              </Box>
-            </Group>
+              <TextInput
+                label="Tipo de servicio"
+                size="md"
+                value={currentServiceTypeLabel}
+                readOnly
+              />
+            </SimpleGrid>
 
-            <Box maw={280}>
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
               <Controller
                 name="durationMinutes"
                 control={control}
@@ -130,7 +130,6 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
                   <NumberInput
                     {...field}
                     label="Duracion del turno"
-                    description="Tiempo estimado de cada turno en minutos."
                     placeholder="Ej: 45"
                     min={1}
                     max={480}
@@ -138,11 +137,33 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
                     suffix=" min"
                     error={errors.durationMinutes?.message}
                     disabled={isPending}
-                    onChange={(value) => field.onChange(typeof value === 'number' ? value : undefined)}
+                    onChange={(value) =>
+                      field.onChange(typeof value === 'number' ? value : undefined)
+                    }
                   />
                 )}
               />
-            </Box>
+
+              <Controller
+                name="price"
+                control={control}
+                render={({ field }) => (
+                  <NumberInput
+                    {...field}
+                    label="Precio por turno"
+                    placeholder="Ej: 5000"
+                    min={0}
+                    decimalScale={2}
+                    prefix="$ "
+                    error={errors.price?.message}
+                    disabled={isPending}
+                    onChange={(value) =>
+                      field.onChange(typeof value === 'number' ? value : undefined)
+                    }
+                  />
+                )}
+              />
+            </SimpleGrid>
 
             <Textarea
               label="Descripcion"

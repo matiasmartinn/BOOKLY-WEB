@@ -173,6 +173,9 @@ export function HistoryPageContainer() {
   }, [appointments, selectedStatus]);
 
   const totalResults = historyRows.length;
+  const attended = historyRows.filter((item) =>
+    appointmentStatusIncludes(item.status, 'ATTEND', 'CONFIRM'),
+  ).length;
   const cancellations = historyRows.filter((item) =>
     appointmentStatusIncludes(item.status, 'CANCEL'),
   ).length;
@@ -197,6 +200,12 @@ export function HistoryPageContainer() {
             value={isLoading ? '...' : String(totalResults)}
             accentColor="var(--mantine-color-gray-4)"
             backgroundColor="var(--mantine-color-gray-0)"
+          />
+          <CompactHistoryStat
+            label="Asistieron"
+            value={isLoading ? '...' : String(attended)}
+            accentColor="var(--mantine-color-green-5)"
+            backgroundColor="var(--mantine-color-green-0)"
           />
           <CompactHistoryStat
             label="Cancelado"

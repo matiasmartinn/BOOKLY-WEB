@@ -1,5 +1,4 @@
 import { z } from 'zod';
-
 import type { DynamicFieldDefinitionDto } from 'shared/models';
 import { ServiceTypeFieldType } from 'shared/models';
 

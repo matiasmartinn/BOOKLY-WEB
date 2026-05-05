@@ -43,7 +43,6 @@ export interface CompleteAdminInvitationDto {
 
 export interface AuthResponseDto {
   accessToken: string;
-  refreshToken: string;
   userId: number;
   email: string;
   role: string;
@@ -52,7 +51,6 @@ export interface AuthResponseDto {
 
 export interface AuthSession {
   accessToken: string;
-  refreshToken: string;
   userId: number;
   email: string;
   role: string;
@@ -96,7 +94,6 @@ function getAccessTokenExpiresAt(accessToken: string): string | null {
 function toAuthSession(response: AuthResponseDto): AuthSession {
   return {
     accessToken: response.accessToken,
-    refreshToken: response.refreshToken,
     userId: response.userId,
     email: response.email,
     role: response.role,
@@ -129,10 +126,10 @@ const login = async (dto: LoginRequest): Promise<AuthenticatedSessionResult> => 
   return { session, user };
 };
 
-const refreshSession = async (refreshToken: string): Promise<AuthenticatedSessionResult> => {
+const refreshSession = async (): Promise<AuthenticatedSessionResult> => {
   const response = await apiClient.post<AuthResponseDto>(
     '/auth/refresh',
-    { refreshToken },
+    undefined,
     publicAuthRequestConfig,
   );
   const session = toAuthSession(response.data);
@@ -141,11 +138,11 @@ const refreshSession = async (refreshToken: string): Promise<AuthenticatedSessio
   return { session, user };
 };
 
-const logout = (refreshToken: string) =>
+const logout = () =>
   apiClient
     .post<void>(
       '/auth/logout',
-      { refreshToken },
+      undefined,
       {
         skipAuth: true,
         skipAuthRefresh: true,

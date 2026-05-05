@@ -16,6 +16,8 @@ function isAccessTokenExpired(session: AuthSession | null): boolean {
   return Number.isNaN(expiresAt) || expiresAt <= Date.now();
 }
 
+type LegacyAuthSession = AuthSession & { refreshToken?: string };
+
 interface AuthStore {
   session: AuthSession | null;
   user: UserModel | null;
@@ -28,6 +30,31 @@ interface AuthStore {
   clearSession: () => void;
   setUser: (user: UserModel | null) => void;
   finishHydration: () => void;
+}
+
+function sanitizeAuthSession(session: LegacyAuthSession | null | undefined): AuthSession | null {
+  if (!session) {
+    return null;
+  }
+
+  const sanitizedSession = { ...session };
+  delete sanitizedSession.refreshToken;
+  return sanitizedSession;
+}
+
+function getPersistedAuthState(
+  persistedState: unknown,
+): Pick<AuthStore, 'session' | 'user' | 'isAuthenticated'> {
+  const state = persistedState as Partial<AuthStore> | undefined;
+  const session = sanitizeAuthSession(state?.session as LegacyAuthSession | null | undefined);
+  const user = state?.user ?? null;
+  const hasValidSession = Boolean(session && user);
+
+  return {
+    session: hasValidSession ? session : null,
+    user: hasValidSession ? user : null,
+    isAuthenticated: hasValidSession,
+  };
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -54,26 +81,15 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       logout: async () => {
-        const refreshToken = get().session?.refreshToken;
-
         try {
-          if (refreshToken) {
-            await authService.logout(refreshToken);
-          }
+          await authService.logout();
         } finally {
           get().clearSession();
         }
       },
 
       refreshSession: async () => {
-        const currentRefreshToken = get().session?.refreshToken;
-
-        if (!currentRefreshToken) {
-          get().clearSession();
-          return null;
-        }
-
-        const authResult = await authService.refreshSession(currentRefreshToken);
+        const authResult = await authService.refreshSession();
 
         set({
           session: authResult.session,
@@ -145,30 +161,17 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'auth',
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         session: state.session,
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
-      migrate: (persistedState, version) => {
-        if (version !== 2) {
-          return {
-            session: null,
-            user: null,
-            isAuthenticated: false,
-          };
-        }
-
-        const state = persistedState as Partial<AuthStore> | undefined;
-        const hasValidSession = Boolean(state?.session && state.user);
-
-        return {
-          session: hasValidSession ? state?.session ?? null : null,
-          user: hasValidSession ? state?.user ?? null : null,
-          isAuthenticated: hasValidSession,
-        };
-      },
+      migrate: getPersistedAuthState,
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...getPersistedAuthState(persistedState),
+      }),
       onRehydrateStorage: () => (state) => {
         if (!state) {
           return;

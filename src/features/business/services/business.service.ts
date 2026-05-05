@@ -32,7 +32,7 @@ export interface UpdateBusinessDto {
   durationMinutes?: number;
   capacity?: number;
   mode?: number;
-  price?: number;
+  price?: number | null;
 }
 
 export interface SetBusinessSecretariesDto {

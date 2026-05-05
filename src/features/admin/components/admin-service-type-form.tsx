@@ -2,14 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Button, Group, Stack, TextInput, Textarea } from '@mantine/core';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { isApiError, type ProblemDetails } from 'app/api';
-import { useEffect } from 'react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import type { ServiceTypeDto } from 'shared/models';
-
 import type {
   CreateServiceTypeDto,
   UpdateServiceTypeDto,
 } from 'features/service-types/services';
+import { useEffect } from 'react';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import type { ServiceTypeDto } from 'shared/models';
 
 import {
   serviceTypeFormSchema,

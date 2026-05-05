@@ -1,27 +1,32 @@
 import { Checkbox, Select, Stack, Text, TextInput, Textarea } from '@mantine/core';
 import { useMemo } from 'react';
-import { Controller, type Control, type FieldErrors } from 'react-hook-form';
-
+import {
+  Controller,
+  type Control,
+  type FieldErrors,
+  type FieldValues,
+  type Path,
+} from 'react-hook-form';
 import type { DynamicFieldDefinitionDto } from 'shared/models';
 import { ServiceTypeFieldType } from 'shared/models';
 
-interface DynamicFieldsSectionProps {
-  control: Control<any>;
-  errors?: FieldErrors<any>;
+interface DynamicFieldsSectionProps<TFieldValues extends FieldValues = FieldValues> {
+  control: Control<TFieldValues>;
+  errors?: FieldErrors<TFieldValues>;
   fieldDefinitions: DynamicFieldDefinitionDto[];
   disabled?: boolean;
   title?: string;
   description?: string;
 }
 
-export function DynamicFieldsSection({
+export function DynamicFieldsSection<TFieldValues extends FieldValues = FieldValues>({
   control,
   errors,
   fieldDefinitions,
   disabled = false,
   title = 'Campos adicionales',
   description,
-}: DynamicFieldsSectionProps) {
+}: DynamicFieldsSectionProps<TFieldValues>) {
   const orderedFields = useMemo(
     () =>
       [...fieldDefinitions].sort(
@@ -46,7 +51,7 @@ export function DynamicFieldsSection({
       </Stack>
 
       {orderedFields.map((fieldDefinition) => {
-        const fieldName = `additionalFields.${fieldDefinition.key}` as const;
+        const fieldName = `additionalFields.${fieldDefinition.key}` as Path<TFieldValues>;
         const fieldError = additionalFieldErrors[fieldDefinition.key]?.message;
 
         if (fieldDefinition.fieldType === ServiceTypeFieldType.MultilineText) {

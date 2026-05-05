@@ -65,6 +65,7 @@ export const stepSchemas = {
   }),
   schedules: z.object({
     durationMinutes: createBusinessSchema.shape.durationMinutes,
+    price: createBusinessSchema.shape.price,
     schedules: z.array(scheduleSchema).min(1, 'Configurá al menos un horario de atención'),
   }),
 } as const;

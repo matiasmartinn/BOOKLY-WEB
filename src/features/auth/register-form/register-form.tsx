@@ -47,7 +47,14 @@ export function RegisterForm() {
 
   const { mutateAsync, isPending } = useRegister();
 
-  const onSubmit: SubmitHandler<RegisterUserRequst> = async ({ confirmPassword, ...dto }) => {
+  const onSubmit: SubmitHandler<RegisterUserRequst> = async (values) => {
+    const dto = {
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      password: values.password,
+    };
+
     clearErrors('root');
     setFeedback(null);
 

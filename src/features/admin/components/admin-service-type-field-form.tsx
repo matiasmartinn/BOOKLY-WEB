@@ -2,17 +2,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Button, Checkbox, Group, Select, Stack, TextInput } from '@mantine/core';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { isApiError, type ProblemDetails } from 'app/api';
+import type {
+  CreateServiceTypeFieldDto,
+  UpdateServiceTypeFieldDto,
+} from 'features/service-types/services';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import type {
   ServiceTypeDto,
   ServiceTypeFieldDefinitionDto,
 } from 'shared/models';
-
-import type {
-  CreateServiceTypeFieldDto,
-  UpdateServiceTypeFieldDto,
-} from 'features/service-types/services';
 
 import {
   createServiceTypeFieldFormSchema,

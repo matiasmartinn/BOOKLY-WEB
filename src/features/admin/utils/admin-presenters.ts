@@ -64,7 +64,7 @@ export const formatAdminPrice = (value?: number | null) => {
     return 'Sin definir';
   }
 
-  return numberFormatter.format(value);
+  return `$ ${numberFormatter.format(value)}`;
 };
 
 export const formatAdminPlan = (plan?: AdminPlanDto | null) => {

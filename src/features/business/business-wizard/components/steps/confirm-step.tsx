@@ -94,7 +94,7 @@ export function ConfirmStep() {
           },
           { label: 'Descripción', value: values.description || 'Sin descripción' },
           { label: 'Telefono', value: values.phoneNumber || 'Sin telefono' },
-          { label: 'URL', value: values.slug ? `bookly.app/${values.slug}` : '—' },
+          { label: 'URL sugerida', value: values.slug ? `bookly.app/${values.slug}` : '—' },
         ]}
       />
 

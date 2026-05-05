@@ -32,6 +32,10 @@ const DAY_TO_NUMBER: Record<Day, number> = {
   Domingo: 0,
 };
 
+const NUMBER_TO_DAY = Object.fromEntries(
+  Object.entries(DAY_TO_NUMBER).map(([day, value]) => [value, day]),
+) as Record<number, Day>;
+
 const DURATION_PRESETS = [15, 30, 45, 60, 90, 120];
 const DEFAULT_RANGE: Range = { start: '09:00', end: '18:00', capacity: 1 };
 const EMPTY_RANGE: Range = { start: null, end: null, capacity: 1 };
@@ -42,6 +46,30 @@ const buildInitial = (): SchedulesState =>
     acc[day] = { enabled: false, ranges: [EMPTY_RANGE] };
     return acc;
   }, {} as SchedulesState);
+
+function fromScheduleValues(values: ScheduleValue[] = []): SchedulesState {
+  const state = buildInitial();
+
+  for (const schedule of values) {
+    const day = NUMBER_TO_DAY[schedule.day];
+
+    if (!day) {
+      continue;
+    }
+
+    if (!state[day].enabled) {
+      state[day] = { enabled: true, ranges: [] };
+    }
+
+    state[day].ranges.push({
+      start: schedule.startTime.slice(0, 5),
+      end: schedule.endTime.slice(0, 5),
+      capacity: schedule.capacity,
+    });
+  }
+
+  return state;
+}
 
 function toScheduleValues(state: SchedulesState): ScheduleValue[] {
   return DAY_ARRAY.flatMap((day) => {
@@ -69,13 +97,16 @@ const createNextRange = (ranges: Range[]): Range => {
 
 export function SchedulesStep() {
   const {
+    getValues,
     setValue,
     watch,
     control,
     clearErrors,
     formState: { errors },
   } = useFormContext<CreateBusinessFormValues>();
-  const [schedules, setSchedules] = useState<SchedulesState>(buildInitial);
+  const [schedules, setSchedules] = useState<SchedulesState>(() =>
+    fromScheduleValues(getValues('schedules')),
+  );
 
   const duration = watch('durationMinutes');
 
@@ -187,6 +218,25 @@ export function SchedulesStep() {
               suffix=" min"
               w={200}
               error={errors.durationMinutes?.message}
+              onChange={(val) => field.onChange(typeof val === 'number' ? val : undefined)}
+            />
+          )}
+        />
+
+        <Controller
+          name="price"
+          control={control}
+          render={({ field }) => (
+            <NumberInput
+              {...field}
+              placeholder="Ej: 5000"
+              label="Precio por turno"
+              description="Opcional. Si lo dejas vacio, el turno aparecera como a consultar."
+              min={0}
+              decimalScale={2}
+              prefix="$ "
+              w={240}
+              error={errors.price?.message}
               onChange={(val) => field.onChange(typeof val === 'number' ? val : undefined)}
             />
           )}

@@ -94,7 +94,7 @@ export function BasicInfoStep() {
       {name.length > 1 && (
         <Box>
           <Text size="xs" c="dimmed" mb={4}>
-            URL pública de tu servicio
+            URL publica sugerida
           </Text>
           <Box
             px="sm"

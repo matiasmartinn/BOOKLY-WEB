@@ -23,6 +23,8 @@ const getModeLabel = (mode: string) => {
   }
 };
 
+const formatPrice = (price: number) => `$ ${price.toLocaleString('es-AR')}`;
+
 function PublicBookingSkeleton() {
   return (
     <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
@@ -204,7 +206,7 @@ export function PublicBookingPageContainer() {
                     >
                       Precio
                     </Text>
-                    <Text fw={600}>${service.price}</Text>
+                    <Text fw={600}>{formatPrice(service.price)}</Text>
                   </Stack>
                 ) : null}
 

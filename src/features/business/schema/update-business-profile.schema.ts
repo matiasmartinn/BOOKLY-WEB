@@ -11,6 +11,7 @@ export const updateBusinessProfileSchema = z.object({
     .int()
     .min(1, 'La duracion debe ser mayor a 0')
     .max(1440, 'La duracion no puede superar 1440 minutos'),
+  price: createBusinessSchema.shape.price,
   placeName: z.string().optional(),
   address: z.string().optional(),
 });

@@ -1,14 +1,19 @@
-import type { AxiosError} from 'axios';
+import type { AxiosError } from 'axios';
 import axios, { type InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from 'store/use-auth-store';
 
 declare module 'axios' {
+  // Axios declara este parametro como any; la extension debe conservar la firma original.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   interface AxiosRequestConfig<D = any> {
+    data?: D;
     skipAuth?: boolean;
     skipAuthRefresh?: boolean;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   interface InternalAxiosRequestConfig<D = any> {
+    data?: D;
     _retry?: boolean;
     skipAuth?: boolean;
     skipAuthRefresh?: boolean;
@@ -42,6 +47,7 @@ export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 100000,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
 let refreshSessionPromise: Promise<string | null> | null = null;
@@ -102,13 +108,6 @@ apiClient.interceptors.response.use(
       !originalRequest.skipAuthRefresh
     ) {
       const authStore = useAuthStore.getState();
-      const refreshToken = authStore.session?.refreshToken;
-
-      if (!refreshToken) {
-        authStore.clearSession();
-        return Promise.reject<ProblemDetails>(toProblemDetails(error));
-      }
-
       originalRequest._retry = true;
 
       try {
