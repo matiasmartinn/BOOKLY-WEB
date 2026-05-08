@@ -1,38 +1,163 @@
-import { AppLayout } from 'app/layouts/app-layout';
+import { lazy, Suspense } from 'react';
+import { Navigate, type RouteObject } from 'react-router-dom';
 import { AuthLayout } from 'app/layouts/auth-layout';
-import { DashboardLayout } from 'app/layouts/dashboard-layout';
-import { PublicBookingLayout } from 'app/layouts/public-booking-layout';
+import { AppLayout } from 'app/layouts/app-layout';
 import { HomePage } from 'app/pages/public/home-page';
 import { NotFoundPage } from 'app/pages/public/not-found-page';
-import { OverviewPage } from 'features/dashboard/overview-page';
-import { EventsPage } from 'features/dashboard/activity-page';
-import { HistoryPage } from 'features/dashboard/history-page';
-import { MetricsPage } from 'features/dashboard/metrics-page';
-import { WelcomePage } from 'features/dashboard/welcome-page';
-import { BusinessPage } from 'features/business/business-page';
-import { BusinessPublicBookingPage } from 'features/business/business-public-booking-page';
-import { BusinessStatusPage } from 'features/business/business-status-page';
-import { TeamPage } from 'features/users/team-page';
-import { SettingsPage } from 'features/settings/settings-page';
-import { AdminDashboardPage } from 'features/admin/admin-dashboard-page';
-import { AdminOwnersPage } from 'features/admin/admin-owners-page';
-import { AdminServicesPage } from 'features/admin/admin-services-page';
-import { AdminServiceTypesPage } from 'features/admin/admin-service-types-page';
-import { AppointmentPage } from 'features/appoiments/appointment-page';
-import { ConfirmEmailPage } from 'features/auth/confirm-email-page/confirm-email-page';
-import { LoginForm } from 'features/auth/login-form/login-form';
-import { RecoverAccountForm } from 'features/auth/recover-account-form/recover-account-form';
-import { RegisterForm } from 'features/auth/register-form/register-form';
-import { ResetPasswordForm } from 'features/auth/reset-password-form/reset-password-form';
-import { SecretaryOnboardingForm } from 'features/auth/secretary-onboarding-form/secretary-onboarding-form';
-import { BusinessWizardPage } from 'features/business/business-wizard/business-wizard-page';
-import { PublicBookingPage } from 'features/public-booking/public-booking-page';
-import { SchedulesPage } from 'features/schedules/schedules-page';
-import { UnavailabilitiesPage } from 'features/unavailability/unavailabilities-page';
-import { Navigate, type RouteObject } from 'react-router-dom';
 
-import { RequireAuth, RequireDashboardAccess, RequireGuest, RequireOwner } from './auth-guards';
 import { PATHS } from './PATHS';
+import { RequireAuth, RequireDashboardAccess, RequireGuest, RequireOwner } from './auth-guards';
+
+const DashboardLayout = lazy(() =>
+  import('app/layouts/dashboard-layout').then((m) => ({ default: m.DashboardLayout })),
+);
+
+const PublicBookingLayout = lazy(() =>
+  import('app/layouts/public-booking-layout').then((m) => ({ default: m.PublicBookingLayout })),
+);
+
+// Auth pages
+const ConfirmEmailPage = lazy(() =>
+  import('features/auth/confirm-email-page/confirm-email-page').then((m) => ({
+    default: m.ConfirmEmailPage,
+  })),
+);
+
+const LoginForm = lazy(() =>
+  import('features/auth/login-form/login-form').then((m) => ({
+    default: m.LoginForm,
+  })),
+);
+
+const RecoverAccountForm = lazy(() =>
+  import('features/auth/recover-account-form/recover-account-form').then((m) => ({
+    default: m.RecoverAccountForm,
+  })),
+);
+
+const RegisterForm = lazy(() =>
+  import('features/auth/register-form/register-form').then((m) => ({
+    default: m.RegisterForm,
+  })),
+);
+
+const ResetPasswordForm = lazy(() =>
+  import('features/auth/reset-password-form/reset-password-form').then((m) => ({
+    default: m.ResetPasswordForm,
+  })),
+);
+
+const SecretaryOnboardingForm = lazy(() =>
+  import('features/auth/secretary-onboarding-form/secretary-onboarding-form').then((m) => ({
+    default: m.SecretaryOnboardingForm,
+  })),
+);
+
+// Dashboard pages
+const OverviewPage = lazy(() =>
+  import('features/dashboard/overview-page').then((m) => ({ default: m.OverviewPage })),
+);
+
+const EventsPage = lazy(() =>
+  import('features/dashboard/activity-page').then((m) => ({ default: m.EventsPage })),
+);
+
+const HistoryPage = lazy(() =>
+  import('features/dashboard/history-page').then((m) => ({ default: m.HistoryPage })),
+);
+
+const MetricsPage = lazy(() =>
+  import('features/dashboard/metrics-page').then((m) => ({ default: m.MetricsPage })),
+);
+
+const WelcomePage = lazy(() =>
+  import('features/dashboard/welcome-page').then((m) => ({ default: m.WelcomePage })),
+);
+
+// Business pages
+const BusinessPage = lazy(() =>
+  import('features/business/business-page').then((m) => ({
+    default: m.BusinessPage,
+  })),
+);
+
+const BusinessPublicBookingPage = lazy(() =>
+  import('features/business/business-public-booking-page').then((m) => ({
+    default: m.BusinessPublicBookingPage,
+  })),
+);
+
+const BusinessStatusPage = lazy(() =>
+  import('features/business/business-status-page').then((m) => ({
+    default: m.BusinessStatusPage,
+  })),
+);
+
+const BusinessWizardPage = lazy(() =>
+  import('features/business/business-wizard/business-wizard-page').then((m) => ({
+    default: m.BusinessWizardPage,
+  })),
+);
+
+// Admin pages
+const AdminDashboardPage = lazy(() =>
+  import('features/admin/admin-dashboard-page').then((m) => ({
+    default: m.AdminDashboardPage,
+  })),
+);
+
+const AdminOwnersPage = lazy(() =>
+  import('features/admin/admin-owners-page').then((m) => ({
+    default: m.AdminOwnersPage,
+  })),
+);
+
+const AdminServicesPage = lazy(() =>
+  import('features/admin/admin-services-page').then((m) => ({
+    default: m.AdminServicesPage,
+  })),
+);
+
+const AdminServiceTypesPage = lazy(() =>
+  import('features/admin/admin-service-types-page').then((m) => ({
+    default: m.AdminServiceTypesPage,
+  })),
+);
+
+// Other feature pages
+const TeamPage = lazy(() =>
+  import('features/users/team-page').then((m) => ({ default: m.TeamPage })),
+);
+
+const SettingsPage = lazy(() =>
+  import('features/settings/settings-page').then((m) => ({ default: m.SettingsPage })),
+);
+
+const AppointmentPage = lazy(() =>
+  import('features/appoiments/appointment-page').then((m) => ({ default: m.AppointmentPage })),
+);
+
+const PublicBookingPage = lazy(() =>
+  import('features/public-booking/public-booking-page').then((m) => ({
+    default: m.PublicBookingPage,
+  })),
+);
+
+const SchedulesPage = lazy(() =>
+  import('features/schedules/schedules-page').then((m) => ({ default: m.SchedulesPage })),
+);
+
+const UnavailabilitiesPage = lazy(() =>
+  import('features/unavailability/unavailabilities-page').then((m) => ({
+    default: m.UnavailabilitiesPage,
+  })),
+);
+
+const PageLoader = () => <div />;
+
+const withSuspense = (element: React.ReactNode) => (
+  <Suspense fallback={<PageLoader />}>{element}</Suspense>
+);
 
 export const appRoutes: RouteObject[] = [
   {
@@ -45,8 +170,8 @@ export const appRoutes: RouteObject[] = [
   },
   {
     path: PATHS.public.booking,
-    element: <PublicBookingLayout />,
-    children: [{ index: true, element: <PublicBookingPage /> }],
+    element: withSuspense(<PublicBookingLayout />),
+    children: [{ index: true, element: withSuspense(<PublicBookingPage />) }],
   },
   {
     path: 'auth',
@@ -55,16 +180,16 @@ export const appRoutes: RouteObject[] = [
       {
         element: <RequireGuest />,
         children: [
-          { path: 'register', element: <RegisterForm /> },
-          { path: 'login', element: <LoginForm /> },
+          { path: 'register', element: withSuspense(<RegisterForm />) },
+          { path: 'login', element: withSuspense(<LoginForm />) },
         ],
       },
-      { path: 'confirm-email', element: <ConfirmEmailPage /> },
-      { path: 'forgot-password', element: <RecoverAccountForm /> },
-      { path: 'reset-password', element: <ResetPasswordForm /> },
-      { path: 'admin-invitation', element: <SecretaryOnboardingForm /> },
-      { path: 'secretary-invitation', element: <SecretaryOnboardingForm /> },
-      { path: 'secretary-password-form', element: <SecretaryOnboardingForm /> },
+      { path: 'confirm-email', element: withSuspense(<ConfirmEmailPage />) },
+      { path: 'forgot-password', element: withSuspense(<RecoverAccountForm />) },
+      { path: 'reset-password', element: withSuspense(<ResetPasswordForm />) },
+      { path: 'admin-invitation', element: withSuspense(<SecretaryOnboardingForm />) },
+      { path: 'secretary-invitation', element: withSuspense(<SecretaryOnboardingForm />) },
+      { path: 'secretary-password-form', element: withSuspense(<SecretaryOnboardingForm />) },
     ],
   },
   {
@@ -75,7 +200,7 @@ export const appRoutes: RouteObject[] = [
         children: [
           {
             path: 'service/new',
-            element: <BusinessWizardPage />,
+            element: withSuspense(<BusinessWizardPage />),
           },
         ],
       },
@@ -84,29 +209,32 @@ export const appRoutes: RouteObject[] = [
         element: <RequireDashboardAccess />,
         children: [
           {
-            element: <DashboardLayout />,
+            element: withSuspense(<DashboardLayout />),
             children: [
-              { index: true, element: <OverviewPage /> },
+              { index: true, element: withSuspense(<OverviewPage />) },
               { path: 'overview', element: <Navigate to={PATHS.dashboard.overview} replace /> },
-              { path: 'admin', element: <AdminDashboardPage /> },
-              { path: 'admin/owners', element: <AdminOwnersPage /> },
-              { path: 'admin/services', element: <AdminServicesPage /> },
-              { path: 'admin/service-types', element: <AdminServiceTypesPage /> },
+              { path: 'admin', element: withSuspense(<AdminDashboardPage />) },
+              { path: 'admin/owners', element: withSuspense(<AdminOwnersPage />) },
+              { path: 'admin/services', element: withSuspense(<AdminServicesPage />) },
+              { path: 'admin/service-types', element: withSuspense(<AdminServiceTypesPage />) },
               { path: 'activity', element: <Navigate to={PATHS.dashboard.events} replace /> },
-              { path: 'events', element: <EventsPage /> },
-              { path: 'appointments', element: <AppointmentPage /> },
-              { path: 'schedules', element: <SchedulesPage /> },
-              { path: 'history', element: <HistoryPage /> },
-              { path: 'metrics', element: <MetricsPage /> },
-              { path: 'business', element: <BusinessPage /> },
-              { path: 'business/:serviceId/public-booking', element: <BusinessPublicBookingPage /> },
-              { path: 'unavailability', element: <UnavailabilitiesPage /> },
-              { path: 'status', element: <BusinessStatusPage /> },
-              { path: 'team', element: <TeamPage /> },
-              { path: 'account', element: <SettingsPage /> },
+              { path: 'events', element: withSuspense(<EventsPage />) },
+              { path: 'appointments', element: withSuspense(<AppointmentPage />) },
+              { path: 'schedules', element: withSuspense(<SchedulesPage />) },
+              { path: 'history', element: withSuspense(<HistoryPage />) },
+              { path: 'metrics', element: withSuspense(<MetricsPage />) },
+              { path: 'business', element: withSuspense(<BusinessPage />) },
+              {
+                path: 'business/:serviceId/public-booking',
+                element: withSuspense(<BusinessPublicBookingPage />),
+              },
+              { path: 'unavailability', element: withSuspense(<UnavailabilitiesPage />) },
+              { path: 'status', element: withSuspense(<BusinessStatusPage />) },
+              { path: 'team', element: withSuspense(<TeamPage />) },
+              { path: 'account', element: withSuspense(<SettingsPage />) },
               { path: 'profile', element: <Navigate to={PATHS.dashboard.account} replace /> },
               { path: 'settings', element: <Navigate to={PATHS.dashboard.account} replace /> },
-              { path: 'welcome', element: <WelcomePage /> },
+              { path: 'welcome', element: withSuspense(<WelcomePage />) },
             ],
           },
         ],
