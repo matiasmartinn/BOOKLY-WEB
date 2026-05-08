@@ -1,4 +1,4 @@
-import { toDateOnlyDate } from './local-date-time';
+import { toDateOnlyDate } from './local-date-time.normalize';
 
 export const getDateOnlyRangeDays = (startDate: string, endDate: string) => {
   const start = toDateOnlyDate(startDate);
