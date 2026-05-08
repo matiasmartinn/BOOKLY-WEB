@@ -49,15 +49,7 @@ export const teamColumns = (selectedServiceId?: number): TableColumn<SecretaryDt
       );
     },
   },
-  {
-    key: 'type',
-    title: 'Tipo',
-    render: () => (
-      <Badge color="blue" variant="light">
-        Secretario/a
-      </Badge>
-    ),
-  },
+
   {
     key: 'currentServiceAccess',
     title: 'Servicio actual',

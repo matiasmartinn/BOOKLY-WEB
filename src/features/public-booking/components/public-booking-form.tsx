@@ -18,7 +18,7 @@ import {
   formatDateTime,
   getActiveDynamicFieldDefinitions,
   mapAdditionalFieldsToFieldValues,
-  normalizeLocalDateTime,
+  normalizeBusinessLocalDateTime,
 } from 'shared/utils';
 
 import {
@@ -188,7 +188,7 @@ export function PublicBookingForm({
         clientPhone: values.clientPhone.trim(),
         clientEmail: values.clientEmail.trim(),
         clientNotes: values.clientNotes?.trim() || undefined,
-        startDateTime: normalizeLocalDateTime(values.slot) ?? values.slot,
+        startDateTime: normalizeBusinessLocalDateTime(values.slot) ?? values.slot,
         fieldValues: canUseDynamicFields
           ? mapAdditionalFieldsToFieldValues(values.additionalFields, fieldDefinitions)
           : undefined,

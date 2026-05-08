@@ -1,4 +1,4 @@
-import { Alert, Box, Divider, Stack } from '@mantine/core';
+import { Alert, Divider, Stack } from '@mantine/core';
 import { SubscriptionSettingsSection } from 'features/subscriptions/components';
 import { PageCard } from 'shared/layout';
 import { useAuthStore } from 'store/use-auth-store';
@@ -10,12 +10,10 @@ export function SettingsPageContainer() {
   const isOwner = authUser?.role?.trim().toLowerCase() === 'owner';
 
   return (
-    <Stack gap="md">
+    <Stack gap="lg">
       <PageCard>
         <Stack gap="lg">
-          <Box w="100%" maw={560}>
-            <UserProfileForm />
-          </Box>
+          <UserProfileForm />
           <Divider />
           <UserSecuritySection />
         </Stack>

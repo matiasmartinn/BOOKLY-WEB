@@ -43,8 +43,14 @@ type AuthRequestConfig = InternalAxiosRequestConfig & {
   skipAuthRefresh?: boolean;
 };
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
+if (!apiUrl) {
+  throw new Error('VITE_API_URL is not configured');
+}
+
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: apiUrl,
   timeout: 100000,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,

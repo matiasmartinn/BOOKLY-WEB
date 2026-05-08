@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { ProblemDetails } from 'app/api';
 import type { AppointmentDto } from 'shared/models/appointment-dto';
-import { normalizeLocalDateTime } from 'shared/utils';
+import { normalizeBusinessLocalDateTime } from 'shared/utils';
 import { useBusinessStore } from 'store/use-business-store';
 
 import { appointmentService } from '../services';
@@ -17,7 +17,7 @@ export const useRescheduleAppointment = (appointmentId: number) => {
   return useMutation<AppointmentDto, ProblemDetails, RescheduleAppointmentValues>({
     mutationFn: (values) =>
       appointmentService.reschedule(appointmentId, {
-        startDateTime: normalizeLocalDateTime(values.slot) ?? values.slot,
+        startDateTime: normalizeBusinessLocalDateTime(values.slot) ?? values.slot,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({

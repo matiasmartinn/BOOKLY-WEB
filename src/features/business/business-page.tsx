@@ -4,7 +4,7 @@ import { BusinessPageContainer } from './container';
 
 export function BusinessPage() {
   return (
-    <Page title="Mi servicio" description="Edita los datos base del servicio actual.">
+    <Page title="Mi servicio" description="Edita los datos del servicio actual.">
       <BusinessPageContainer />
     </Page>
   );

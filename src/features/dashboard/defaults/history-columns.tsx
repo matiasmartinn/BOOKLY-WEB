@@ -1,6 +1,6 @@
 import { Badge, Stack, Text } from '@mantine/core';
 import type { TableColumn } from 'shared/components/generic-table';
-import { formatDateTime, formatTime } from 'shared/utils';
+import { formatDateTime } from 'shared/utils';
 
 import { getAppointmentStatusColor, getAppointmentStatusLabel } from '../utils';
 import type { HistoryAppointmentViewModel } from '../viewmodel/history-appointment-view-model';
@@ -14,12 +14,7 @@ export const historyColumns: TableColumn<HistoryAppointmentViewModel>[] = [
     noWrap: true,
     render: (row) => formatDateTime(row.startDateTime),
   },
-  {
-    key: 'timeRange',
-    title: 'Horario',
-    render: (row) => `${formatTime(row.startDateTime)} - ${formatTime(row.endDateTime)}`,
-    noWrap: true,
-  },
+
   {
     key: 'clientName',
     title: 'Cliente',
@@ -43,7 +38,7 @@ export const historyColumns: TableColumn<HistoryAppointmentViewModel>[] = [
   },
   {
     key: 'createdByLabel',
-    title: 'Generado por',
+    title: 'Creado por',
     accessor: 'createdByLabel',
     sortable: true,
   },

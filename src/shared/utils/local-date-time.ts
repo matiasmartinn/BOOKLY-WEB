@@ -2,7 +2,10 @@ const BUSINESS_TIME_ZONE = 'America/Argentina/Buenos_Aires';
 const UI_DATE_LOCALE = 'es-AR';
 
 const DATE_ONLY_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
-const LOCAL_DATE_TIME_REGEX = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/;
+const LOCAL_DATE_TIME_REGEX =
+  /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.\d{1,7})?)?$/;
+const ZONED_DATE_TIME_REGEX =
+  /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,7})?)?(?:Z|[+-]\d{2}:?\d{2})$/i;
 const TIME_ONLY_REGEX = /^(\d{2}):(\d{2})(?::(\d{2}))?$/;
 
 const businessNowFormatter = new Intl.DateTimeFormat('en-CA', {
@@ -82,6 +85,26 @@ const isValidTimeOnlyParts = ({ hour, minute, second }: TimeOnlyParts) =>
 
 const parseNumber = (value: string) => Number.parseInt(value, 10);
 
+const getBusinessDateTimeParts = (date: Date): DateTimeParts | null => {
+  const partMap = new Map(
+    businessNowFormatter
+      .formatToParts(date)
+      .filter((part) => part.type !== 'literal')
+      .map((part) => [part.type, part.value]),
+  );
+
+  const parts: DateTimeParts = {
+    year: parseNumber(partMap.get('year') ?? '0'),
+    month: parseNumber(partMap.get('month') ?? '0'),
+    day: parseNumber(partMap.get('day') ?? '0'),
+    hour: parseNumber(partMap.get('hour') ?? '0'),
+    minute: parseNumber(partMap.get('minute') ?? '0'),
+    second: parseNumber(partMap.get('second') ?? '0'),
+  };
+
+  return isValidDateOnlyParts(parts) && isValidTimeOnlyParts(parts) ? parts : null;
+};
+
 export const parseDateOnlyParts = (value?: string | null): DateOnlyParts | null => {
   if (!value) {
     return null;
@@ -142,39 +165,56 @@ export const parseLocalDateTimeParts = (value?: string | null): DateTimeParts | 
   return isValidDateOnlyParts(parts) && isValidTimeOnlyParts(parts) ? parts : null;
 };
 
-const getBusinessNowParts = (): DateTimeParts => {
-  const partMap = new Map(
-    businessNowFormatter
-      .formatToParts(new Date())
-      .filter((part) => part.type !== 'literal')
-      .map((part) => [part.type, part.value]),
-  );
+const parseZonedDateTimeParts = (value?: string | null): DateTimeParts | null => {
+  if (!value) {
+    return null;
+  }
 
-  return {
-    year: parseNumber(partMap.get('year') ?? '0'),
-    month: parseNumber(partMap.get('month') ?? '0'),
-    day: parseNumber(partMap.get('day') ?? '0'),
-    hour: parseNumber(partMap.get('hour') ?? '0'),
-    minute: parseNumber(partMap.get('minute') ?? '0'),
-    second: parseNumber(partMap.get('second') ?? '0'),
-  };
+  const trimmedValue = value.trim();
+  if (!ZONED_DATE_TIME_REGEX.test(trimmedValue)) {
+    return null;
+  }
+
+  const date = new Date(trimmedValue.replace(' ', 'T'));
+  return Number.isNaN(date.getTime()) ? null : getBusinessDateTimeParts(date);
 };
+
+const parseBusinessDateTimeParts = (value?: string | null) =>
+  parseLocalDateTimeParts(value) ?? parseZonedDateTimeParts(value);
+
+const parseBusinessDateParts = (value?: string | null) =>
+  parseDateOnlyParts(value) ?? parseBusinessDateTimeParts(value);
+
+const getBusinessNowParts = (): DateTimeParts =>
+  getBusinessDateTimeParts(new Date()) ?? {
+    year: 0,
+    month: 0,
+    day: 0,
+    hour: 0,
+    minute: 0,
+    second: 0,
+  };
 
 export const getCurrentBusinessDateOnly = () => buildDateOnly(getBusinessNowParts());
 
 export const getCurrentBusinessDateTime = () => buildLocalDateTime(getBusinessNowParts());
 
 export const normalizeDateOnly = (value?: string | null) => {
-  const parts = parseDateOnlyParts(value) ?? parseLocalDateTimeParts(value);
+  const parts = parseBusinessDateParts(value);
   return parts ? buildDateOnly(parts) : null;
 };
 
 export const toDateOnlyDate = (value?: string | null) => {
-  const parts = parseDateOnlyParts(value) ?? parseLocalDateTimeParts(value);
+  const parts = parseBusinessDateParts(value);
   return parts ? buildNativeDate(parts) : null;
 };
 
 export const normalizeLocalDateTime = (value?: string | null) => {
+  const parts = parseBusinessDateTimeParts(value);
+  return parts ? buildLocalDateTime(parts) : null;
+};
+
+export const normalizeBusinessLocalDateTime = (value?: string | null) => {
   const parts = parseLocalDateTimeParts(value);
   return parts ? buildLocalDateTime(parts) : null;
 };
@@ -182,7 +222,7 @@ export const normalizeLocalDateTime = (value?: string | null) => {
 export const extractDateOnly = (value?: string | null) => normalizeDateOnly(value);
 
 export const extractTimeOnly = (value?: string | null, includeSeconds = false) => {
-  const dateTimeParts = parseLocalDateTimeParts(value);
+  const dateTimeParts = parseBusinessDateTimeParts(value);
   if (dateTimeParts) {
     return buildTimeOnly(dateTimeParts, includeSeconds);
   }
@@ -278,7 +318,7 @@ export const compareLocalDateTime = (left?: string | null, right?: string | null
 };
 
 export const formatLocalDateOnly = (value?: string | null) => {
-  const parts = parseDateOnlyParts(value) ?? parseLocalDateTimeParts(value);
+  const parts = parseBusinessDateParts(value);
 
   if (!parts) {
     return value ?? '';
@@ -288,12 +328,12 @@ export const formatLocalDateOnly = (value?: string | null) => {
 };
 
 export const formatShortLocalDateOnly = (value?: string | null) => {
-  const parts = parseDateOnlyParts(value) ?? parseLocalDateTimeParts(value);
+  const parts = parseBusinessDateParts(value);
   return parts ? shortLocalDateFormatter.format(buildBusinessDateForFormatting(parts)) : value ?? '';
 };
 
 export const formatLongLocalDateOnly = (value?: string | null) => {
-  const parts = parseDateOnlyParts(value) ?? parseLocalDateTimeParts(value);
+  const parts = parseBusinessDateParts(value);
   return parts ? longLocalDateFormatter.format(buildBusinessDateForFormatting(parts)) : value ?? '';
 };
 

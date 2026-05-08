@@ -1,5 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, Button, Group, Loader, SimpleGrid, Stack, Text, TextInput } from '@mantine/core';
+import {
+  Alert,
+  Badge,
+  Box,
+  Button,
+  Grid,
+  Group,
+  Loader,
+  Stack,
+  Text,
+  TextInput,
+} from '@mantine/core';
 import { isApiError } from 'app/api';
 import { useUpdateUser, useUser } from 'features/users/hooks';
 import { useEffect, useMemo } from 'react';
@@ -106,32 +117,73 @@ export function UserProfileForm() {
           </Alert>
         )}
 
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-          <TextInput
-            label="Nombre"
-            placeholder="Tu nombre"
-            withAsterisk
-            {...register('firstName')}
-            error={errors.firstName?.message}
-            disabled={!currentUser || isPending}
-          />
+        <Grid gutter="md">
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <TextInput
+              label="Nombre"
+              placeholder="Tu nombre"
+              withAsterisk
+              {...register('firstName')}
+              error={errors.firstName?.message}
+              disabled={!currentUser || isPending}
+            />
+          </Grid.Col>
 
-          <TextInput
-            label="Apellido"
-            placeholder="Tu apellido"
-            withAsterisk
-            {...register('lastName')}
-            error={errors.lastName?.message}
-            disabled={!currentUser || isPending}
-          />
-        </SimpleGrid>
+          <Grid.Col span={{ base: 12, sm: 6 }}>
+            <TextInput
+              label="Apellido"
+              placeholder="Tu apellido"
+              withAsterisk
+              {...register('lastName')}
+              error={errors.lastName?.message}
+              disabled={!currentUser || isPending}
+            />
+          </Grid.Col>
 
-        <TextInput
-          label="Email"
-          readOnly
-          {...register('email')}
-          error={errors.email?.message}
-        />
+          <Grid.Col span={{ base: 12, sm: 7 }}>
+            <input type="hidden" {...register('email')} />
+
+            <Stack gap={6}>
+              <Text size="sm" fw={500}>
+                Email
+              </Text>
+
+              <Box
+                px="sm"
+                py={9}
+                style={{
+                  borderRadius: 'var(--mantine-radius-md)',
+                  border: '1px solid var(--app-color-border)',
+                  backgroundColor: 'var(--app-color-surface-soft)',
+                }}
+              >
+                <Group justify="space-between" gap="sm" wrap="nowrap">
+                  <Text
+                    size="sm"
+                    style={{
+                      color: 'var(--app-color-text-primary)',
+                      overflowWrap: 'anywhere',
+                      flex: 1,
+                      minWidth: 0,
+                    }}
+                  >
+                    {currentUser?.email}
+                  </Text>
+
+                  <Badge color="gray" variant="light" radius="sm">
+                    Cuenta
+                  </Badge>
+                </Group>
+              </Box>
+
+              {errors.email?.message ? (
+                <Text size="xs" c="red">
+                  {errors.email.message}
+                </Text>
+              ) : null}
+            </Stack>
+          </Grid.Col>
+        </Grid>
 
         <Group justify="flex-end">
           <Button type="submit" loading={isPending} disabled={!currentUser}>

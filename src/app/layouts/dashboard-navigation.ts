@@ -73,8 +73,8 @@ export function buildServicePermissions(
   }
 
   const grantedPermissions =
-    selectedService?.secretaryPermissions.find((item) => item.secretaryId === user?.id)?.permissions ??
-    [];
+    selectedService?.secretaryPermissions.find((item) => item.secretaryId === user?.id)
+      ?.permissions ?? [];
 
   return {
     viewAppointments: grantedPermissions.includes(SecretaryPermission.ViewAppointments),
@@ -119,9 +119,7 @@ export function buildSidebarPermissions(
 
   const servicePermissions = buildServicePermissions(user, selectedService);
   const canManageSchedules = servicePermissions.manageSchedules;
-  const canViewAppointments = Object.entries(servicePermissions).some(([key, granted]) =>
-    key !== 'manageSchedules' && granted,
-  );
+  const canViewAppointments = servicePermissions.viewAppointments;
 
   return {
     viewAppointments: canViewAppointments,
@@ -135,6 +133,10 @@ export function buildSidebarPermissions(
 }
 
 export function getDefaultDashboardPath(role: UserRole, permissions: SidebarPermissions): string {
+  if (!hasFunctionalDashboardAccess(role, permissions)) {
+    return PATHS.dashboard.welcome;
+  }
+
   if (role === 'owner') {
     return PATHS.dashboard.overview;
   }
@@ -160,11 +162,48 @@ export function getDefaultDashboardPath(role: UserRole, permissions: SidebarPerm
   return PATHS.dashboard.account;
 }
 
+export function resolveDashboardPath(
+  pathname: string,
+  role: UserRole,
+  permissions: SidebarPermissions,
+): string {
+  const defaultPath = getDefaultDashboardPath(role, permissions);
+
+  if (pathname === PATHS.dashboard.overview) {
+    return defaultPath;
+  }
+
+  if (canAccessDashboardPath(pathname, role, permissions)) {
+    return pathname;
+  }
+
+  return defaultPath;
+}
+
+export function hasFunctionalDashboardAccess(
+  role: UserRole,
+  permissions: SidebarPermissions,
+): boolean {
+  if (role === 'owner' || role === 'admin') {
+    return true;
+  }
+
+  return (
+    permissions.viewAppointments ||
+    permissions.viewSchedules ||
+    permissions.viewUnavailability
+  );
+}
+
 export function canAccessDashboardPath(
   pathname: string,
   role: UserRole,
   permissions: SidebarPermissions,
 ): boolean {
+  if (pathname === PATHS.dashboard.welcome) {
+    return !hasFunctionalDashboardAccess(role, permissions);
+  }
+
   if (ACCOUNT_PATHS.has(pathname)) {
     return permissions.viewSettings;
   }

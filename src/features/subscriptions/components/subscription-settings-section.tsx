@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Grid, Group, Skeleton, Stack, Text } from '@mantine/core';
+import { Alert, Badge, Box, Button, Grid, Group, Skeleton, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect } from 'react';
 import { PageCard } from 'shared/layout';
@@ -92,57 +92,103 @@ export function SubscriptionSettingsSection({ ownerId }: SubscriptionSettingsSec
               <Skeleton h={92} radius="md" />
             </Stack>
           ) : subscription ? (
-            <Stack gap="lg">
-              <Grid gutter="xl" align="flex-start">
-                <Grid.Col span={{ base: 12, md: 7 }}>
-                  <Stack gap="md">
-                    <Stack gap={4}>
-                      <Group gap="xs" wrap="wrap">
-                        <Text size="lg" fw={700}>
-                          {currentPlanName}
-                        </Text>
-                        <Badge color={getSubscriptionStatusColor(subscription)} variant="light">
-                          {getSubscriptionStatusLabel(subscription)}
-                        </Badge>
-                      </Group>
+            <Stack gap="md">
+              <Box
+                p="md"
+                style={{
+                  borderRadius: 'var(--mantine-radius-lg)',
+                  border: '1px solid var(--app-color-brand-outline)',
+                  backgroundColor: 'var(--app-color-brand-soft)',
+                }}
+              >
+                <Group justify="space-between" align="center" gap="md" wrap="wrap">
+                  <Stack gap={6} style={{ flex: '1 1 320px' }}>
+                    <Group gap="xs" wrap="wrap">
+                      <Text
+                        size="xs"
+                        fw={700}
+                        tt="uppercase"
+                        style={{
+                          color: 'var(--mantine-color-brand-6)',
+                          letterSpacing: '0.05em',
+                        }}
+                      >
+                        Plan actual
+                      </Text>
+
+                      <Badge
+                        color={getSubscriptionStatusColor(subscription)}
+                        variant={subscription.isActive ? 'filled' : 'light'}
+                        radius="sm"
+                        tt="uppercase"
+                      >
+                        {getSubscriptionStatusLabel(subscription)}
+                      </Badge>
+                    </Group>
+
+                    <Stack gap={2}>
+                      <Text
+                        size="xl"
+                        fw={700}
+                        style={{ color: 'var(--app-color-text-primary)' }}
+                      >
+                        {currentPlanName}
+                      </Text>
 
                       <Text size="sm" c="dimmed">
                         Vigencia: {formatSubscriptionValidity(subscription)}
                       </Text>
                     </Stack>
+                  </Stack>
 
-                    <Stack gap={6}>
-                      <Text size="sm">
-                        Servicios usados: {usedServices} /{' '}
-                        {formatSubscriptionLimitValue(currentPlanLimits.maxServices)}
-                      </Text>
-                      <Text size="sm">
-                        Secretarios: {usedSecretaries} /{' '}
-                        {formatSubscriptionLimitValue(currentPlanLimits.maxSecretaries)}
-                      </Text>
-                      <Text size="sm">
-                        Campos personalizados:{' '}
-                        {currentPlanLimits.allowsExtraFields
-                          ? 'disponibles en tu plan'
-                          : 'no disponibles en tu plan'}
-                      </Text>
-                    </Stack>
+                  <Group gap="xs" justify="flex-end" wrap="wrap" style={{ flex: '0 1 280px' }}>
+                    <Button onClick={openModal}>Cambiar plan</Button>
+                    {subscription.canRenew && (
+                      <Button variant="light" onClick={openModal}>
+                        Renovar
+                      </Button>
+                    )}
+                    {subscription.canCancel && (
+                      <Button color="red" variant="light" onClick={openModal}>
+                        Cancelar suscripcion
+                      </Button>
+                    )}
+                  </Group>
+                </Group>
+              </Box>
+
+              <Grid gutter="md">
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Stack gap={2}>
+                    <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+                      Servicios
+                    </Text>
+                    <Text size="sm" fw={600}>
+                      {usedServices} / {formatSubscriptionLimitValue(currentPlanLimits.maxServices)}
+                    </Text>
                   </Stack>
                 </Grid.Col>
 
-                <Grid.Col span={{ base: 12, md: 5 }}>
-                  <Stack align="flex-end" gap="sm">
-                    <Group gap="xs" justify="flex-end" wrap="wrap">
-                      <Button variant="light" onClick={openModal}>
-                        Cambiar plan
-                      </Button>
-                      {subscription.canCancel && (
-                        <Button color="red" variant="light" onClick={openModal}>
-                          Cancelar suscripcion
-                        </Button>
-                      )}
-                      {subscription.canRenew && <Button onClick={openModal}>Renovar</Button>}
-                    </Group>
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Stack gap={2}>
+                    <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+                      Secretarios
+                    </Text>
+                    <Text size="sm" fw={600}>
+                      {usedSecretaries} /{' '}
+                      {formatSubscriptionLimitValue(currentPlanLimits.maxSecretaries)}
+                    </Text>
+                  </Stack>
+                </Grid.Col>
+
+                <Grid.Col span={{ base: 12, sm: 4 }}>
+                  <Stack gap={2}>
+                    <Text size="xs" fw={700} tt="uppercase" c="dimmed">
+                      Campos personalizados
+                    </Text>
+                    <Text size="sm" fw={600}>
+                      {currentPlanLimits.allowsExtraFields ? 'Disponibles' : 'No disponibles'}
+                    </Text>
                   </Stack>
                 </Grid.Col>
               </Grid>

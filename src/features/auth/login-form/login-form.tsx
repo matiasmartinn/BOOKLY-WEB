@@ -1,5 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Anchor, Button, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
+import {
+  buildSidebarPermissions,
+  normalizeUserRole,
+  resolveDashboardPath,
+} from 'app/layouts/dashboard-navigation';
 import { isApiError } from 'app/api';
 import { PATHS } from 'app/router';
 import { AuthFormWrapper } from 'features/auth/components';
@@ -7,25 +12,67 @@ import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from 'store/use-auth-store';
+import { useBusinessStore } from 'store/use-business-store';
 
 import { loginSchema, type LoginRequest } from './login.schema';
 
-function getRedirectTarget(state: unknown): string {
-  if (typeof state !== 'object' || state === null || !('from' in state)) {
-    return PATHS.dashboard.overview;
-  }
+interface RedirectLocation {
+  pathname: string;
+  search: string;
+  hash: string;
+}
 
+function getRequestedLocation(state: unknown): RedirectLocation {
+  if (typeof state !== 'object' || state === null || !('from' in state)) {
+    return { pathname: PATHS.dashboard.overview, search: '', hash: '' };
+  }
   const from = state.from;
 
   if (typeof from !== 'object' || from === null || !('pathname' in from)) {
-    return PATHS.dashboard.overview;
+    return { pathname: PATHS.dashboard.overview, search: '', hash: '' };
   }
 
   const pathname = typeof from.pathname === 'string' ? from.pathname : PATHS.dashboard.overview;
   const search = 'search' in from && typeof from.search === 'string' ? from.search : '';
   const hash = 'hash' in from && typeof from.hash === 'string' ? from.hash : '';
 
-  return `${pathname}${search}${hash}`;
+  return { pathname, search, hash };
+}
+
+function isDashboardPath(pathname: string): boolean {
+  return pathname === PATHS.dashboard.overview || pathname.startsWith(`${PATHS.dashboard.overview}/`);
+}
+
+function toPath(location: RedirectLocation): string {
+  return `${location.pathname}${location.search}${location.hash}`;
+}
+
+function getRedirectTarget(state: unknown): string {
+  const requestedLocation = getRequestedLocation(state);
+  const authUser = useAuthStore.getState().user;
+  const selectedService = useBusinessStore.getState().selectedService;
+
+  if (!authUser) {
+    return PATHS.dashboard.overview;
+  }
+
+  const role = normalizeUserRole(authUser.role);
+  const permissions = buildSidebarPermissions(authUser, selectedService);
+  const defaultPath = resolveDashboardPath(PATHS.dashboard.overview, role, permissions);
+
+  if (!isDashboardPath(requestedLocation.pathname)) {
+    return requestedLocation.pathname === PATHS.service.create && role !== 'owner'
+      ? defaultPath
+      : toPath(requestedLocation);
+  }
+
+  const resolvedPath = resolveDashboardPath(requestedLocation.pathname, role, permissions);
+
+  if (resolvedPath !== requestedLocation.pathname) {
+    return resolvedPath;
+  }
+
+  return toPath(requestedLocation);
 }
 
 function getLoginErrorMessage(error: unknown) {

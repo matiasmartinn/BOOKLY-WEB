@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Anchor, Button, Stack, Text, TextInput } from '@mantine/core';
 import { PATHS } from 'app/router';
-import { AuthFormWrapper } from 'features/auth/components';
+import { AuthFormWrapper, AuthSuccessState } from 'features/auth/components';
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { Link } from 'react-router-dom';
@@ -45,6 +45,17 @@ export function RecoverAccountForm() {
     }
   };
 
+  if (successMessage) {
+    return (
+      <AuthSuccessState
+        description="Te enviamos un enlace para restablecer tu contrasena al correo electronico indicado."
+        noticeTitle="Revisa tu bandeja de entrada y spam."
+        noticeText="Sigue las instrucciones del correo para crear una nueva contrasena."
+        loginMessage={successMessage}
+      />
+    );
+  }
+
   return (
     <AuthFormWrapper onSubmit={handleSubmit(onSubmit)} title="Recupera tu contrasena">
       <Stack gap="xl">
@@ -56,12 +67,6 @@ export function RecoverAccountForm() {
           {...register('email')}
           error={errors.email?.message}
         />
-
-        {successMessage ? (
-          <Alert color="green" variant="light">
-            {successMessage}
-          </Alert>
-        ) : null}
 
         {errors.root ? (
           <Alert color="red" variant="light">

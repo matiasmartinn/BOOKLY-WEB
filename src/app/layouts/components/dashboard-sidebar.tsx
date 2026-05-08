@@ -4,7 +4,6 @@ import {
   faCalendarXmark,
   faChartColumn,
   faChartPie,
-  faCheck,
   faChevronDown,
   faClock,
   faClockRotateLeft,
@@ -24,7 +23,6 @@ import {
   Divider,
   Group,
   Popover,
-  ScrollArea,
   Stack,
   Text,
   ThemeIcon,
@@ -32,6 +30,7 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import { PATHS } from 'app/router/PATHS';
+import { BusinessOptions } from 'features/business/components';
 import { SubscriptionSidebarBanner } from 'features/subscriptions/components';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -101,14 +100,6 @@ const OWNER_NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    label: 'Seguimiento',
-    items: [
-      { label: 'Eventos', icon: faRectangleList, path: PATHS.dashboard.events },
-      { label: 'Historico', icon: faClockRotateLeft, path: PATHS.dashboard.history },
-      { label: 'Metricas', icon: faChartColumn, path: PATHS.dashboard.metrics },
-    ],
-  },
-  {
     label: 'Servicio',
     items: [
       {
@@ -116,6 +107,12 @@ const OWNER_NAV_SECTIONS: NavSection[] = [
         icon: faStore,
         path: PATHS.dashboard.service,
         permission: 'viewService',
+      },
+      {
+        label: 'Equipo',
+        icon: faUsers,
+        path: PATHS.dashboard.team,
+        permission: 'viewTeam',
       },
       {
         label: 'Estado',
@@ -126,14 +123,11 @@ const OWNER_NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    label: 'Equipo',
+    label: 'Seguimiento',
     items: [
-      {
-        label: 'Equipo',
-        icon: faUsers,
-        path: PATHS.dashboard.team,
-        permission: 'viewTeam',
-      },
+      { label: 'Auditoría', icon: faRectangleList, path: PATHS.dashboard.events },
+      { label: 'Historico', icon: faClockRotateLeft, path: PATHS.dashboard.history },
+      { label: 'Metricas', icon: faChartColumn, path: PATHS.dashboard.metrics },
     ],
   },
 ];
@@ -306,94 +300,6 @@ function ServiceSwitcher({
     );
   }
 
-  const serviceOptionsContent = (
-    <Popover.Dropdown p={4}>
-      <ScrollArea.Autosize mah={240}>
-        <Stack gap={2}>
-          {services.map((service) => {
-            const isActive = service.id === activeServiceId;
-
-            return (
-              <UnstyledButton
-                key={service.id}
-                px="sm"
-                py={8}
-                style={(theme) => ({
-                  borderRadius: theme.radius.md,
-                  backgroundColor: isActive ? 'var(--app-color-surface-hover)' : 'transparent',
-                })}
-                onClick={() => {
-                  onServiceChange(service.id);
-                  setOpened(false);
-                }}
-              >
-                <Group gap={8} wrap="nowrap">
-                  <Box
-                    w={6}
-                    h={6}
-                    style={{
-                      borderRadius: '50%',
-                      backgroundColor: isActive
-                        ? 'var(--mantine-color-brand-5)'
-                        : 'var(--app-color-text-muted)',
-                      flexShrink: 0,
-                    }}
-                  />
-                  <Text
-                    size="xs"
-                    fw={isActive ? 500 : 400}
-                    c={isActive ? 'var(--app-color-text-primary)' : 'dimmed'}
-                    flex={1}
-                    truncate
-                  >
-                    {service.name}
-                  </Text>
-                  {isActive ? (
-                    <FontAwesomeIcon
-                      icon={faCheck}
-                      style={{ fontSize: 9, color: 'var(--mantine-color-brand-5)' }}
-                    />
-                  ) : null}
-                </Group>
-              </UnstyledButton>
-            );
-          })}
-
-          {allowCreate ? (
-            <>
-              <Divider my={4} />
-
-              <UnstyledButton px="sm" py={8} onClick={handleCreateService}>
-                <Group gap={8} wrap="nowrap">
-                  <Box
-                    w={16}
-                    h={16}
-                    style={{
-                      borderRadius: 4,
-                      border: '1px solid var(--app-color-border)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      icon={faPlus}
-                      style={{ fontSize: 8, color: 'var(--mantine-color-brand-5)' }}
-                    />
-                  </Box>
-                  <Text size="xs" fw={500} c="dimmed">
-                    Nuevo servicio
-                  </Text>
-                </Group>
-              </UnstyledButton>
-            </>
-          ) : null}
-        </Stack>
-      </ScrollArea.Autosize>
-    </Popover.Dropdown>
-  );
-
   if (collapsed) {
     return (
       <Popover
@@ -434,7 +340,14 @@ function ServiceSwitcher({
           </UnstyledButton>
         </Popover.Target>
 
-        {serviceOptionsContent}
+        <BusinessOptions
+          services={services}
+          activeServiceId={activeServiceId}
+          onServiceChange={onServiceChange}
+          onServiceClose={() => setOpened(false)}
+          allowCreate={allowCreate}
+          onCreateService={handleCreateService}
+        />
       </Popover>
     );
   }
@@ -486,7 +399,14 @@ function ServiceSwitcher({
         </UnstyledButton>
       </Popover.Target>
 
-      {serviceOptionsContent}
+      <BusinessOptions
+        services={services}
+        activeServiceId={activeServiceId}
+        onServiceChange={onServiceChange}
+        onServiceClose={() => setOpened(false)}
+        allowCreate={allowCreate}
+        onCreateService={handleCreateService}
+      />
     </Popover>
   );
 }
@@ -585,11 +505,7 @@ function UserFooter({
   isLoggingOut: boolean;
 }) {
   const roleLabel =
-    user.role === 'owner'
-      ? 'Owner'
-      : user.role === 'admin'
-        ? 'Admin'
-        : 'Secretario/a';
+    user.role === 'owner' ? 'Owner' : user.role === 'admin' ? 'Admin' : 'Secretario/a';
 
   if (collapsed) {
     return (
@@ -696,16 +612,16 @@ export function DashboardSidebar({
   const visibleSections = NAV_SECTIONS_BY_ROLE[user.role]
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) => (item.permission ? permissions[item.permission] : true)),
+      items: section.items.filter((item) =>
+        item.permission ? permissions[item.permission] : true,
+      ),
     }))
     .filter((section) => section.items.length > 0);
 
   const accountItems =
     user.role === 'admin'
       ? []
-      : ACCOUNT_NAV_ITEMS.filter((item) =>
-          item.permission ? permissions[item.permission] : true,
-        );
+      : ACCOUNT_NAV_ITEMS.filter((item) => (item.permission ? permissions[item.permission] : true));
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -784,9 +700,7 @@ export function DashboardSidebar({
             onServiceChange={onServiceChange}
             collapsed={collapsed}
             allowCreate={user.role === 'owner'}
-            emptyLabel={
-              user.role === 'owner' ? 'Sin servicios creados' : 'Sin servicios asignados'
-            }
+            emptyLabel={user.role === 'owner' ? 'Sin servicios creados' : 'Sin servicios asignados'}
           />
         ) : (
           <AdminBadge collapsed={collapsed} />
@@ -824,41 +738,44 @@ export function DashboardSidebar({
                 ))}
               </Stack>
             ))}
+
+            {accountItems.length > 0 ? (
+              <Stack gap={2}>
+                <Divider my={4} />
+
+                {!collapsed ? (
+                  <Text
+                    size="xs"
+                    fw={700}
+                    c="dimmed"
+                    tt="uppercase"
+                    px="xs"
+                    style={{ letterSpacing: '0.05em' }}
+                  >
+                    Cuenta
+                  </Text>
+                ) : null}
+
+                {accountItems.map((item) => (
+                  <NavItemButton
+                    key={item.path}
+                    item={item}
+                    isActive={
+                      pathname === item.path ||
+                      pathname === PATHS.dashboard.profile ||
+                      pathname === PATHS.dashboard.settings
+                    }
+                    collapsed={collapsed}
+                    onClick={() => handleNavigate(item.path)}
+                  />
+                ))}
+              </Stack>
+            ) : null}
           </Stack>
         </Box>
       </Stack>
 
       <Stack gap="sm">
-        {accountItems.length > 0 ? (
-          <>
-            <Divider />
-            <Stack gap={2}>
-              {!collapsed ? (
-                <Text
-                  size="xs"
-                  fw={700}
-                  c="dimmed"
-                  tt="uppercase"
-                  px="xs"
-                  style={{ letterSpacing: '0.05em' }}
-                >
-                  Cuenta
-                </Text>
-              ) : null}
-
-              {accountItems.map((item) => (
-                <NavItemButton
-                  key={item.path}
-                  item={item}
-                  isActive={pathname === item.path || pathname === PATHS.dashboard.profile || pathname === PATHS.dashboard.settings}
-                  collapsed={collapsed}
-                  onClick={() => handleNavigate(item.path)}
-                />
-              ))}
-            </Stack>
-          </>
-        ) : null}
-
         {user.role === 'owner' && ownerId != null ? (
           <>
             <Divider />

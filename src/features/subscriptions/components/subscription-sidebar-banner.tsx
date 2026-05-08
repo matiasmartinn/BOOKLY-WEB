@@ -1,41 +1,71 @@
-import { Badge, Box, Button, Loader, Stack, Text, Tooltip } from '@mantine/core';
+import { Box, Button, Loader, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useAppToast } from 'shared/ui/toast';
+import type { SubscriptionDto } from 'shared/models';
 
 import { useOwnerSubscription } from '../hooks';
 import {
   getSubscriptionCtaLabel,
   getSubscriptionPlanDisplayName,
-  getSubscriptionStatusColor,
   getSubscriptionStatusLabel,
 } from '../utils/subscription.utils';
 
 import { SubscriptionManagementModal } from './subscription-management-modal';
 
+function SubscriptionBannerCollapsed({
+  subscription,
+  planName,
+  onOpen,
+}: {
+  subscription: SubscriptionDto | undefined;
+  planName: string;
+  onOpen: () => void;
+}) {
+  return (
+    <Tooltip
+      label={
+        subscription
+          ? `${planName} | ${getSubscriptionStatusLabel(subscription)}`
+          : 'Gestionar suscripcion'
+      }
+      position="right"
+      withArrow
+    >
+      <Button variant="light" color="brand" size="xs" fullWidth onClick={onOpen}>
+        Plan
+      </Button>
+    </Tooltip>
+  );
+}
+
+function SubscriptionBannerExpanded({
+  onOpen,
+  ctaLabel,
+}: {
+  onOpen: () => void;
+  ctaLabel: string;
+}) {
+  return (
+    <Button size="xs" variant="subtle" color="brand" fullWidth onClick={onOpen}>
+      {ctaLabel}
+    </Button>
+  );
+}
+
 interface SubscriptionSidebarBannerProps {
-  ownerId?: number;
+  ownerId: number;
   collapsed: boolean;
 }
 
-export function SubscriptionSidebarBanner({
-  ownerId,
-  collapsed,
-}: SubscriptionSidebarBannerProps) {
+export function SubscriptionSidebarBanner({ ownerId, collapsed }: SubscriptionSidebarBannerProps) {
   const [opened, { open, close }] = useDisclosure(false);
-  const canManageSubscription = ownerId != null;
   const toast = useAppToast();
 
-  const { data: subscription, isLoading, isError } = useOwnerSubscription(ownerId);
+  const { data: subscription, isLoading } = useOwnerSubscription(ownerId);
   const planName = getSubscriptionPlanDisplayName(subscription?.currentPlan);
   const ctaLabel = subscription ? getSubscriptionCtaLabel(subscription) : 'Gestionar plan';
 
-  if (!canManageSubscription) {
-    return null;
-  }
-
-  const handleOpen = () => {
-    open();
-  };
+  if (ownerId == null) return null;
 
   if (isLoading) {
     if (collapsed) {
@@ -58,70 +88,20 @@ export function SubscriptionSidebarBanner({
         </Tooltip>
       );
     }
-
-    return (
-      <Stack gap={6} px={4}>
-        <Text size="xs" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-          Suscripcion
-        </Text>
-        <Text size="xs" c="dimmed">
-          Cargando plan actual...
-        </Text>
-      </Stack>
-    );
+    return null; // collapsed=false: no renderizar nada mientras carga, el botón aparece solo
   }
-
-  const bannerContent = collapsed ? (
-    <Tooltip
-      label={
-        subscription
-          ? `${planName} | ${getSubscriptionStatusLabel(subscription)}`
-          : 'Gestionar suscripcion'
-      }
-      position="right"
-      withArrow
-    >
-      <Button variant="light" color="brand" size="xs" fullWidth onClick={handleOpen}>
-        Plan
-      </Button>
-    </Tooltip>
-  ) : (
-    <Stack
-      gap={6}
-      p="xs"
-      style={{
-        borderRadius: 'var(--mantine-radius-md)',
-        backgroundColor: 'var(--mantine-color-brand-0)',
-        border: '0.5px solid var(--mantine-color-brand-2)',
-      }}
-    >
-      <Text size="xs" fw={700} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-        Suscripcion
-      </Text>
-
-      <Text size="sm" fw={600}>
-        {subscription ? planName : 'Plan no disponible'}
-      </Text>
-
-      {subscription ? (
-        <Badge color={getSubscriptionStatusColor(subscription)} variant="light" w="fit-content">
-          {getSubscriptionStatusLabel(subscription)}
-        </Badge>
-      ) : (
-        <Text size="xs" c={isError ? 'red.6' : 'dimmed'}>
-          {isError ? 'No se pudo cargar el plan actual.' : 'Sin datos de plan por el momento.'}
-        </Text>
-      )}
-
-      <Button size="xs" variant="light" onClick={handleOpen}>
-        {ctaLabel}
-      </Button>
-    </Stack>
-  );
 
   return (
     <>
-      {bannerContent}
+      {collapsed ? (
+        <SubscriptionBannerCollapsed
+          subscription={subscription}
+          planName={planName}
+          onOpen={open}
+        />
+      ) : (
+        <SubscriptionBannerExpanded ctaLabel={ctaLabel} onOpen={open} />
+      )}
 
       <SubscriptionManagementModal
         ownerId={ownerId}

@@ -8,6 +8,7 @@ import { OverviewPage } from 'features/dashboard/overview-page';
 import { EventsPage } from 'features/dashboard/activity-page';
 import { HistoryPage } from 'features/dashboard/history-page';
 import { MetricsPage } from 'features/dashboard/metrics-page';
+import { WelcomePage } from 'features/dashboard/welcome-page';
 import { BusinessPage } from 'features/business/business-page';
 import { BusinessPublicBookingPage } from 'features/business/business-public-booking-page';
 import { BusinessStatusPage } from 'features/business/business-status-page';
@@ -105,6 +106,7 @@ export const appRoutes: RouteObject[] = [
               { path: 'account', element: <SettingsPage /> },
               { path: 'profile', element: <Navigate to={PATHS.dashboard.account} replace /> },
               { path: 'settings', element: <Navigate to={PATHS.dashboard.account} replace /> },
+              { path: 'welcome', element: <WelcomePage /> },
             ],
           },
         ],

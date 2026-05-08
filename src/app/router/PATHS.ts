@@ -35,6 +35,7 @@ export const PATHS = {
     account: '/dashboard/account',
     profile: '/dashboard/profile',
     settings: '/dashboard/settings',
+    welcome: '/dashboard/welcome',
   },
 
   service: {

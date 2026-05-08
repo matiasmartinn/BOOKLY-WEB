@@ -22,13 +22,9 @@ import {
 import { useMemo, useState, type ReactNode } from 'react';
 import type { ServicePublicBookingDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
+import { formatDateTime } from 'shared/utils';
 
 import { buildPublicBookingUrl } from '../utils';
-
-const publicBookingDateFormatter = new Intl.DateTimeFormat('es-AR', {
-  dateStyle: 'short',
-  timeStyle: 'short',
-});
 
 interface PublicBookingSharePanelProps {
   serviceId: number;
@@ -47,13 +43,7 @@ const formatPublicBookingTimestamp = (value?: string | null) => {
     return 'Sin registros';
   }
 
-  const parsed = new Date(value);
-
-  if (Number.isNaN(parsed.getTime())) {
-    return 'Fecha no disponible';
-  }
-
-  return publicBookingDateFormatter.format(parsed);
+  return formatDateTime(value) || 'Fecha no disponible';
 };
 
 export function PublicBookingSharePanel({

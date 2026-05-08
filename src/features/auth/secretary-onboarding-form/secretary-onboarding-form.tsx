@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, Anchor, Button, PasswordInput, Stack, Text } from '@mantine/core';
+import { Alert, Button, PasswordInput, Stack } from '@mantine/core';
 import { PATHS } from 'app/router';
-import { AuthFormWrapper } from 'features/auth/components';
+import { AuthFormWrapper, AuthSuccessState } from 'features/auth/components';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 import { useCompleteAdminInvitation, useCompleteSecretaryInvitation } from '../auth.hooks';
 import { getAuthErrorMessage } from '../get-auth-error-message';
@@ -12,7 +12,6 @@ import {
   secretaryOnboardingSchema,
   type SecretaryOnboardingValues,
 } from './secretary-onboarding.schema';
-
 
 export function SecretaryOnboardingForm() {
   const { pathname } = useLocation();
@@ -56,6 +55,19 @@ export function SecretaryOnboardingForm() {
     }
   };
 
+  if (completeInvitation.isSuccess) {
+    const roleLabel = isAdminInvitation ? 'administrador' : 'secretario';
+
+    return (
+      <AuthSuccessState
+        description={`Tu invitacion de ${roleLabel} fue aceptada correctamente.`}
+        noticeTitle="Cuenta activada."
+        noticeText="Ya puedes iniciar sesion y continuar desde Bookly."
+        loginMessage="Tu cuenta fue activada correctamente. Ya puedes iniciar sesion."
+      />
+    );
+  }
+
   return (
     <AuthFormWrapper onSubmit={handleSubmit(onSubmit)} title="Activa tu acceso">
       <Stack gap="xl">
@@ -65,53 +77,35 @@ export function SecretaryOnboardingForm() {
           </Alert>
         ) : null}
 
-        {completeInvitation.isSuccess ? (
-          <Stack gap="sm">
-            <Alert color="green" variant="light">
-              La cuenta se activo correctamente. Ya puedes iniciar sesion.
-            </Alert>
+        <PasswordInput
+          label="Contrasena"
+          placeholder="********"
+          withAsterisk
+          disabled={!token}
+          autoComplete="new-password"
+          {...register('password')}
+          error={errors.password?.message}
+        />
 
-            <Text size="sm" c="dimmed">
-              Continua desde{' '}
-              <Anchor c="gray.7" component={Link} to={PATHS.auth.login}>
-                el login
-              </Anchor>
-              .
-            </Text>
-          </Stack>
-        ) : (
-          <>
-            <PasswordInput
-              label="Contrasena"
-              placeholder="********"
-              withAsterisk
-              disabled={!token}
-              autoComplete="new-password"
-              {...register('password')}
-              error={errors.password?.message}
-            />
+        <PasswordInput
+          label="Confirmar contrasena"
+          placeholder="********"
+          withAsterisk
+          disabled={!token}
+          autoComplete="new-password"
+          {...register('confirmPassword')}
+          error={errors.confirmPassword?.message}
+        />
 
-            <PasswordInput
-              label="Confirmar contrasena"
-              placeholder="********"
-              withAsterisk
-              disabled={!token}
-              autoComplete="new-password"
-              {...register('confirmPassword')}
-              error={errors.confirmPassword?.message}
-            />
+        {errors.root ? (
+          <Alert color="red" variant="light">
+            {errors.root.message}
+          </Alert>
+        ) : null}
 
-            {errors.root ? (
-              <Alert color="red" variant="light">
-                {errors.root.message}
-              </Alert>
-            ) : null}
-
-            <Button type="submit" loading={completeInvitation.isPending} disabled={!token} fullWidth>
-              Activar cuenta
-            </Button>
-          </>
-        )}
+        <Button type="submit" loading={completeInvitation.isPending} disabled={!token} fullWidth>
+          Activar cuenta
+        </Button>
       </Stack>
     </AuthFormWrapper>
   );

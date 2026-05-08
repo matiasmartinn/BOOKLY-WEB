@@ -1,9 +1,8 @@
 import { Center, Loader } from '@mantine/core';
 import {
   buildSidebarPermissions,
-  canAccessDashboardPath,
-  getDefaultDashboardPath,
   normalizeUserRole,
+  resolveDashboardPath,
 } from 'app/layouts/dashboard-navigation';
 import { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
@@ -11,7 +10,6 @@ import { useAuthStore } from 'store/use-auth-store';
 import { useBusinessStore } from 'store/use-business-store';
 
 import { PATHS } from './PATHS';
-
 
 function AuthGuardFallback() {
   return (
@@ -84,15 +82,10 @@ export function RequireDashboardAccess() {
 
   const role = normalizeUserRole(authUser.role);
   const permissions = buildSidebarPermissions(authUser, selectedService);
-  const defaultPath = getDefaultDashboardPath(role, permissions);
-  const isAllowedPath = canAccessDashboardPath(location.pathname, role, permissions);
+  const resolvedPath = resolveDashboardPath(location.pathname, role, permissions);
 
-  if (location.pathname === PATHS.dashboard.overview && role !== 'owner') {
-    return <Navigate to={defaultPath} replace />;
-  }
-
-  if (!isAllowedPath) {
-    return <Navigate to={defaultPath} replace />;
+  if (resolvedPath !== location.pathname) {
+    return <Navigate to={resolvedPath} replace />;
   }
 
   return <Outlet />;

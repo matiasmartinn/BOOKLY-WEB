@@ -47,13 +47,12 @@ export const appTheme = createTheme({
           border: `1px solid ${appColorVars.border}`,
           color: appColorVars.textPrimary,
           boxShadow: '0 1px 2px rgba(15, 23, 42, 0.05)',
-          transition:
-            'border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease',
+          transition: 'border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease',
           '&::placeholder': {
             color: appColorVars.textMuted,
             opacity: 0.92,
           },
-          '&:focus, &:focus-within': {
+          '&:focus, &:focusWithin': {
             borderColor: 'var(--mantine-color-brand-5)',
             boxShadow: `0 0 0 ${rem(3)} var(--app-color-brand-soft)`,
           },
@@ -62,7 +61,7 @@ export const appTheme = createTheme({
             color: appColorVars.textSecondary,
             borderColor: appColorVars.borderSoft,
           },
-          '&[data-disabled]': {
+          '&[dataDisabled]': {
             backgroundColor: 'var(--mantine-color-gray-0)',
             color: appColorVars.textMuted,
           },

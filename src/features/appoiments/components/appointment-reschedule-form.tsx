@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Button, Divider, Group, Stack } from '@mantine/core';
 import { useMemo, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { extractDateOnly, normalizeLocalDateTime } from 'shared/utils';
+import { extractDateOnly, normalizeBusinessLocalDateTime } from 'shared/utils';
 import { useBusinessStore } from 'store/use-business-store';
 
 import {
@@ -52,7 +52,7 @@ export function AppointmentRescheduleForm({
     defaultValues: {
       ...defaultValues,
       date: initialDate,
-      slot: normalizeLocalDateTime(appointment.startDateTime) ?? appointment.startDateTime ?? '',
+      slot: normalizeBusinessLocalDateTime(appointment.startDateTime) ?? appointment.startDateTime ?? '',
     },
   });
 

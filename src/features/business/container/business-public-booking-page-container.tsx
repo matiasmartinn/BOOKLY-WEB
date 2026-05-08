@@ -36,7 +36,8 @@ export function BusinessPublicBookingPageContainer() {
   const updateService = useBusinessStore((state) => state.updateService);
 
   const parsedServiceId = Number(rawServiceId);
-  const serviceId = Number.isInteger(parsedServiceId) && parsedServiceId > 0 ? parsedServiceId : null;
+  const serviceId =
+    Number.isInteger(parsedServiceId) && parsedServiceId > 0 ? parsedServiceId : null;
   const selectedMatchesRoute = serviceId != null && selectedService?.id === serviceId;
 
   const serviceQuery = useBusiness(serviceId ?? undefined);
@@ -136,11 +137,8 @@ export function BusinessPublicBookingPageContainer() {
         <Stack gap="xl">
           <Group justify="space-between" align="flex-start" wrap="wrap" gap="md">
             <Stack gap={6} maw={640}>
-              <Text size="xs" fw={700} tt="uppercase" style={{ letterSpacing: '0.08em' }}>
-                Link publico
-              </Text>
               <Text fw={700} size="xl">
-                Public Booking
+                Reserva Pública
               </Text>
               <Text size="sm" c="dimmed">
                 Gestiona el enlace publico de {currentService.name} y comparte la reserva online con
@@ -196,7 +194,9 @@ export function BusinessPublicBookingPageContainer() {
 
           <Group justify="space-between" align="center" wrap="wrap" gap="sm">
             <Text size="sm" c="dimmed">
-              {isDirty ? 'Hay cambios pendientes en el slug del enlace.' : 'Sin cambios pendientes.'}
+              {isDirty
+                ? 'Hay cambios pendientes en el slug del enlace.'
+                : 'Sin cambios pendientes.'}
             </Text>
 
             <Group gap="sm">

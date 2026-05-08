@@ -17,7 +17,7 @@ import { DynamicFieldsSection } from 'shared/components';
 import {
   getActiveDynamicFieldDefinitions,
   mapAdditionalFieldsToFieldValues,
-  normalizeLocalDateTime,
+  normalizeBusinessLocalDateTime,
 } from 'shared/utils';
 import { useBusinessStore } from 'store/use-business-store';
 
@@ -177,7 +177,7 @@ export function AppointmentForm({
       clientPhone: values.clientPhone.trim(),
       clientEmail: values.clientEmail.trim(),
       clientNotes: values.clientNotes?.trim() || undefined,
-      startDateTime: normalizeLocalDateTime(values.slot) ?? values.slot,
+      startDateTime: normalizeBusinessLocalDateTime(values.slot) ?? values.slot,
       fieldValues: canUseDynamicFields
         ? mapAdditionalFieldsToFieldValues(values.additionalFields, fieldDefinitions)
         : undefined,

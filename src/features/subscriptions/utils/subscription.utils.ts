@@ -3,14 +3,7 @@ import type {
   SubscriptionPlanLimitsDto,
   SubscriptionPlanDto,
 } from 'shared/models';
-import { parseDateOnlyParts } from 'shared/utils';
-
-const subscriptionDateFormatter = new Intl.DateTimeFormat('es-AR', {
-  timeZone: 'America/Argentina/Buenos_Aires',
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-});
+import { formatDateOnly, normalizeDateOnly } from 'shared/utils';
 
 const DEFAULT_SUBSCRIPTION_PLAN_LIMITS: SubscriptionPlanLimitsDto = {
   maxServices: null,
@@ -23,16 +16,13 @@ export const formatSubscriptionDate = (value?: string | null) => {
     return 'Sin fecha informada';
   }
 
-  const dateOnlyParts = parseDateOnlyParts(value);
-  const parsedDate = dateOnlyParts
-    ? new Date(Date.UTC(dateOnlyParts.year, dateOnlyParts.month - 1, dateOnlyParts.day, 12, 0, 0))
-    : new Date(value);
+  const normalizedDate = normalizeDateOnly(value);
 
-  if (Number.isNaN(parsedDate.getTime())) {
+  if (!normalizedDate) {
     return 'Sin fecha informada';
   }
 
-  return subscriptionDateFormatter.format(parsedDate);
+  return formatDateOnly(normalizedDate);
 };
 
 export const formatSubscriptionLimitValue = (value?: number | null) => {

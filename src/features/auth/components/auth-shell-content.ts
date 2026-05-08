@@ -26,23 +26,23 @@ const AUTH_VIEW_CONTENT: Record<AuthViewId, AuthViewContent> = {
   },
   'confirm-email': {
     id: 'confirm-email',
-    asideLines: ['Confirma tu cuenta.', 'Segui sin friccion.'],
+    asideLines: ['Confirmacion', 'de email'],
   },
   'forgot-password': {
     id: 'forgot-password',
-    asideLines: ['Recupera acceso.', 'Sin friccion.'],
+    asideLines: ['Recuperacion', 'de contrasena'],
   },
   'reset-password': {
     id: 'reset-password',
-    asideLines: ['Cambia tu clave.', 'Entra otra vez.'],
+    asideLines: ['Recuperacion', 'de contrasena'],
   },
   'admin-invitation': {
     id: 'admin-invitation',
-    asideLines: ['Activa tu acceso.', 'Entra al panel.'],
+    asideLines: ['Invitacion', 'de administrador'],
   },
   'secretary-invitation': {
     id: 'secretary-invitation',
-    asideLines: ['Activa tu acceso.', 'Entra al equipo.'],
+    asideLines: ['Invitacion', 'de secretario'],
   },
   'secretary-password-form': {
     id: 'secretary-password-form',

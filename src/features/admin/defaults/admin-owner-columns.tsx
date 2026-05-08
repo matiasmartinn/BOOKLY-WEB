@@ -2,13 +2,7 @@ import { Badge, Stack, Text } from '@mantine/core';
 import type { TableColumn } from 'shared/components';
 
 import type { AdminOwnerListItemDto } from '../models';
-import {
-  formatAdminDate,
-  formatAdminNumber,
-  formatAdminPlan,
-  getOwnerStatusMeta,
-  getSubscriptionStatusMeta,
-} from '../utils';
+import { formatAdminDate, formatAdminNumber, formatAdminPlan, getOwnerStatusMeta } from '../utils';
 
 export const adminOwnerColumns: TableColumn<AdminOwnerListItemDto>[] = [
   {
@@ -48,20 +42,7 @@ export const adminOwnerColumns: TableColumn<AdminOwnerListItemDto>[] = [
       </Badge>
     ),
   },
-  {
-    key: 'subscriptionStatus',
-    title: 'Suscripcion',
-    width: 180,
-    render: (row) => {
-      const status = getSubscriptionStatusMeta(row.subscriptionStatus);
 
-      return (
-        <Badge color={status.color} variant="light" radius="sm">
-          {status.label}
-        </Badge>
-      );
-    },
-  },
   {
     key: 'serviceCount',
     title: 'Servicios',

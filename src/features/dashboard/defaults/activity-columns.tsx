@@ -11,12 +11,7 @@ export const activityColumns: TableColumn<ActivityEventViewModel>[] = [
     accessor: 'appointmentDateLabel',
     noWrap: true,
   },
-  {
-    key: 'appointmentTimeLabel',
-    title: 'Horario',
-    accessor: 'appointmentTimeLabel',
-    noWrap: true,
-  },
+
   {
     key: 'clientName',
     title: 'Cliente',

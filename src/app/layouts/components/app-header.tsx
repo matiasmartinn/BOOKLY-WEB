@@ -1,8 +1,11 @@
 import { Box, Button, Container, Group, Text } from '@mantine/core';
 import { PATHS } from 'app/router/PATHS';
 import { Link } from 'react-router-dom';
+import { useAuthStore } from 'store/use-auth-store';
 
 export function AppHeader() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return (
     <Container size="lg" h="100%">
       <Group h="100%" justify="space-between" align="center" wrap="nowrap">
@@ -36,14 +39,20 @@ export function AppHeader() {
           </Text>
         </Group>
 
-        <Group gap={6} wrap="nowrap">
-          <Button variant="subtle" color="brand" component={Link} to={PATHS.auth.login} size="xs">
+        {!isAuthenticated ? (
+          <Group gap={6} wrap="nowrap">
+            <Button variant="subtle" color="brand" component={Link} to={PATHS.auth.login} size="xs">
+              Iniciar sesion
+            </Button>
+            <Button color="brand" component={Link} to={PATHS.auth.register} size="xs">
+              Registrarse
+            </Button>
+          </Group>
+        ) : (
+          <Button color="brand" component={Link} to={PATHS.dashboard.overview} size="xs">
             Iniciar sesion
           </Button>
-          <Button color="brand" component={Link} to={PATHS.auth.register} size="xs">
-            Registrarse
-          </Button>
-        </Group>
+        )}
       </Group>
     </Container>
   );

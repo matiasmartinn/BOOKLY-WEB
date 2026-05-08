@@ -83,7 +83,7 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
 
       updateService(updatedService);
       reset(mapBusinessToFormValues(updatedService));
-      toast.success('Los datos base del servicio se guardaron.');
+      toast.success('Los datos del servicio se guardaron.');
     } catch {
       // El eror se refleja inline desde el estado del mutation.
     }

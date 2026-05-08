@@ -1,0 +1,140 @@
+.root {
+  width: min(100%, 30rem);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.iconWrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  border-radius: 999px;
+  color: var(--mantine-color-success-7);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.8), transparent 54%),
+    var(--mantine-color-success-0);
+}
+
+.iconWrap::before,
+.iconWrap::after {
+  content: '';
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--mantine-color-success-5);
+  box-shadow: 0 0 0 3px rgba(47, 158, 68, 0.1);
+}
+
+.iconWrap::before {
+  top: 18px;
+  right: -12px;
+}
+
+.iconWrap::after {
+  left: -8px;
+  bottom: 24px;
+  width: 7px;
+  height: 7px;
+}
+
+.icon {
+  font-size: 3rem;
+}
+
+.copy {
+  display: grid;
+  gap: 10px;
+}
+
+.title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0;
+  color: var(--mantine-color-gray-9);
+}
+
+.description {
+  max-width: 28rem;
+  margin: 0;
+  color: var(--mantine-color-gray-6);
+  line-height: 1.55;
+}
+
+.notice {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  border: 1px solid rgba(47, 158, 68, 0.12);
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(47, 158, 68, 0.14), rgba(47, 158, 68, 0.06));
+  text-align: left;
+}
+
+.noticeIcon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: var(--mantine-color-success-6);
+}
+
+.noticeTitle {
+  margin: 0 0 4px;
+  font-weight: 800;
+  color: var(--mantine-color-gray-9);
+}
+
+.noticeText {
+  margin: 0;
+  color: var(--mantine-color-gray-7);
+  line-height: 1.45;
+}
+
+.actions {
+  width: 100%;
+  display: grid;
+  gap: 14px;
+}
+
+.secondaryLink {
+  justify-self: center;
+  font-weight: 700;
+  color: var(--mantine-color-brand-7);
+}
+
+@media (max-width: 36em) {
+  .root {
+    gap: 20px;
+  }
+
+  .iconWrap {
+    width: 96px;
+    height: 96px;
+  }
+
+  .icon {
+    font-size: 2.55rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .notice {
+    padding: 16px;
+  }
+}
