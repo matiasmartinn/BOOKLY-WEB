@@ -1,5 +1,4 @@
 const BUSINESS_TIME_ZONE = 'America/Argentina/Buenos_Aires';
-const UI_DATE_LOCALE = 'es-AR';
 
 const DATE_ONLY_REGEX = /^(\d{4})-(\d{2})-(\d{2})$/;
 const LOCAL_DATE_TIME_REGEX =
@@ -7,6 +6,20 @@ const LOCAL_DATE_TIME_REGEX =
 const ZONED_DATE_TIME_REGEX =
   /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d{1,7})?)?(?:Z|[+-]\d{2}:?\d{2})$/i;
 const TIME_ONLY_REGEX = /^(\d{2}):(\d{2})(?::(\d{2}))?$/;
+const SHORT_MONTH_LABELS = [
+  'ene',
+  'feb',
+  'mar',
+  'abr',
+  'may',
+  'jun',
+  'jul',
+  'ago',
+  'sep',
+  'oct',
+  'nov',
+  'dic',
+] as const;
 
 const businessNowFormatter = new Intl.DateTimeFormat('en-CA', {
   timeZone: BUSINESS_TIME_ZONE,
@@ -17,17 +30,6 @@ const businessNowFormatter = new Intl.DateTimeFormat('en-CA', {
   minute: '2-digit',
   second: '2-digit',
   hourCycle: 'h23',
-});
-const shortLocalDateFormatter = new Intl.DateTimeFormat(UI_DATE_LOCALE, {
-  timeZone: BUSINESS_TIME_ZONE,
-  day: '2-digit',
-  month: 'short',
-});
-const longLocalDateFormatter = new Intl.DateTimeFormat(UI_DATE_LOCALE, {
-  timeZone: BUSINESS_TIME_ZONE,
-  day: '2-digit',
-  month: 'short',
-  year: 'numeric',
 });
 
 interface DateOnlyParts {
@@ -50,9 +52,6 @@ const buildDateOnly = ({ year, month, day }: DateOnlyParts) =>
   `${year}-${pad2(month)}-${pad2(day)}`;
 
 const buildNativeDate = ({ year, month, day }: DateOnlyParts) => new Date(year, month - 1, day);
-
-const buildBusinessDateForFormatting = ({ year, month, day }: DateOnlyParts) =>
-  new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
 const buildTimeOnly = (
   { hour, minute, second }: TimeOnlyParts,
@@ -329,12 +328,14 @@ export const formatLocalDateOnly = (value?: string | null) => {
 
 export const formatShortLocalDateOnly = (value?: string | null) => {
   const parts = parseBusinessDateParts(value);
-  return parts ? shortLocalDateFormatter.format(buildBusinessDateForFormatting(parts)) : value ?? '';
+  return parts ? `${pad2(parts.day)} ${SHORT_MONTH_LABELS[parts.month - 1]}` : value ?? '';
 };
 
 export const formatLongLocalDateOnly = (value?: string | null) => {
   const parts = parseBusinessDateParts(value);
-  return parts ? longLocalDateFormatter.format(buildBusinessDateForFormatting(parts)) : value ?? '';
+  return parts
+    ? `${pad2(parts.day)} ${SHORT_MONTH_LABELS[parts.month - 1]} ${parts.year}`
+    : value ?? '';
 };
 
 export const formatLocalDateOnlyRange = (
@@ -381,3 +382,7 @@ export const formatLocalDateTime = (value?: string | null) => {
 
   return `${dateLabel} ${timeLabel}`;
 };
+
+export const formatDateOnly = formatLocalDateOnly;
+export const formatTime = formatLocalTime;
+export const formatDateTime = formatLocalDateTime;
