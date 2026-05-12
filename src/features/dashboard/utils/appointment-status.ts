@@ -32,9 +32,9 @@ export const getAppointmentStatusColor = (value?: string | null) => {
 
   if (normalized.includes('CANCEL')) return 'red';
   if (normalized.includes('NO_SHOW') || normalized.includes('NOSHOW')) return 'orange';
-  if (normalized.includes('RESCHEDULE') || normalized.includes('REPROGRAM')) return 'blue';
+  if (normalized.includes('RESCHEDULE') || normalized.includes('REPROGRAM')) return 'brand';
   if (normalized.includes('ATTEND') || normalized.includes('CONFIRM')) return 'green';
-  if (normalized.includes('CREATED') || normalized.includes('PENDING')) return 'indigo';
+  if (normalized.includes('CREATED') || normalized.includes('PENDING')) return 'brand';
 
   return 'gray';
 };

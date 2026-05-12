@@ -38,7 +38,7 @@ export const adminServiceTypeFieldColumns: TableColumn<ServiceTypeFieldDefinitio
     width: 150,
     textAlign: 'center',
     render: (row) => (
-      <Badge color={row.isRequired ? 'blue' : 'gray'} variant="light" radius="sm">
+      <Badge color={row.isRequired ? 'brand' : 'gray'} variant="light" radius="sm">
         {row.isRequired ? 'Si' : 'No'}
       </Badge>
     ),

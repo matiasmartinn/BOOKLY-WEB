@@ -34,8 +34,15 @@ export const ScheduleDayRow = memo(function ScheduleDayRow({
   const canAddRange = ranges.length < MAX_SCHEDULE_RANGES_PER_DAY;
 
   return (
-    <Group align="flex-start" wrap="nowrap" gap="md">
-      <Box w={156} style={{ flex: '0 0 156px' }}>
+    <Group
+      align="flex-start"
+      gap="md"
+      style={{
+        width: '100%',
+        flexWrap: 'wrap',
+      }}
+    >
+      <Box w={{ base: '100%', sm: 156 }} style={{ flex: '0 0 auto' }}>
         <Switch
           label={DAY_LABELS[day]}
           checked={enabled}
@@ -44,13 +51,27 @@ export const ScheduleDayRow = memo(function ScheduleDayRow({
       </Box>
 
       {enabled && (
-        <Stack gap={8} flex={1}>
+        <Stack
+          gap={8}
+          style={{
+            flex: '1 1 260px',
+            minWidth: 0,
+          }}
+        >
           <Text size="xs" c="dimmed">
             Cupo: reservas permitidas en ese horario.
           </Text>
 
           {ranges.map((range, i) => (
-            <Group key={range.id} align="flex-start" wrap="wrap" gap="sm">
+            <Group
+              key={range.id}
+              align="flex-start"
+              gap="sm"
+              style={{
+                width: '100%',
+                flexWrap: 'wrap',
+              }}
+            >
               <SelectDayTimePicker
                 startValue={range.start}
                 endValue={range.end}

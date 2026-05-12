@@ -26,7 +26,7 @@ const createdEvent = (
   id: `created-${appointment.id}`,
   appointmentId: appointment.id,
   eventType: 'Turno creado',
-  eventTypeColor: 'blue',
+  eventTypeColor: 'brand',
   clientName: appointment.clientName,
   clientEmail: appointment.clientEmail,
   actorUserId: creationHistory?.userId ?? null,

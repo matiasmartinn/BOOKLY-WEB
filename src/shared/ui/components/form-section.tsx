@@ -24,7 +24,7 @@ export function FormSection({
   children,
   contentGap = 'md',
   withBorder = true,
-  radius = 'xl',
+  radius = 'lg',
   p = 'xl',
   style,
   ...paperProps
@@ -35,10 +35,9 @@ export function FormSection({
       radius={radius}
       p={p}
       style={{
-        background:
-          'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.92) 100%)',
+        background: 'var(--app-color-surface)',
         borderColor: 'var(--app-color-border)',
-        boxShadow: '0 10px 24px rgba(15, 23, 42, 0.04)',
+        boxShadow: '0 8px 20px rgba(15, 23, 42, 0.03)',
         ...style,
       }}
       {...paperProps}
@@ -51,7 +50,7 @@ export function FormSection({
               fw={700}
               style={{
                 color: 'var(--app-color-text-primary)',
-                letterSpacing: '-0.01em',
+                letterSpacing: 0,
               }}
             >
               {title}

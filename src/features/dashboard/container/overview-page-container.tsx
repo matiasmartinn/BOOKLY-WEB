@@ -12,6 +12,7 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageCard } from 'shared/layout';
 import type { AppointmentSummaryDto } from 'shared/models';
+import { appColorVars } from 'shared/ui/theme/theme';
 import {
   compareLocalDateTime,
   formatDateOnly,
@@ -137,18 +138,29 @@ export function OverviewPageContainer() {
       )}
 
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }}>
-        <DashboardStatCard label="Turnos hoy" value={getStatValue(appointmentSignals.totalToday)} />
+        <DashboardStatCard
+          label="Turnos hoy"
+          value={getStatValue(appointmentSignals.totalToday)}
+          accentColor="var(--mantine-color-brand-5)"
+          accentBackground={appColorVars.brandSoft}
+        />
         <DashboardStatCard
           label="Proximos"
           value={getStatValue(appointmentSignals.upcomingCount)}
+          accentColor="var(--mantine-color-brand-5)"
+          accentBackground={appColorVars.brandSoft}
         />
         <DashboardStatCard
           label="Cancelado"
           value={getStatValue(appointmentSignals.cancelledToday)}
+          accentColor="var(--mantine-color-warning-5)"
+          accentBackground={appColorVars.warningSoft}
         />
         <DashboardStatCard
           label="No asistio"
           value={getStatValue(appointmentSignals.noShowToday)}
+          accentColor="var(--mantine-color-error-5)"
+          accentBackground={appColorVars.errorSoft}
         />
       </SimpleGrid>
 

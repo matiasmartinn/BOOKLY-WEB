@@ -37,7 +37,7 @@ export const adminOwnerColumns: TableColumn<AdminOwnerListItemDto>[] = [
     title: 'Plan',
     width: 120,
     render: (row) => (
-      <Badge color="blue" variant="light" radius="sm">
+      <Badge color="brand" variant="light" radius="sm">
         {formatAdminPlan(row.currentPlan)}
       </Badge>
     ),

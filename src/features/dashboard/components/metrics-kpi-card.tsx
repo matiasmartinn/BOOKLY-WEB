@@ -23,14 +23,13 @@ export function MetricsKpiCard({
       radius="lg"
       p="md"
       withBorder
-      shadow="xs"
       style={{
-        minHeight: 142,
+        minHeight: 132,
         height: '100%',
         backgroundColor: accentBackground,
-        borderLeft: `4px solid ${accentColor}`,
+        borderLeft: `3px solid ${accentColor}`,
         borderColor: appColorVars.border,
-        boxShadow: '0 12px 28px rgba(15, 23, 42, 0.05)',
+        boxShadow: '0 8px 22px rgba(15, 23, 42, 0.035)',
       }}
     >
       <Stack gap="md" justify="space-between" h="100%">

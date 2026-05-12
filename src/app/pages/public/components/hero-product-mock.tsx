@@ -29,6 +29,10 @@ const appointmentRows = [
   { time: '12:00', client: 'Mica Suarez', status: 'Reprogramado' },
 ];
 
+// Colores explícitos para texto oscuro sobre superficie blanca del mock
+const dark = 'var(--app-color-text-primary)';
+const muted = 'var(--app-color-text-muted)';
+
 export function HeroProductMock() {
   return (
     <div className={classes.mockFrame}>
@@ -39,9 +43,9 @@ export function HeroProductMock() {
       </div>
 
       <div className={classes.mockShell}>
+        {/* Sidebar */}
         <div className={classes.mockSidebar}>
           <div className={classes.mockBrand}>BK</div>
-
           <div className={classes.mockMenu}>
             {productMenu.map((item) => (
               <div
@@ -49,58 +53,49 @@ export function HeroProductMock() {
                 className={item.active ? classes.mockMenuItemActive : classes.mockMenuItem}
               >
                 <FontAwesomeIcon icon={item.icon} />
-                <span>{item.label}</span>
+                <span style={{ color: item.active ? dark : muted }}>{item.label}</span>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Content */}
         <div className={classes.mockContent}>
+          {/* Toolbar */}
           <div className={classes.mockToolbar}>
             <div>
-              <Text fw={700} size="sm">
+              <Text fw={700} size="sm" style={{ color: dark }}>
                 Operacion del dia
               </Text>
-              <Text size="xs" c="dimmed">
+              <Text size="xs" style={{ color: muted }}>
                 Servicio activo y agenda ordenada.
               </Text>
             </div>
-
             <div className={classes.mockToolbarPill}>Hoy</div>
           </div>
 
+          {/* KPIs */}
           <div className={classes.mockKpiGrid}>
-            <div className={classes.mockKpiCard}>
-              <Text size="xs" c="dimmed">
-                Turnos
-              </Text>
-              <Text fw={800} size="xl">
-                18
-              </Text>
-            </div>
-
-            <div className={classes.mockKpiCard}>
-              <Text size="xs" c="dimmed">
-                Equipo
-              </Text>
-              <Text fw={800} size="xl">
-                4
-              </Text>
-            </div>
-
-            <div className={classes.mockKpiCard}>
-              <Text size="xs" c="dimmed">
-                Excepciones
-              </Text>
-              <Text fw={800} size="xl">
-                2
-              </Text>
-            </div>
+            {[
+              { label: 'Turnos', value: '18' },
+              { label: 'Equipo', value: '4' },
+              { label: 'Excepciones', value: '2' },
+            ].map((kpi) => (
+              <div key={kpi.label} className={classes.mockKpiCard}>
+                <Text size="xs" style={{ color: muted }}>
+                  {kpi.label}
+                </Text>
+                <Text fw={800} size="xl" style={{ color: dark }}>
+                  {kpi.value}
+                </Text>
+              </div>
+            ))}
           </div>
 
+          {/* Turnos del dia */}
           <div className={classes.mockPanel}>
             <div className={classes.mockPanelHeader}>
-              <Text fw={700} size="sm">
+              <Text fw={700} size="sm" style={{ color: dark }}>
                 Turnos del dia
               </Text>
               <div className={classes.mockTag}>Agenda activa</div>
@@ -109,10 +104,10 @@ export function HeroProductMock() {
             <div className={classes.mockAppointments}>
               {appointmentRows.map((row) => (
                 <div key={`${row.time}-${row.client}`} className={classes.mockAppointmentRow}>
-                  <Text fw={700} size="sm">
+                  <Text fw={700} size="sm" style={{ color: dark }}>
                     {row.time}
                   </Text>
-                  <Text size="sm" className={classes.mockAppointmentClient}>
+                  <Text size="sm" className={classes.mockAppointmentClient} style={{ color: dark }}>
                     {row.client}
                   </Text>
                   <div className={classes.mockStatus}>{row.status}</div>
@@ -121,9 +116,10 @@ export function HeroProductMock() {
             </div>
           </div>
 
+          {/* Bottom grid */}
           <div className={classes.mockBottomGrid}>
             <div className={classes.mockMiniCard}>
-              <Text fw={700} size="sm">
+              <Text fw={700} size="sm" style={{ color: dark }}>
                 Horarios
               </Text>
               <div className={classes.mockScheduleBars}>
@@ -132,9 +128,8 @@ export function HeroProductMock() {
                 <span style={{ width: '74%' }} />
               </div>
             </div>
-
             <div className={classes.mockMiniCard}>
-              <Text fw={700} size="sm">
+              <Text fw={700} size="sm" style={{ color: dark }}>
                 Equipo
               </Text>
               <div className={classes.mockChips}>

@@ -3,7 +3,6 @@ import {
   faCheck,
   faClock,
   faClockRotateLeft,
-  faPlus,
   faUsers,
   type IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
@@ -38,28 +37,28 @@ interface FeatureCardData {
 const heroSignals: FeatureCardData[] = [
   {
     title: 'Turnos al dia',
-    description: 'Agenda, reprograma y sigue el estado de cada reserva.',
+    description: 'Agenda, reprograma y sigue cada reserva sin perder contexto.',
     icon: faCalendarCheck,
     accent: 'brand',
     points: ['Altas rapidas', 'Estados visibles'],
   },
   {
     title: 'Agenda real',
-    description: 'Controla horarios base, bloqueos y excepciones sin perder contexto.',
+    description: 'Horarios base, bloqueos y excepciones dentro del mismo flujo.',
     icon: faClock,
     accent: 'info',
     points: ['Horarios', 'Excepciones'],
   },
   {
     title: 'Equipo conectado',
-    description: 'Asigna secretarios y organiza permisos por servicio.',
+    description: 'Secretarios y permisos ordenados por servicio.',
     icon: faUsers,
     accent: 'success',
     points: ['Permisos', 'Cobertura'],
   },
   {
-    title: 'Seguimiento continuo',
-    description: 'Consulta actividad, historico y metricas del negocio.',
+    title: 'Lectura continua',
+    description: 'Actividad, historial y metricas para seguir la operacion.',
     icon: faClockRotateLeft,
     accent: 'violetAccent',
     points: ['Historico', 'Metricas'],
@@ -72,30 +71,28 @@ const featureCards: FeatureCardData[] = [
     description: 'Alta, edicion, cambios de estado y lectura rapida de la jornada actual.',
     icon: faCalendarCheck,
     accent: 'brand',
-    points: ['Crear y editar', 'Ver estado por turno', 'Trabajar por dia'],
+    points: ['Crear y editar', 'Ver estado por turno'],
   },
   {
     title: 'Horarios y excepciones',
-    description:
-      'Agenda base del servicio con bloqueos puntuales, vacaciones e indisponibilidades.',
+    description: 'Agenda base del servicio con bloqueos puntuales y disponibilidad clara.',
     icon: faClock,
     accent: 'info',
-    points: ['Franja por dia', 'Bloqueos manuales', 'Disponibilidad clara'],
+    points: ['Franja por dia', 'Bloqueos manuales'],
   },
   {
     title: 'Equipo y permisos',
-    description: 'Gestiona secretarios, servicios asignados y acceso segun la necesidad operativa.',
+    description: 'Gestiona secretarios, servicios asignados y acceso operativo.',
     icon: faUsers,
     accent: 'success',
-    points: ['Equipo por servicio', 'Permisos por accion', 'Cobertura ordenada'],
+    points: ['Equipo por servicio', 'Permisos por accion'],
   },
   {
-    title: 'Historial y lectura del negocio',
-    description:
-      'Sigue actividad, historial de turnos y senales para entender como viene el servicio.',
+    title: 'Historial del negocio',
+    description: 'Consulta actividad y senales utiles para entender el servicio.',
     icon: faClockRotateLeft,
     accent: 'violetAccent',
-    points: ['Historico filtrable', 'Actividad del servicio', 'Metricas del periodo'],
+    points: ['Historico filtrable', 'Metricas del periodo'],
   },
 ];
 
@@ -104,43 +101,59 @@ export function HomePage() {
     <Box className={classes.page}>
       <section className={classes.heroSection}>
         <Container size="lg">
-          <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={{ base: 'xl', lg: 56 }}>
-            <Stack gap="xl" className={classes.heroCopy}>
-              <Badge variant="light" color="brand" radius="xl" className={classes.heroBadge}>
-                Gestion de turnos para servicios que necesitan orden real
+          <SimpleGrid
+            cols={{ base: 1, lg: 2 }}
+            spacing={{ base: 'xl', lg: 52 }}
+            className={classes.heroGrid}
+          >
+            <Stack gap="lg" className={classes.heroCopy}>
+              <Badge variant="outline" radius="xl" className={classes.heroBadge}>
+                Gestion de turnos con foco operativo
               </Badge>
 
-              <Stack gap="lg">
+              <Stack gap="md">
                 <Title order={1} className={classes.heroTitle}>
                   Turnos, agenda y equipo en un mismo lugar.
                 </Title>
 
-                <Text size="xl" c="dimmed" className={classes.heroDescription}>
-                  Bookly te ayuda a organizar horarios, manejar excepciones, coordinar secretarios y
-                  seguir la operacion diaria sin depender de planillas ni mensajes sueltos.
+                <Text size="lg" className={classes.heroDescription}>
+                  Bookly organiza horarios, excepciones y trabajo diario sin depender de planillas
+                  ni mensajes sueltos.
                 </Text>
               </Stack>
 
               <Group gap="sm" className={classes.heroActions}>
-                <Button component={Link} to={PATHS.auth.register} color="brand" size="lg">
+                <Button
+                  component={Link}
+                  to={PATHS.auth.register}
+                  size="lg"
+                  className={classes.primaryButton}
+                >
                   Crear cuenta
                 </Button>
-                <Button component={Link} to={PATHS.auth.login} variant="default" size="lg">
+                <Button
+                  component={Link}
+                  to={PATHS.auth.login}
+                  variant="outline"
+                  size="lg"
+                  className={classes.secondaryButton}
+                >
                   Iniciar sesion
                 </Button>
               </Group>
 
-              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm" className={classes.signalGrid}>
                 {heroSignals.map((item) => (
-                  <Paper key={item.title} p="md" radius="xl" className={classes.signalCard}>
+                  <Paper key={item.title} p="md" radius="lg" className={classes.signalCard}>
                     <Group align="flex-start" wrap="nowrap">
-                      <ThemeIcon color={item.accent} variant="light" radius="lg" size={42}>
+                      <ThemeIcon color={item.accent} variant="light" radius="md" size={40}>
                         <FontAwesomeIcon icon={item.icon} />
                       </ThemeIcon>
-
                       <Stack gap={4}>
-                        <Text fw={700}>{item.title}</Text>
-                        <Text size="sm" c="dimmed">
+                        <Text fw={700} className={classes.signalTitle}>
+                          {item.title}
+                        </Text>
+                        <Text size="sm" className={classes.signalDesc}>
                           {item.description}
                         </Text>
                       </Stack>
@@ -157,106 +170,40 @@ export function HomePage() {
 
       <section className={classes.section}>
         <Container size="lg">
-          <Stack gap="xl">
+          <Stack gap="lg">
             <SectionHeader
-              eyebrow="Beneficios principales"
-              title="Lo importante del negocio queda visible y ordenado."
-              description="Bookly apunta a la operacion real del servicio: organizar reservas, cuidar la agenda y coordinar el trabajo diario."
+              eyebrow="Producto"
+              title="Una agenda mas clara para trabajar con menos friccion."
+              description="Cuatro bloques concentran lo importante: turnos, disponibilidad, equipo y lectura del negocio."
             />
 
             <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="md">
-              {heroSignals.map((item) => (
-                <Paper key={item.title} p="lg" radius="xl" className={classes.featureSurface}>
-                  <Stack gap="md">
-                    <ThemeIcon color={item.accent} variant="light" radius="lg" size={46}>
+              {featureCards.map((item) => (
+                <Paper key={item.title} p="lg" radius="lg" className={classes.featureSurface}>
+                  <Stack gap="md" h="100%">
+                    <ThemeIcon color={item.accent} variant="light" radius="md" size={44}>
                       <FontAwesomeIcon icon={item.icon} />
                     </ThemeIcon>
 
                     <Stack gap={6}>
-                      <Text fw={700} size="lg">
+                      <Text fw={700} size="lg" className={classes.featureTitle}>
                         {item.title}
                       </Text>
-                      <Text size="sm" c="dimmed">
+                      <Text size="sm" className={classes.featureDescription}>
                         {item.description}
                       </Text>
                     </Stack>
 
-                    <Group gap={8}>
-                      {item.points.map((point) => (
-                        <Badge key={point} variant="light" color={item.accent} radius="xl">
-                          {point}
-                        </Badge>
-                      ))}
-                    </Group>
-                  </Stack>
-                </Paper>
-              ))}
-            </SimpleGrid>
-          </Stack>
-        </Container>
-      </section>
-
-      <section className={classes.section}>
-        <Container size="lg">
-          <Stack gap="xl">
-            <SectionHeader
-              eyebrow="Funcionalidades destacadas"
-              title="Bookly resuelve la agenda operativa y tambien la lectura del negocio."
-              description="Cada bloque esta pensado para bajar friccion en el dia a dia y dejar informacion util para decidir mejor."
-            />
-
-            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-              {featureCards.map((item) => (
-                <Paper key={item.title} p="lg" radius="xl" className={classes.detailCard}>
-                  <Stack gap="lg">
-                    <Group justify="space-between" align="flex-start" wrap="wrap">
-                      <Group gap="sm" wrap="nowrap" align="flex-start">
-                        <ThemeIcon color={item.accent} variant="light" radius="lg" size={44}>
-                          <FontAwesomeIcon icon={item.icon} />
-                        </ThemeIcon>
-
-                        <Stack gap={4}>
-                          <Text fw={700} size="lg">
-                            {item.title}
-                          </Text>
-                          <Text size="sm" c="dimmed">
-                            {item.description}
-                          </Text>
-                        </Stack>
-                      </Group>
-
-                      <Badge variant="light" color={item.accent} radius="xl">
-                        Bookly
-                      </Badge>
-                    </Group>
-
-                    <Stack gap="xs">
+                    <Stack gap="xs" mt="auto">
                       {item.points.map((point) => (
                         <div key={point} className={classes.featurePoint}>
-                          <ThemeIcon color={item.accent} variant="light" radius="xl" size={26}>
+                          <ThemeIcon color={item.accent} variant="light" radius="xl" size={24}>
                             <FontAwesomeIcon icon={faCheck} />
                           </ThemeIcon>
                           <Text size="sm">{point}</Text>
                         </div>
                       ))}
                     </Stack>
-
-                    <div className={classes.inlinePreview}>
-                      <div className={classes.inlinePreviewHeader}>
-                        <Text fw={700} size="sm">
-                          Vista rapida
-                        </Text>
-                        <div className={classes.inlinePreviewAction}>
-                          <FontAwesomeIcon icon={faPlus} />
-                        </div>
-                      </div>
-
-                      <div className={classes.inlinePreviewRows}>
-                        <span />
-                        <span />
-                        <span />
-                      </div>
-                    </div>
                   </Stack>
                 </Paper>
               ))}
@@ -265,31 +212,41 @@ export function HomePage() {
         </Container>
       </section>
 
-      <section className={classes.section}>
+      <section className={classes.ctaSection}>
         <Container size="lg">
-          <Paper p={{ base: 'xl', md: 'xl' }} radius="xl" className={classes.finalCta}>
-            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
-              <Stack gap="md">
-                <Badge variant="light" color="brand" radius="xl" className={classes.finalBadge}>
+          <Paper radius="lg" className={classes.finalCta}>
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing={{ base: 'lg', md: 36 }}>
+              <Stack gap={8}>
+                <Badge variant="outline" radius="xl" className={classes.finalBadge}>
                   Empieza con Bookly
                 </Badge>
                 <Title order={2} className={classes.finalTitle}>
-                  Centraliza turnos, agenda y equipo antes de que el dia se desordene.
+                  Ordena la agenda antes de que el dia se disperse.
                 </Title>
-                <Text size="lg" className={classes.finalText}>
-                  Crea tu cuenta para configurar tu servicio y comenzar a trabajar con una agenda
-                  mas clara desde el primer dia.
+                <Text className={classes.finalText}>
+                  Configura tu servicio y empieza con una operacion mas clara.
                 </Text>
               </Stack>
 
-              <Stack gap="sm" justify="center" align="flex-start" className={classes.finalActions}>
-                <Button component={Link} to={PATHS.auth.register} color="brand" size="lg">
+              <Group gap="sm" justify="flex-end" align="center" className={classes.finalActions}>
+                <Button
+                  component={Link}
+                  to={PATHS.auth.register}
+                  size="lg"
+                  className={classes.primaryButton}
+                >
                   Registrarse
                 </Button>
-                <Button component={Link} to={PATHS.auth.login} variant="default" size="lg">
+                <Button
+                  component={Link}
+                  to={PATHS.auth.login}
+                  variant="outline"
+                  size="lg"
+                  className={classes.secondaryButton}
+                >
                   Iniciar sesion
                 </Button>
-              </Stack>
+              </Group>
             </SimpleGrid>
           </Paper>
         </Container>

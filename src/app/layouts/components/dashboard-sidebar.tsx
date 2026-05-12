@@ -36,6 +36,8 @@ import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from 'store/use-auth-store';
 
+import classes from './dashboard-sidebar.module.css';
+
 export type UserRole = 'owner' | 'secretary' | 'admin';
 
 export interface Service {
@@ -243,12 +245,13 @@ function ServiceSwitcher({
               width: 28,
               height: 28,
               borderRadius: theme.radius.md,
-              border: '1px dashed var(--app-color-border)',
+              border: '1px dashed var(--app-color-brand-outline)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto',
-              color: 'var(--app-color-text-secondary)',
+              color: 'var(--mantine-color-brand-6)',
+              backgroundColor: 'var(--app-color-brand-soft)',
             })}
           >
             <FontAwesomeIcon icon={faPlus} style={{ fontSize: 10 }} />
@@ -283,8 +286,8 @@ function ServiceSwitcher({
         style={(theme) => ({
           width: '100%',
           borderRadius: theme.radius.md,
-          border: '1px dashed var(--app-color-border)',
-          backgroundColor: 'var(--app-color-surface)',
+          border: '1px dashed var(--app-color-brand-outline)',
+          backgroundColor: 'var(--app-color-brand-soft)',
         })}
       >
         <Group gap={8} wrap="nowrap">
@@ -431,11 +434,11 @@ function AdminBadge({ collapsed }: { collapsed: boolean }) {
       py={6}
       style={{
         borderRadius: 'var(--mantine-radius-md)',
-        backgroundColor: 'var(--app-color-surface-soft)',
-        border: '1px solid var(--app-color-border)',
+        backgroundColor: 'var(--app-color-brand-soft)',
+        border: '1px solid var(--app-color-brand-outline)',
       }}
     >
-      <Text size="xs" fw={500} c="var(--app-color-text-primary)">
+      <Text size="xs" fw={600} c="brand.6">
         Administracion
       </Text>
     </Box>
@@ -455,27 +458,15 @@ function NavItemButton({ item, isActive, collapsed, onClick }: NavItemButtonProp
       onClick={onClick}
       px="xs"
       py={7}
-      style={(theme) => ({
-        width: '100%',
-        borderRadius: theme.radius.md,
-        display: 'flex',
-        alignItems: 'center',
-        gap: collapsed ? 0 : 9,
-        justifyContent: collapsed ? 'center' : 'flex-start',
-        backgroundColor: isActive ? 'var(--app-color-surface-soft)' : 'transparent',
-        border: isActive ? '1px solid var(--app-color-border)' : '1px solid transparent',
-      })}
+      className={`${classes.navItem} ${collapsed ? classes.navItemCollapsed : ''}`}
+      data-active={isActive ? 'true' : undefined}
     >
-      <ThemeIcon size={16} variant="transparent" c={isActive ? 'brand.5' : 'dimmed'}>
+      <ThemeIcon size={16} variant="transparent" className={classes.navIcon}>
         <FontAwesomeIcon icon={item.icon} style={{ fontSize: 12 }} />
       </ThemeIcon>
 
       {!collapsed ? (
-        <Text
-          size="xs"
-          fw={isActive ? 600 : 500}
-          c={isActive ? 'var(--app-color-text-primary)' : 'dimmed'}
-        >
+        <Text size="xs" fw={isActive ? 600 : 500}>
           {item.label}
         </Text>
       ) : null}
@@ -644,7 +635,7 @@ export function DashboardSidebar({
   };
 
   return (
-    <Stack gap="sm" p="sm" h="100%" style={{ overflow: 'hidden' }}>
+    <Stack gap="sm" p="sm" h="100%" className={classes.sidebarRoot}>
       <Stack gap="sm" style={{ flex: 1, minHeight: 0 }}>
         <Stack gap={collapsed ? 8 : 0}>
           <Group
@@ -653,20 +644,7 @@ export function DashboardSidebar({
             px={collapsed ? 0 : 'xs'}
           >
             <Group gap="sm" wrap="nowrap" justify={collapsed ? 'center' : 'flex-start'}>
-              <Box
-                w={28}
-                h={28}
-                style={{
-                  borderRadius: 8,
-                  backgroundColor: 'var(--mantine-color-brand-6)',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  flexShrink: 0,
-                }}
-              >
+              <Box className={classes.brandMark}>
                 B
               </Box>
 
@@ -706,22 +684,21 @@ export function DashboardSidebar({
           <AdminBadge collapsed={collapsed} />
         )}
 
-        <Divider />
+        <Divider className={classes.separator} />
 
         <Box style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden' }}>
           <Stack gap="sm" pr={collapsed ? 0 : 4}>
             {visibleSections.map((section, index) => (
               <Stack key={section.label} gap={2}>
-                {index > 0 ? <Divider my={4} /> : null}
+                {index > 0 ? <Divider my={4} className={classes.separator} /> : null}
 
                 {!collapsed ? (
                   <Text
+                    className={classes.sectionLabel}
                     size="xs"
                     fw={700}
-                    c="dimmed"
                     tt="uppercase"
                     px="xs"
-                    style={{ letterSpacing: '0.05em' }}
                   >
                     {section.label}
                   </Text>
@@ -741,16 +718,15 @@ export function DashboardSidebar({
 
             {accountItems.length > 0 ? (
               <Stack gap={2}>
-                <Divider my={4} />
+                <Divider my={4} className={classes.separator} />
 
                 {!collapsed ? (
                   <Text
+                    className={classes.sectionLabel}
                     size="xs"
                     fw={700}
-                    c="dimmed"
                     tt="uppercase"
                     px="xs"
-                    style={{ letterSpacing: '0.05em' }}
                   >
                     Cuenta
                   </Text>
@@ -778,12 +754,12 @@ export function DashboardSidebar({
       <Stack gap="sm">
         {user.role === 'owner' && ownerId != null ? (
           <>
-            <Divider />
+            <Divider className={classes.separator} />
             <SubscriptionSidebarBanner ownerId={ownerId} collapsed={collapsed} />
           </>
         ) : null}
 
-        <Divider />
+        <Divider className={classes.separator} />
         <UserFooter
           user={user}
           collapsed={collapsed}

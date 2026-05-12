@@ -15,7 +15,7 @@ export function PageHeader({ title, description, actions }: PageHeaderProps) {
           order={2}
           style={{
             color: 'var(--app-color-text-primary)',
-            letterSpacing: '-0.02em',
+            letterSpacing: 0,
           }}
         >
           {title}

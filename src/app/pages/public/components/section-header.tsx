@@ -17,7 +17,7 @@ export function SectionHeader({ eyebrow, title, description }: SectionHeaderProp
       <Title order={2} className={classes.sectionTitle}>
         {title}
       </Title>
-      <Text size="lg" c="dimmed" className={classes.sectionDescription}>
+      <Text size="md" c="dimmed" className={classes.sectionDescription}>
         {description}
       </Text>
     </Stack>

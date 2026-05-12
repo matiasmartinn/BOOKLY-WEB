@@ -1,4 +1,4 @@
-import { Alert, Button, Checkbox, Group, Select, Stack, Text } from '@mantine/core';
+import { Alert, Box, Button, Checkbox, Group, Select, Stack, Text } from '@mantine/core';
 import { isApiError } from 'app/api';
 import { useBusiness } from 'features/business/hooks';
 import {
@@ -14,6 +14,8 @@ import {
   type ServiceSecretaryPermissionsDto,
 } from 'shared/models';
 import { useBusinessStore } from 'store/use-business-store';
+
+import classes from './secretary-permissions-form.module.css';
 
 interface SecretaryPermissionsFormProps {
   ownerId: number;
@@ -220,47 +222,56 @@ export function SecretaryPermissionsForm({
         </Alert>
       )}
 
-      {serviceOptions.length > 0 ? (
-        <Select
-          label="Servicio"
-          fw={500}
-          description="Selecciona el servicio sobre el que quieres gestionar acceso y permisos."
-          data={serviceOptions}
-          value={activeServiceId != null ? String(activeServiceId) : null}
-          onChange={(value) => {
-            setActiveServiceId(value ? Number(value) : null);
-            setSubmitError(null);
-          }}
-          disabled={isPending || serviceOptions.length === 1}
-          allowDeselect={false}
-        />
-      ) : (
-        <Alert color="yellow" variant="light">
-          No hay servicios disponibles para configurar.
-        </Alert>
-      )}
-      <Checkbox
-        checked={hasAccess}
-        onChange={(event) => setHasAccess(event.currentTarget.checked)}
-        label={`Puede operar en ${activeService?.name ?? 'este servicio'}`}
-        description="Si desactivas este acceso, el secretario deja de estar asignado al servicio."
-        disabled={isPending || !activeService}
-      />
-
-      <Stack gap="xs">
-        <Text fw={600}>Permisos</Text>
-        {SECRETARY_PERMISSION_OPTIONS.map((option) => (
-          <Checkbox
-            key={option.value}
-            checked={selectedPermissions.includes(option.value)}
-            onChange={(event) => togglePermission(option.value, event.currentTarget.checked)}
-            label={option.label}
-            description={option.description}
-            disabled={isPending || !hasAccess || !activeService}
+      <Stack gap="sm">
+        <Text fw={600}>Servicio y acceso</Text>
+        {serviceOptions.length > 0 ? (
+          <Select
+            data={serviceOptions}
+            value={activeServiceId != null ? String(activeServiceId) : null}
+            onChange={(value) => {
+              setActiveServiceId(value ? Number(value) : null);
+              setSubmitError(null);
+            }}
+            disabled={isPending || serviceOptions.length === 1}
+            allowDeselect={false}
           />
-        ))}
+        ) : (
+          <Alert color="yellow" variant="light">
+            No hay servicios disponibles para configurar.
+          </Alert>
+        )}
+
+        <Box className={classes.accessBlock}>
+          <Checkbox
+            checked={hasAccess}
+            onChange={(event) => setHasAccess(event.currentTarget.checked)}
+            label={`Puede operar en ${activeService?.name ?? 'este servicio'}`}
+            description="Si desactivas este acceso, el secretario deja de estar asignado al servicio."
+            disabled={isPending || !activeService}
+          />
+        </Box>
       </Stack>
-      <Group justify="flex-end">
+
+      <Stack gap="sm">
+        <Stack gap={4}>
+          <Text fw={600}>Permisos operativos</Text>
+        </Stack>
+
+        <Box className={classes.permissionList}>
+          {SECRETARY_PERMISSION_OPTIONS.map((option, index) => (
+            <Box key={option.value} className={classes.permissionRow} data-first={index === 0}>
+              <Checkbox
+                checked={selectedPermissions.includes(option.value)}
+                onChange={(event) => togglePermission(option.value, event.currentTarget.checked)}
+                label={option.label}
+                description={option.description}
+                disabled={isPending || !hasAccess || !activeService}
+              />
+            </Box>
+          ))}
+        </Box>
+      </Stack>
+      <Group className={classes.actions} justify="flex-end" gap="sm">
         <Button type="button" variant="default" onClick={onCancel} disabled={isPending}>
           Cancelar
         </Button>

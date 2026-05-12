@@ -47,7 +47,9 @@ export function WizardRightPanel({
         </Box>
         <Box
           maw={880}
-          mx="auto"
+          w="100%"
+          ml={{ base: 0, lg: 48, xl: 96 }}
+          mr="auto"
           px={{ base: 'md', sm: 'xl', lg: 56 }}
           pt={{ base: 'xl', sm: 40 }}
           pb={120}
@@ -64,7 +66,7 @@ export function WizardRightPanel({
                   fw={800}
                   size="2.25rem"
                   c="dark"
-                  style={{ lineHeight: 1.05, letterSpacing: '-0.03em' }}
+                  style={{ lineHeight: 1.05, letterSpacing: 0 }}
                 >
                   {step.label}
                 </Text>
@@ -88,7 +90,14 @@ export function WizardRightPanel({
           backdropFilter: 'blur(6px)',
         }}
       >
-        <Box maw={880} mx="auto" px={{ base: 'md', sm: 'xl', lg: 56 }} py="md">
+        <Box
+          maw={880}
+          w="100%"
+          ml={{ base: 0, lg: 48, xl: 96 }}
+          mr="auto"
+          px={{ base: 'md', sm: 'xl', lg: 56 }}
+          py="md"
+        >
           <Group justify="space-between">
             <Button variant="subtle" color="gray" onClick={onCancel} disabled={isSubmitting}>
               Cancelar

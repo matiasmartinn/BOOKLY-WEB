@@ -17,7 +17,12 @@ export function AppointmentNoShowModal({
   onSuccess,
 }: BaseStatusModalProps) {
   return (
-    <GenericModal opened={isOpen} onClose={onClose} title="Marcar no asistencia" size="sm">
+    <GenericModal
+      opened={isOpen}
+      onClose={onClose}
+      title="Marcar no asistencia"
+      size="sm"
+    >
       {isOpen && appointment ? (
         <AppointmentNoShowForm appointment={appointment} onCancel={onClose} onSuccess={onSuccess} />
       ) : null}

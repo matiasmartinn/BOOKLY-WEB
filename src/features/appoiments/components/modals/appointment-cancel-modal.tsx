@@ -17,7 +17,12 @@ export function AppointmentCancelModal({
   onSuccess,
 }: AppointmentCancelModalProps) {
   return (
-    <GenericModal opened={isOpen} onClose={onClose} title="Cancelar turno" size="md">
+    <GenericModal
+      opened={isOpen}
+      onClose={onClose}
+      title="Cancelar turno"
+      size="md"
+    >
       {isOpen && appointment ? (
         <AppointmentCancelForm appointment={appointment} onCancel={onClose} onSuccess={onSuccess} />
       ) : null}

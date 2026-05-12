@@ -55,7 +55,6 @@ export function AuthAside({ content }: AuthAsideProps) {
       window.clearTimeout(enterTimer);
       window.clearTimeout(settleTimer);
     };
-    // Mantiene la animacion de salida/entrada completa antes de cambiar el contenido visible.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content.id]);
 

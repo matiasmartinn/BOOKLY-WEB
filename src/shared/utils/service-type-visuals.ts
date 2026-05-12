@@ -8,7 +8,7 @@ import {
   faWandMagicSparkles,
 } from '@fortawesome/free-solid-svg-icons';
 
-export const SERVICE_TYPE_DEFAULT_COLOR_HEX = '#4E63F5';
+export const SERVICE_TYPE_DEFAULT_COLOR_HEX = '#7C5CFF';
 
 export const SERVICE_TYPE_ICON_KEYS = [
   'scissors',
@@ -40,7 +40,7 @@ export const SERVICE_TYPE_COLOR_SWATCHES = [
   '#D97706',
   '#DB2777',
   '#EA580C',
-  '#2563EB',
+  '#6548E6',
   '#475569',
   '#9333EA',
   SERVICE_TYPE_DEFAULT_COLOR_HEX,

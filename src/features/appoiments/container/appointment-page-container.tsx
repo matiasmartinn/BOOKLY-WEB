@@ -1,10 +1,11 @@
-import { Alert, Button, Group, Select, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Alert, Button, Select, SimpleGrid, Stack } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useDisclosure } from '@mantine/hooks';
 import { buildServicePermissions } from 'app/layouts/dashboard-navigation';
 import { getAppointmentStatusLabel } from 'features/dashboard/utils';
 import { useMemo, useState } from 'react';
 import { PageCard } from 'shared/layout';
+import { FilterSurface, filterFieldStyles } from 'shared/ui/components';
 import { useAppToast } from 'shared/ui/toast';
 import { formatDateOnly, getCurrentBusinessDateOnly } from 'shared/utils';
 import { useAuthStore } from 'store/use-auth-store';
@@ -223,61 +224,56 @@ export function AppointmentPageContainer() {
         )}
 
         {selectedService && !canViewAppointments && (
-          <Alert color="blue" variant="light">
+          <Alert color="brand" variant="light">
             No cuentas con permiso para ver los turnos de este servicio. Solo se muestran las
             acciones habilitadas para tu perfil.
           </Alert>
         )}
 
-        <PageCard>
-          <Stack gap="md">
-            <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
-              <Stack gap={4}>
-                <Text fw={600}>Operacion diaria</Text>
-                <Text size="sm" c="dimmed">
-                  Mostrando {totalAppointments} turnos para {dayLabel}.
-                </Text>
-              </Stack>
+        <FilterSurface
+          title="Operacion diaria"
+          description={`Mostrando ${totalAppointments} turnos para ${dayLabel}.`}
+          actions={
+            canCreateAppointments ? (
+              <Button onClick={createHandlers.open} disabled={!selectedService || !selectedDate}>
+                Agregar turno
+              </Button>
+            ) : null
+          }
+        >
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
+            <DatePickerInput
+              label="Fecha"
+              placeholder="Selecciona un dia"
+              value={selectedDate}
+              onChange={setSelectedDate}
+              valueFormat="DD/MM/YYYY"
+              clearable={false}
+              disabled={!selectedService}
+              styles={{
+                ...filterFieldStyles,
+                day: {
+                  color: 'var(--mantine-color-text)',
+                },
+                weekday: {
+                  color: 'var(--mantine-color-text)',
+                },
+              }}
+            />
 
-              {canCreateAppointments ? (
-                <Button onClick={createHandlers.open} disabled={!selectedService || !selectedDate}>
-                  Agregar turno
-                </Button>
-              ) : null}
-            </Group>
-
-            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
-              <DatePickerInput
-                label="Fecha"
-                placeholder="Selecciona un dia"
-                value={selectedDate}
-                onChange={setSelectedDate}
-                valueFormat="DD/MM/YYYY"
-                clearable={false}
-                disabled={!selectedService}
-                styles={{
-                  day: {
-                    color: 'var(--mantine-color-text)',
-                  },
-                  weekday: {
-                    color: 'var(--mantine-color-text)',
-                  },
-                }}
-              />
-
-              <Select
-                label="Estado"
-                placeholder="Todos los estados"
-                data={statusOptions}
-                value={selectedStatus}
-                onChange={setSelectedStatus}
-                clearable
-                searchable
-                disabled={!selectedService || !canViewAppointments}
-              />
-            </SimpleGrid>
-          </Stack>
-        </PageCard>
+            <Select
+              label="Estado"
+              placeholder="Todos los estados"
+              data={statusOptions}
+              value={selectedStatus}
+              onChange={setSelectedStatus}
+              clearable
+              searchable
+              disabled={!selectedService || !canViewAppointments}
+              styles={filterFieldStyles}
+            />
+          </SimpleGrid>
+        </FilterSurface>
 
         <PageCard>
           <AppointmentTable

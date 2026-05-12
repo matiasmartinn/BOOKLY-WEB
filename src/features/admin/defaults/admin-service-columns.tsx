@@ -40,7 +40,7 @@ export const adminServiceColumns: TableColumn<AdminServiceListItemDto>[] = [
     title: 'Plan owner',
     width: 120,
     render: (row) => (
-      <Badge color="blue" variant="light" radius="sm">
+      <Badge color="brand" variant="light" radius="sm">
         {formatAdminPlan(row.ownerPlan)}
       </Badge>
     ),

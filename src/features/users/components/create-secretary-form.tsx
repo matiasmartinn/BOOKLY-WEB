@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, Button, Group, Stack, TextInput } from '@mantine/core';
+import { Alert, Button, Group, Stack, Text, TextInput } from '@mantine/core';
 import { isApiError } from 'app/api';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import type { UserEmailDispatchResultDto } from 'shared/models';
@@ -57,6 +57,13 @@ export function CreateSecretaryForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Stack gap="lg">
+        <Stack gap={4}>
+          <Text fw={600}>Invitacion por email</Text>
+          <Text size="sm" c="dimmed">
+            El secretario/a recibira la invitacion en el email informado para completar su acceso.
+          </Text>
+        </Stack>
+
         {isError && error && (
           <Alert color="red" variant="light">
             {isApiError(error) ? error.detail : 'No se pudo crear el secretario/a.'}

@@ -19,7 +19,7 @@ const OWNER_STATUS_META: Record<AdminOwnerAccountStatus, BadgeMeta> = {
   active: { label: 'Activo', color: 'green' },
   disabled: { label: 'Deshabilitado', color: 'red' },
   pending_email_confirmation: { label: 'Pendiente email', color: 'yellow' },
-  pending_invitation_acceptance: { label: 'Pendiente invitacion', color: 'blue' },
+  pending_invitation_acceptance: { label: 'Pendiente invitacion', color: 'yellow' },
 };
 
 const SERVICE_STATUS_META: Record<AdminServiceStatus, BadgeMeta> = {

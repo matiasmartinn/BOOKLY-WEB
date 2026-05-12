@@ -1,10 +1,8 @@
 import {
   Alert,
   Badge,
-  Box,
   Button,
   Group,
-  Paper,
   Select,
   SimpleGrid,
   Skeleton,
@@ -25,6 +23,7 @@ import {
   YAxis,
 } from 'recharts';
 import type { LabelFormatter } from 'recharts/types/component/Label';
+import { FilterSurface, filterFieldStyles } from 'shared/ui/components';
 import { appChartColorVars, appChartTooltipStyles, appColorVars } from 'shared/ui/theme/theme';
 import {
   addDaysToDateOnly,
@@ -70,8 +69,8 @@ const STATUS_VISUALS = {
   },
   pending: {
     label: 'Pendiente',
-    color: 'var(--mantine-color-info-6)',
-    softColor: appColorVars.infoSoft,
+    color: 'var(--mantine-color-brand-5)',
+    softColor: appColorVars.brandSoft,
   },
 } as const;
 
@@ -103,15 +102,6 @@ const LEGEND_BADGE_STYLE = {
 
 const VERTICAL_BAR_RADIUS: [number, number, number, number] = [8, 8, 0, 0];
 const HORIZONTAL_BAR_RADIUS: [number, number, number, number] = [0, 8, 8, 0];
-
-const compactFieldStyles = {
-  label: {
-    color: appColorVars.textSecondary,
-    fontSize: 'var(--mantine-font-size-xs)',
-    marginBottom: 4,
-    fontWeight: 600,
-  },
-} as const;
 
 const getDefaultRange = () => {
   const to = getCurrentBusinessDateOnly();
@@ -389,69 +379,62 @@ export function MetricsPageContainer() {
         </Stack>
       )}
 
-      <Box w="100%">
-        <Paper
-          radius="lg"
-          p="md"
-          withBorder
-          shadow="xs"
-          style={{
-            borderColor: appColorVars.border,
-            backgroundColor: appColorVars.surface,
-          }}
-        >
-          <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="sm" verticalSpacing="sm">
-            <DatePickerInput
-              label="Desde"
-              placeholder="Fecha inicial"
-              value={fromDate}
-              onChange={setFromDate}
-              valueFormat="DD/MM/YYYY"
-              clearable={false}
-              disabled={!authUser}
-              size="sm"
-              styles={compactFieldStyles}
-            />
+      <FilterSurface
+        title="Filtros"
+        description="Define el periodo y el servicio para analizar los indicadores."
+        actions={
+          <Group gap="xs" justify="flex-end" wrap="wrap">
+            {isFetching && (
+              <Badge color="brand" variant="light" radius="sm" w="fit-content" tt="none">
+                Actualizando
+              </Badge>
+            )}
 
-            <DatePickerInput
-              label="Hasta"
-              placeholder="Fecha final"
-              value={toDate}
-              onChange={setToDate}
-              valueFormat="DD/MM/YYYY"
-              clearable={false}
-              disabled={!authUser}
-              size="sm"
-              styles={compactFieldStyles}
-            />
+            <Button variant="light" size="sm" onClick={resetFilters}>
+              Ultimos 30 dias
+            </Button>
+          </Group>
+        }
+      >
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="sm" verticalSpacing="sm">
+          <DatePickerInput
+            label="Desde"
+            placeholder="Fecha inicial"
+            value={fromDate}
+            onChange={setFromDate}
+            valueFormat="DD/MM/YYYY"
+            clearable={false}
+            disabled={!authUser}
+            size="sm"
+            styles={filterFieldStyles}
+          />
 
-            <Select
-              label="Servicio"
-              placeholder="Todos los servicios"
-              data={serviceOptions}
-              value={selectedServiceId}
-              onChange={setSelectedServiceId}
-              clearable
-              searchable
-              disabled={!authUser}
-              size="sm"
-              styles={compactFieldStyles}
-            />
+          <DatePickerInput
+            label="Hasta"
+            placeholder="Fecha final"
+            value={toDate}
+            onChange={setToDate}
+            valueFormat="DD/MM/YYYY"
+            clearable={false}
+            disabled={!authUser}
+            size="sm"
+            styles={filterFieldStyles}
+          />
 
-            <Stack gap={6} justify="flex-end" h="100%">
-              {isFetching && (
-                <Badge color="brand" variant="light" radius="sm" w="fit-content" tt="none">
-                  Actualizando
-                </Badge>
-              )}
-
-              <Button variant="light" size="sm" onClick={resetFilters} fullWidth>
-                Ultimos 30 dias
-              </Button>
-            </Stack>
-          </SimpleGrid>
-        </Paper>
-      </Box>
+          <Select
+            label="Servicio"
+            placeholder="Todos los servicios"
+            data={serviceOptions}
+            value={selectedServiceId}
+            onChange={setSelectedServiceId}
+            clearable
+            searchable
+            disabled={!authUser}
+            size="sm"
+            styles={filterFieldStyles}
+          />
+        </SimpleGrid>
+      </FilterSurface>
 
       <SimpleGrid cols={{ base: 1, sm: 2, xl: 4 }} spacing="md" verticalSpacing="md">
         <MetricsKpiCard

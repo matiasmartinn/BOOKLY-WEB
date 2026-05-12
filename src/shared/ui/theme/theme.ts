@@ -29,13 +29,17 @@ export const appTheme = createTheme({
       styles: {
         root: {
           fontWeight: 600,
-          letterSpacing: '-0.01em',
+          letterSpacing: 0,
           transition:
             'transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease, border-color 140ms ease',
           boxShadow: '0 1px 2px rgba(15, 23, 42, 0.05)',
           '&:hover': {
             transform: 'translateY(-1px)',
             boxShadow: '0 8px 18px rgba(15, 23, 42, 0.08)',
+          },
+          '&:focus-visible': {
+            outline: `2px solid var(--mantine-color-brand-5)`,
+            outlineOffset: rem(2),
           },
         },
       },
@@ -152,6 +156,29 @@ export const appTheme = createTheme({
           color: appColorVars.textSecondary,
           lineHeight: 1.45,
         },
+      },
+    },
+    ActionIcon: {
+      defaultProps: {
+        color: 'brand',
+      },
+      styles: {
+        root: {
+          '&:focus-visible': {
+            outline: `2px solid var(--mantine-color-brand-5)`,
+            outlineOffset: rem(2),
+          },
+        },
+      },
+    },
+    Anchor: {
+      defaultProps: {
+        c: 'brand.6',
+      },
+    },
+    Pagination: {
+      defaultProps: {
+        color: 'brand',
       },
     },
     Paper: {

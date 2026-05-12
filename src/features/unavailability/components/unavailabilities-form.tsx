@@ -94,9 +94,11 @@ export function UnavailabilitiesForm({
           </Alert>
         )}
 
-        <Alert color="yellow" variant="light">
-          Al crear esta inhabilitación, los turnos existentes dentro del rango seleccionado serán
-          cancelados automáticamente.
+        <Alert color="yellow" variant="light" radius="md" p="sm">
+          <Text size="sm">
+            Al crear esta inhabilitación, los turnos existentes dentro del rango seleccionado serán
+            cancelados automáticamente.
+          </Text>
         </Alert>
 
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">

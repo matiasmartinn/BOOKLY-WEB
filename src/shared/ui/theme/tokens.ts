@@ -1,16 +1,16 @@
 import type { MantineColorsTuple } from '@mantine/core';
 
 const brand: MantineColorsTuple = [
-  '#eef2ff',
-  '#dfe7ff',
-  '#c3d0ff',
-  '#9eb2ff',
-  '#7a95ff',
-  '#5d78ff',
-  '#4e63f5',
-  '#3e4fd0',
-  '#3341a9',
-  '#2b377f',
+  '#f1f3ff',
+  '#e3e7ff',
+  '#c8d0ff',
+  '#a7b1f4',
+  '#818ce3',
+  '#5d67cf',
+  '#3f49a5',
+  '#333b86',
+  '#25315b',
+  '#1d2340',
 ];
 
 const violetAccent: MantineColorsTuple = [

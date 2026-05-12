@@ -1,0 +1,18 @@
+.quickAction {
+  width: 100%;
+  border-radius: var(--mantine-radius-lg);
+  border: 1px solid var(--app-color-border);
+  padding: 0.9rem;
+  color: var(--app-color-text-primary);
+  background: var(--app-color-surface);
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.quickAction:not([data-disabled='true']):hover {
+  color: var(--mantine-color-brand-6);
+  border-color: var(--app-color-brand-outline);
+  background: var(--app-color-brand-soft);
+}

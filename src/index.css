@@ -1,13 +1,19 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --app-layout-max-width: 78rem;
-  --app-gradient-brand: linear-gradient(
-    180deg,
-    var(--mantine-color-brand-5) 0%,
-    var(--mantine-color-brand-7) 100%
-  );
-  --app-shadow-panel: 0 20px 40px rgba(79, 70, 229, 0.18);
+
+  --app-gradient-brand:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 32%),
+    radial-gradient(circle at bottom left, rgba(124, 92, 255, 0.16), transparent 38%),
+    linear-gradient(155deg, #1d2340 0%, #25315b 54%, #3f49a5 100%);
+
+  --app-shadow-panel: 0 20px 40px rgba(63, 73, 165, 0.16);
+
+  --app-color-brand-soft: rgba(63, 73, 165, 0.08);
+  --app-color-brand-soft-hover: rgba(63, 73, 165, 0.12);
+  --app-color-brand-outline: rgba(63, 73, 165, 0.18);
+
   --app-shadow-floating: 0 24px 48px rgba(15, 23, 42, 0.12);
   --app-color-background: #f7f8fc;
   --app-color-background-alt: #ffffff;
@@ -19,14 +25,12 @@
   --app-color-text-primary: #111827;
   --app-color-text-secondary: #475569;
   --app-color-text-muted: #6b7280;
-  --app-color-brand-soft: rgba(99, 102, 241, 0.08);
-  --app-color-brand-soft-hover: rgba(99, 102, 241, 0.12);
-  --app-color-brand-outline: rgba(99, 102, 241, 0.18);
-  --app-color-violet-soft: rgba(124, 92, 255, 0.1);
+
+  --app-color-violet-soft: rgba(168, 85, 247, 0.1);
   --app-color-success-soft: rgba(34, 197, 94, 0.12);
   --app-color-warning-soft: rgba(245, 158, 11, 0.12);
   --app-color-error-soft: rgba(239, 68, 68, 0.12);
-  --app-color-info-soft: rgba(59, 130, 246, 0.12);
+  --app-color-info-soft: rgba(6, 182, 212, 0.12);
   --app-color-grid: rgba(100, 116, 139, 0.14);
   --app-color-overlay: rgba(15, 23, 42, 0.12);
 }

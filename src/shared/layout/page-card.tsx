@@ -8,14 +8,13 @@ interface PageCardProps {
 export function PageCard({ children }: PageCardProps) {
   return (
     <Paper
-      radius="xl"
+      radius="lg"
       p="xl"
       withBorder
       style={{
-        background:
-          'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, var(--app-color-background-alt) 100%)',
+        background: 'var(--app-color-surface)',
         borderColor: 'var(--app-color-border)',
-        boxShadow: '0 18px 40px rgba(15, 23, 42, 0.07)',
+        boxShadow: '0 10px 28px rgba(15, 23, 42, 0.04)',
       }}
     >
       {children}

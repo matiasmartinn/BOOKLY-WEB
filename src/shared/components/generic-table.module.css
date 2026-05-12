@@ -1,0 +1,63 @@
+.root {
+  width: 100%;
+  min-width: 0;
+}
+
+.toolbar {
+  display: grid;
+  gap: var(--mantine-spacing-xs);
+  margin-bottom: var(--mantine-spacing-sm);
+}
+
+.toolbarActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.toolbarControls {
+  padding: 0 0 var(--mantine-spacing-xs);
+  border-bottom: 1px solid var(--app-color-border);
+}
+
+.pageSizeInput,
+.searchInput {
+  background-color: var(--app-color-surface);
+  border-color: var(--app-color-border);
+}
+
+.searchRoot {
+  min-width: min(100%, 280px);
+}
+
+.tableShell {
+  overflow: hidden;
+  border: 1px solid var(--app-color-border);
+  border-radius: var(--mantine-radius-lg);
+  background: var(--app-color-surface);
+}
+
+.table {
+  background: var(--app-color-surface);
+}
+
+.table :global(thead tr th) {
+  background: var(--app-color-surface-soft);
+}
+
+.tableShell[data-highlight='true'] .table :global(tbody tr:hover td) {
+  background: var(--app-color-brand-soft);
+}
+
+.emptyState {
+  min-height: 8.5rem;
+  text-align: center;
+}
+
+.retryButton {
+  font-weight: 600;
+  color: var(--mantine-color-brand-6);
+}
+
+.footer {
+  padding-top: var(--mantine-spacing-xs);
+}

@@ -17,7 +17,12 @@ export function AppointmentAttendedModal({
   onSuccess,
 }: BaseStatusModalProps) {
   return (
-    <GenericModal opened={isOpen} onClose={onClose} title="Marcar asistencia" size="sm">
+    <GenericModal
+      opened={isOpen}
+      onClose={onClose}
+      title="Marcar asistencia"
+      size="sm"
+    >
       {isOpen && appointment ? (
         <AppointmentAttendedForm
           appointment={appointment}

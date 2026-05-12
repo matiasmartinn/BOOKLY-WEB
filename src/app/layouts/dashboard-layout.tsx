@@ -105,7 +105,11 @@ export function DashboardLayout() {
       }}
       padding="md"
       styles={{
-        main: { backgroundColor: '#f7f8fc' },
+        main: { backgroundColor: 'var(--app-color-background)' },
+        navbar: {
+          backgroundColor: 'var(--app-color-surface)',
+          borderColor: 'var(--app-color-border)',
+        },
       }}
     >
       <AppShell.Header hiddenFrom="md">

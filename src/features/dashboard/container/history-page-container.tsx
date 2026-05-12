@@ -1,23 +1,18 @@
-import { Button, Group, Paper, Select, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Button, Select, SimpleGrid, Stack } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useSearchAppointments } from 'features/appoiments/hooks';
 import { useOwnerBusinesses } from 'features/business/hooks';
 import { useOwnerSecretaries } from 'features/users/hooks';
 import { useMemo, useState } from 'react';
+import { PageCard } from 'shared/layout';
+import { FilterSurface, filterFieldStyles } from 'shared/ui/components';
+import { appColorVars } from 'shared/ui/theme/theme';
 import { compareDateOnly, getCurrentBusinessDateOnly } from 'shared/utils';
 import { useAuthStore } from 'store/use-auth-store';
 
 import { CompactHistoryStat, HistoryTable } from '../components';
 import { appointmentStatusIncludes, getAppointmentStatusLabel } from '../utils';
 import type { HistoryAppointmentViewModel } from '../viewmodel/history-appointment-view-model';
-
-const compactFieldStyles = {
-  label: {
-    color: 'var(--mantine-color-dimmed)',
-    fontSize: 'var(--mantine-font-size-xs)',
-    marginBottom: 4,
-  },
-} as const;
 
 const actorRoleLabelByRole: Record<string, string> = {
   Admin: 'Administrador/a',
@@ -192,130 +187,112 @@ export function HistoryPageContainer() {
   };
 
   return (
-    <Stack gap="sm">
+    <Stack gap="md">
       {authUser && (
         <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="sm">
           <CompactHistoryStat
             label="Registros"
             value={isLoading ? '...' : String(totalResults)}
-            accentColor="var(--mantine-color-gray-4)"
-            backgroundColor="var(--mantine-color-gray-0)"
+            accentColor="var(--mantine-color-brand-5)"
+            backgroundColor={appColorVars.brandSoft}
           />
           <CompactHistoryStat
             label="Asistieron"
             value={isLoading ? '...' : String(attended)}
             accentColor="var(--mantine-color-green-5)"
-            backgroundColor="var(--mantine-color-green-0)"
+            backgroundColor={appColorVars.successSoft}
           />
           <CompactHistoryStat
             label="Cancelado"
             value={isLoading ? '...' : String(cancellations)}
             accentColor="var(--mantine-color-orange-5)"
-            backgroundColor="var(--mantine-color-orange-0)"
+            backgroundColor={appColorVars.warningSoft}
           />
           <CompactHistoryStat
             label="No asistio"
             value={isLoading ? '...' : String(noShow)}
             accentColor="var(--mantine-color-red-5)"
-            backgroundColor="var(--mantine-color-red-0)"
+            backgroundColor={appColorVars.errorSoft}
           />
         </SimpleGrid>
       )}
 
-      <Paper
-        radius="lg"
-        p="sm"
-        withBorder
-        style={{
-          background: 'white',
-        }}
+      <FilterSurface
+        title="Filtros"
+        description="Ajusta el periodo, servicio, estado y equipo para consultar el historial."
+        actions={
+          <Button variant="default" size="xs" onClick={resetFilters}>
+            Limpiar filtros
+          </Button>
+        }
       >
-        <Stack gap="xs">
-          <Group justify="space-between" align="center" wrap="wrap" gap="xs">
-            <Text size="sm" fw={600}>
-              Filtros
-            </Text>
+        <SimpleGrid
+          cols={{ base: 1, md: 2, lg: secretaryOptions.length > 0 ? 5 : 4 }}
+          spacing="sm"
+        >
+          <DatePickerInput
+            label="Desde"
+            placeholder="Fecha inicial"
+            value={fromDate}
+            onChange={setFromDate}
+            valueFormat="DD/MM/YYYY"
+            clearable
+            size="sm"
+            styles={filterFieldStyles}
+          />
 
-            <Button variant="default" size="xs" onClick={resetFilters}>
-              Limpiar filtros
-            </Button>
-          </Group>
+          <DatePickerInput
+            label="Hasta"
+            placeholder="Fecha final"
+            value={toDate}
+            onChange={setToDate}
+            valueFormat="DD/MM/YYYY"
+            clearable
+            size="sm"
+            styles={filterFieldStyles}
+          />
 
-          <SimpleGrid
-            cols={{ base: 1, md: 2, lg: secretaryOptions.length > 0 ? 5 : 4 }}
-            spacing="xs"
-          >
-            <DatePickerInput
-              label="Desde"
-              placeholder="Fecha inicial"
-              value={fromDate}
-              onChange={setFromDate}
-              valueFormat="DD/MM/YYYY"
-              clearable
-              size="sm"
-              styles={compactFieldStyles}
-            />
+          <Select
+            label="Servicio"
+            placeholder="Todos los servicios"
+            data={serviceOptions}
+            value={selectedServiceId}
+            onChange={setSelectedServiceId}
+            clearable
+            searchable
+            size="sm"
+            styles={filterFieldStyles}
+          />
 
-            <DatePickerInput
-              label="Hasta"
-              placeholder="Fecha final"
-              value={toDate}
-              onChange={setToDate}
-              valueFormat="DD/MM/YYYY"
-              clearable
-              size="sm"
-              styles={compactFieldStyles}
-            />
+          <Select
+            label="Estado"
+            placeholder="Todos los estados"
+            data={statusOptions}
+            value={selectedStatus}
+            onChange={setSelectedStatus}
+            clearable
+            searchable
+            size="sm"
+            styles={filterFieldStyles}
+          />
 
+          {secretaryOptions.length > 0 && (
             <Select
-              label="Servicio"
-              placeholder="Todos los servicios"
-              data={serviceOptions}
-              value={selectedServiceId}
-              onChange={setSelectedServiceId}
+              label="Secretario/a"
+              placeholder="Todo el equipo"
+              data={secretaryOptions}
+              value={selectedSecretaryId}
+              onChange={setSelectedSecretaryId}
               clearable
               searchable
               size="sm"
-              styles={compactFieldStyles}
+              styles={filterFieldStyles}
             />
+          )}
+        </SimpleGrid>
+      </FilterSurface>
 
-            <Select
-              label="Estado"
-              placeholder="Todos los estados"
-              data={statusOptions}
-              value={selectedStatus}
-              onChange={setSelectedStatus}
-              clearable
-              searchable
-              size="sm"
-              styles={compactFieldStyles}
-            />
-
-            {secretaryOptions.length > 0 && (
-              <Select
-                label="Secretario/a"
-                placeholder="Todo el equipo"
-                data={secretaryOptions}
-                value={selectedSecretaryId}
-                onChange={setSelectedSecretaryId}
-                clearable
-                searchable
-                size="sm"
-                styles={compactFieldStyles}
-              />
-            )}
-          </SimpleGrid>
-        </Stack>
-      </Paper>
-
-      <Paper
-        radius="lg"
-        p="sm"
-        withBorder
-        style={{
-          background: 'white',
-        }}
-      >
+      <PageCard>
         <HistoryTable
           data={historyRows}
           loading={isLoading}
@@ -324,7 +301,7 @@ export function HistoryPageContainer() {
           onRefetch={refetch}
           filtersKey={filtersKey}
         />
-      </Paper>
+      </PageCard>
     </Stack>
   );
 }

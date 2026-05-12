@@ -96,7 +96,7 @@ export function ConfirmEmailPage() {
     <AuthFormWrapper onSubmit={handleSubmit(onResendSubmit)} title="Confirma tu email">
       <Stack gap="xl">
         {token && (!confirmationAttempted || confirmEmail.isPending) ? (
-          <Alert color="blue" variant="light">
+          <Alert color="brand" variant="light">
             Estamos validando tu enlace de confirmacion...
           </Alert>
         ) : (

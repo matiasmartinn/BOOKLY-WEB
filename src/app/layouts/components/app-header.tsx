@@ -3,57 +3,111 @@ import { PATHS } from 'app/router/PATHS';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from 'store/use-auth-store';
 
+const headerActionStyles = {
+  root: {
+    height: 34,
+    paddingInline: 12,
+    borderRadius: 10,
+    color: 'rgba(248, 250, 252, 0.92)',
+    background: 'transparent',
+    borderColor: 'transparent',
+    boxShadow: 'none',
+    '&:hover': {
+      background: 'rgba(255, 255, 255, 0.08)',
+      borderColor: 'rgba(255, 255, 255, 0.12)',
+    },
+  },
+} as const;
+
+const headerPrimaryStyles = {
+  root: {
+    height: 34,
+    paddingInline: 14,
+    borderRadius: 10,
+    color: '#ffffff',
+    background: '#5963c7',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    boxShadow: 'none',
+    '&:hover': {
+      background: '#515aba',
+    },
+  },
+} as const;
+
 export function AppHeader() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <Container size="lg" h="100%">
-      <Group h="100%" justify="space-between" align="center" wrap="nowrap">
-        <Group gap="xs" wrap="nowrap">
-          <Box
-            style={{
-              display: 'grid',
-              placeItems: 'center',
-              width: 36,
-              height: 36,
-              borderRadius: 12,
-              color: 'white',
-              fontWeight: 800,
-              backgroundColor: 'var(--mantine-color-brand-6)',
-              flexShrink: 0,
-            }}
-          >
-            B
-          </Box>
+    <Box h="100%">
+      <Container size="lg" h="100%">
+        <Group h="100%" justify="space-between" align="center" wrap="nowrap">
+          <Group gap="xs" wrap="nowrap">
+            <Box
+              style={{
+                display: 'grid',
+                placeItems: 'center',
+                width: 32,
+                height: 32,
+                borderRadius: 10,
+                color: '#ffffff',
+                fontWeight: 800,
+                background:
+                  'linear-gradient(180deg, rgba(116, 127, 225, 0.96) 0%, rgba(84, 95, 198, 0.96) 100%)',
+                border: '1px solid rgba(255, 255, 255, 0.16)',
+                boxShadow: '0 6px 16px rgba(18, 24, 54, 0.18)',
+                flexShrink: 0,
+              }}
+            >
+              B
+            </Box>
 
-          <Text
-            component={Link}
-            to="/"
-            td="none"
-            size="md"
-            fw={800}
-            c="brand.6"
-            style={{ whiteSpace: 'nowrap' }}
-          >
-            Bookly
-          </Text>
-        </Group>
-
-        {!isAuthenticated ? (
-          <Group gap={6} wrap="nowrap">
-            <Button variant="subtle" color="brand" component={Link} to={PATHS.auth.login} size="xs">
-              Iniciar sesion
-            </Button>
-            <Button color="brand" component={Link} to={PATHS.auth.register} size="xs">
-              Registrarse
-            </Button>
+            <Text
+              component={Link}
+              to="/"
+              td="none"
+              size="md"
+              fw={800}
+              style={{
+                color: 'rgba(255, 255, 255, 0.98)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              Bookly
+            </Text>
           </Group>
-        ) : (
-          <Button color="brand" component={Link} to={PATHS.dashboard.overview} size="xs">
-            Iniciar sesion
-          </Button>
-        )}
-      </Group>
-    </Container>
+
+          {!isAuthenticated ? (
+            <Group gap={8} wrap="nowrap">
+              <Button
+                component={Link}
+                to={PATHS.auth.login}
+                size="sm"
+                variant="outline"
+                styles={headerActionStyles}
+              >
+                Iniciar sesion
+              </Button>
+              <Button
+                component={Link}
+                to={PATHS.auth.register}
+                size="sm"
+                styles={headerPrimaryStyles}
+              >
+                Registrarse
+              </Button>
+            </Group>
+          ) : (
+            <Button
+              component={Link}
+              to={PATHS.dashboard.overview}
+              size="sm"
+              styles={headerPrimaryStyles}
+            >
+              Ir al dashboard
+            </Button>
+          )}
+        </Group>
+      </Container>
+    </Box>
   );
 }

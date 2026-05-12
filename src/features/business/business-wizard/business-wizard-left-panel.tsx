@@ -50,7 +50,7 @@ export function WizardLeftPanel({
                     fw={800}
                     size="xl"
                     c="white"
-                    style={{ lineHeight: 1.1, letterSpacing: '-0.02em' }}
+                    style={{ lineHeight: 1.1, letterSpacing: 0 }}
                   >
                     Bookly
                   </Text>
@@ -77,7 +77,7 @@ export function WizardLeftPanel({
                 fw={800}
                 size="2rem"
                 c="white"
-                style={{ lineHeight: 1.05, letterSpacing: '-0.03em' }}
+                style={{ lineHeight: 1.05, letterSpacing: 0 }}
               >
                 Creando tu agenda
               </Text>

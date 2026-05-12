@@ -8,7 +8,6 @@ interface GenericModalProps {
   opened: boolean;
   onClose: () => void;
   title?: ReactNode;
-  description?: ReactNode;
   children: ReactNode;
   footer?: ReactNode;
   size?: ModalProps['size'];
@@ -24,7 +23,6 @@ export function GenericModal({
   opened,
   onClose,
   title,
-  description,
   children,
   footer,
   size = 'md',
@@ -35,13 +33,7 @@ export function GenericModal({
   loading = false,
   styles,
 }: GenericModalProps) {
-  const modalTitle = description ? (
-    <ModalHeader title={title} description={description} />
-  ) : title ? (
-    <span className={classes.plainTitle}>{title}</span>
-  ) : (
-    undefined
-  );
+  const modalTitle = title ? <ModalHeader title={title} /> : undefined;
 
   return (
     <Modal
@@ -53,20 +45,25 @@ export function GenericModal({
       closeOnClickOutside={!loading && closeOnClickOutside}
       closeOnEscape={!loading && closeOnEscape}
       withCloseButton={withCloseButton && !loading}
-      radius="xl"
-      padding="xl"
+      radius="lg"
+      padding={0}
       styles={styles}
       classNames={{
         content: classes.content,
         header: classes.header,
+        close: classes.close,
         title: classes.title,
         body: classes.body,
       }}
     >
-      <Stack gap="md">
+      <Stack gap="lg" className={classes.contentStack}>
         <div>{children}</div>
 
-        {footer ? <Group justify="flex-end">{footer}</Group> : null}
+        {footer ? (
+          <Group className={classes.footer} justify="flex-end" gap="sm" wrap="wrap">
+            {footer}
+          </Group>
+        ) : null}
       </Stack>
     </Modal>
   );

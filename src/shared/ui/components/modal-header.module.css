@@ -1,0 +1,36 @@
+.root {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.copy {
+  align-items: center;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.eyebrow {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.title {
+  font-size: 1.25rem;
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: var(--mantine-color-white);
+}
+
+.meta {
+  flex-shrink: 0;
+}
+
+.root[data-with-meta='true'] {
+  justify-content: space-between;
+  text-align: left;
+}
+
+.root[data-with-meta='true'] .copy {
+  align-items: flex-start;
+  margin-inline: 0;
+}

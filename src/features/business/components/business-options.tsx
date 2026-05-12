@@ -42,7 +42,7 @@ export function BusinessOptions({
                 py={8}
                 style={(theme) => ({
                   borderRadius: theme.radius.md,
-                  backgroundColor: isActive ? 'var(--app-color-surface-hover)' : 'transparent',
+                  backgroundColor: isActive ? 'var(--app-color-brand-soft)' : 'transparent',
                 })}
                 onClick={() => {
                   onServiceChange(service.id);
@@ -63,8 +63,8 @@ export function BusinessOptions({
                   />
                   <Text
                     size="xs"
-                    fw={isActive ? 500 : 400}
-                    c={isActive ? 'var(--app-color-text-primary)' : 'dimmed'}
+                    fw={isActive ? 600 : 400}
+                    c={isActive ? 'brand.6' : 'dimmed'}
                     flex={1}
                     truncate
                   >
@@ -91,7 +91,8 @@ export function BusinessOptions({
                     h={16}
                     style={{
                       borderRadius: 4,
-                      border: '1px solid var(--app-color-border)',
+                      border: '1px solid var(--app-color-brand-outline)',
+                      backgroundColor: 'var(--app-color-brand-soft)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -103,7 +104,7 @@ export function BusinessOptions({
                       style={{ fontSize: 8, color: 'var(--mantine-color-brand-5)' }}
                     />
                   </Box>
-                  <Text size="xs" fw={500} c="dimmed">
+                  <Text size="xs" fw={500} c="brand.6">
                     Nuevo servicio
                   </Text>
                 </Group>

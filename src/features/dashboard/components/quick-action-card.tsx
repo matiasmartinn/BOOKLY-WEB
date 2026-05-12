@@ -2,6 +2,8 @@ import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Group, Stack, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
 
+import classes from './quick-action-card.module.css';
+
 interface QuickActionCardProps {
   label: string;
   description: string;
@@ -20,11 +22,9 @@ export function QuickActionCard({
   return (
     <UnstyledButton
       onClick={disabled ? undefined : onClick}
+      className={classes.quickAction}
+      data-disabled={disabled ? 'true' : undefined}
       style={{
-        width: '100%',
-        borderRadius: 'var(--mantine-radius-lg)',
-        border: '1px solid var(--mantine-color-default-border)',
-        padding: '0.9rem',
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? 'default' : 'pointer',
       }}

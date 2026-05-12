@@ -61,7 +61,7 @@ export function ChangePasswordModal({ opened, onClose, email }: ChangePasswordMo
         </Text>
 
         {email ? (
-          <Alert color="blue" variant="light">
+          <Alert color="brand" variant="light">
             Enviaremos el enlace a <strong>{email}</strong>.
           </Alert>
         ) : (

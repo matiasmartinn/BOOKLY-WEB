@@ -171,7 +171,7 @@ export function TeamPageContainer() {
       <GenericModal
         opened={permissionsOpened}
         onClose={closePermissions}
-        title="Permisos"
+        title="Gestionar permisos"
         size="lg"
       >
         {permissionsOpened && selectedSecretary && authUser && services.length > 0 ? (

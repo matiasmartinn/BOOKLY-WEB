@@ -17,6 +17,8 @@ import {
 } from '@mantine/core';
 import { useEffect, useMemo, useState, useRef, type ReactNode, type CSSProperties } from 'react';
 
+import classes from './generic-table.module.css';
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Align = 'left' | 'center' | 'right';
@@ -172,9 +174,14 @@ function defaultSortFn<T>(a: T, b: T, sort: SortState, columns: TableColumn<T>[]
 // ─── SortIcon ─────────────────────────────────────────────────────────────────
 
 function SortIcon({ active, direction }: { active: boolean; direction?: SortDirection }) {
-  if (!active) return <FontAwesomeIcon icon={faSort} style={{ opacity: 0.4 }} />;
-  if (direction === 'asc') return <FontAwesomeIcon icon={faSortUp} />;
-  return <FontAwesomeIcon icon={faSortDown} />;
+  const style = {
+    color: active ? 'var(--mantine-color-brand-6)' : 'var(--app-color-text-muted)',
+    opacity: active ? 1 : 0.58,
+  } as const;
+
+  if (!active) return <FontAwesomeIcon icon={faSort} style={style} />;
+  if (direction === 'asc') return <FontAwesomeIcon icon={faSortUp} style={style} />;
+  return <FontAwesomeIcon icon={faSortDown} style={style} />;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -385,6 +392,7 @@ export function GenericTable<T>({
                     width: col.width,
                     textAlign: getTextAlign(col.textAlign),
                     whiteSpace: col.noWrap ? 'nowrap' : undefined,
+                    borderBottomColor: 'var(--app-color-border)',
                   }}
                 >
                   {content}
@@ -397,6 +405,7 @@ export function GenericTable<T>({
                 style={{
                   width: columnOfActions.width,
                   textAlign: getTextAlign(columnOfActions.textAlign),
+                  borderBottomColor: 'var(--app-color-border)',
                 }}
               >
                 {columnOfActions.render(row, index)}
@@ -414,7 +423,7 @@ export function GenericTable<T>({
       return (
         <Table.Tr>
           <Table.Td colSpan={totalColumns}>
-            <Center py="lg">
+            <Center py="xl" className={classes.emptyState}>
               <Group gap="sm">
                 <Loader size="sm" />
                 <Text size="sm" c="dimmed">
@@ -431,7 +440,7 @@ export function GenericTable<T>({
       return (
         <Table.Tr>
           <Table.Td colSpan={totalColumns}>
-            <Center py="lg">
+            <Center py="xl" className={classes.emptyState}>
               {isRequestError && onHandleTableRefetch ? (
                 <Group gap="sm">
                   <Text size="sm" c="red">
@@ -439,8 +448,8 @@ export function GenericTable<T>({
                   </Text>
                   <UnstyledButton
                     onClick={onHandleTableRefetch}
+                    className={classes.retryButton}
                     style={{
-                      color: 'var(--mantine-color-blue-6)',
                       fontSize: 'var(--mantine-font-size-sm)',
                     }}
                   >
@@ -463,7 +472,7 @@ export function GenericTable<T>({
 
   // ─────────────────────────────────────────────────────────────────────────
   return (
-    <Box className={tableClassName} pos="relative">
+    <Box className={[classes.root, tableClassName].filter(Boolean).join(' ')} pos="relative">
       <LoadingOverlay
         visible={fetching}
         zIndex={10}
@@ -472,7 +481,7 @@ export function GenericTable<T>({
       />
 
       {/* Header */}
-      <Box mb="sm">
+      <Box className={classes.toolbar}>
         {showTitle && title && (
           <Text fw={600} ta="center" mb="xs">
             {title}
@@ -480,126 +489,147 @@ export function GenericTable<T>({
         )}
 
         {customButtons && (
-          <Group justify="flex-end" mb="xs">
+          <Group className={classes.toolbarActions}>
             {customButtons}
           </Group>
         )}
 
-        <Group justify="space-between" wrap="wrap" gap="sm">
-          {showPaginator && (
-            <Group gap="xs" align="center">
-              <Text size="sm" c="dimmed">
-                Mostrar
-              </Text>
-              <Select
-                w={80}
-                size="sm"
-                value={String(activePageSize)}
-                onChange={handlePageSizeChange}
-                data={pageSizeOptions.map((n) => ({ value: String(n), label: String(n) }))}
-              />
-              <Text size="sm" c="dimmed">
-                entradas
-              </Text>
-            </Group>
-          )}
+        {(showPaginator || showSearch) && (
+          <Group className={classes.toolbarControls} justify="space-between" wrap="wrap" gap="sm">
+            {showPaginator && (
+              <Group gap="xs" align="center">
+                <Text size="sm" c="dimmed">
+                  Mostrar
+                </Text>
+                <Select
+                  w={80}
+                  size="sm"
+                  value={String(activePageSize)}
+                  onChange={handlePageSizeChange}
+                  data={pageSizeOptions.map((n) => ({ value: String(n), label: String(n) }))}
+                  classNames={{ input: classes.pageSizeInput }}
+                />
+                <Text size="sm" c="dimmed">
+                  entradas
+                </Text>
+              </Group>
+            )}
 
-          {showSearch && (
-            <TextInput
-              size="sm"
-              placeholder={searchPlaceholder}
-              leftSection={<FontAwesomeIcon icon={faSearch} />}
-              onChange={handleSearchInput}
-              style={{ marginLeft: showPaginator ? undefined : 'auto' }}
-            />
-          )}
-        </Group>
+            {showSearch && (
+              <TextInput
+                size="sm"
+                placeholder={searchPlaceholder}
+                leftSection={<FontAwesomeIcon icon={faSearch} />}
+                onChange={handleSearchInput}
+                style={{ marginLeft: showPaginator ? undefined : 'auto' }}
+                classNames={{ root: classes.searchRoot, input: classes.searchInput }}
+              />
+            )}
+          </Group>
+        )}
       </Box>
 
       {/* Table */}
-      <ScrollArea h={scrollHeight}>
-        <Table
-          miw={minWidth}
-          striped={striped}
-          highlightOnHover={highlightOnHover}
-          withTableBorder={withTableBorder}
-          withColumnBorders={withColumnBorders}
-          horizontalSpacing={horizontalSpacing}
-          verticalSpacing={verticalSpacing}
-          stickyHeader={stickyHeader}
-          stickyHeaderOffset={stickyHeaderOffset}
-        >
-          <Table.Thead>
-            <Table.Tr>
-              {visibleColumns.map((col) => {
-                const isSorted = activeSort.columnKey === col.key;
-                return (
+      <Box className={classes.tableShell} data-highlight={highlightOnHover ? 'true' : undefined}>
+        <ScrollArea h={scrollHeight}>
+          <Table
+            miw={minWidth}
+            striped={striped}
+            highlightOnHover={highlightOnHover}
+            withTableBorder={withTableBorder}
+            withColumnBorders={withColumnBorders}
+            horizontalSpacing={horizontalSpacing}
+            verticalSpacing={verticalSpacing}
+            stickyHeader={stickyHeader}
+            stickyHeaderOffset={stickyHeaderOffset}
+            className={classes.table}
+          >
+            <Table.Thead style={{ backgroundColor: 'var(--app-color-surface-soft)' }}>
+              <Table.Tr>
+                {visibleColumns.map((col) => {
+                  const isSorted = activeSort.columnKey === col.key;
+                  return (
+                    <Table.Th
+                      key={col.key}
+                      className={col.headerClassName}
+                      style={{
+                        width: col.width,
+                        textAlign: getTextAlign(col.textAlign),
+                        whiteSpace: col.noWrap ? 'nowrap' : undefined,
+                        color: 'var(--app-color-text-secondary)',
+                        fontSize: 'var(--mantine-font-size-xs)',
+                        fontWeight: 700,
+                        borderBottomColor: 'var(--app-color-border)',
+                      }}
+                    >
+                      {col.sortable ? (
+                        <UnstyledButton
+                          onClick={() => handleSort(col)}
+                          style={{
+                            width: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent:
+                              col.textAlign === 'right'
+                                ? 'flex-end'
+                                : col.textAlign === 'center'
+                                  ? 'center'
+                                  : 'flex-start',
+                          }}
+                        >
+                          <Group gap={6} wrap="nowrap">
+                            <span>{col.title}</span>
+                            <SortIcon
+                              active={isSorted}
+                              direction={isSorted ? activeSort.direction : undefined}
+                            />
+                          </Group>
+                        </UnstyledButton>
+                      ) : (
+                        col.title
+                      )}
+                    </Table.Th>
+                  );
+                })}
+
+                {columnOfActions && (
                   <Table.Th
-                    key={col.key}
-                    className={col.headerClassName}
                     style={{
-                      width: col.width,
-                      textAlign: getTextAlign(col.textAlign),
-                      whiteSpace: col.noWrap ? 'nowrap' : undefined,
+                      width: columnOfActions.width,
+                      textAlign: getTextAlign(columnOfActions.textAlign),
+                      color: 'var(--app-color-text-secondary)',
+                      fontSize: 'var(--mantine-font-size-xs)',
+                      fontWeight: 700,
+                      borderBottomColor: 'var(--app-color-border)',
                     }}
                   >
-                    {col.sortable ? (
-                      <UnstyledButton
-                        onClick={() => handleSort(col)}
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent:
-                            col.textAlign === 'right'
-                              ? 'flex-end'
-                              : col.textAlign === 'center'
-                                ? 'center'
-                                : 'flex-start',
-                        }}
-                      >
-                        <Group gap={6} wrap="nowrap">
-                          <span>{col.title}</span>
-                          <SortIcon
-                            active={isSorted}
-                            direction={isSorted ? activeSort.direction : undefined}
-                          />
-                        </Group>
-                      </UnstyledButton>
-                    ) : (
-                      col.title
-                    )}
+                    {columnOfActions.header ?? null}
                   </Table.Th>
-                );
-              })}
+                )}
+              </Table.Tr>
+            </Table.Thead>
 
-              {columnOfActions && (
-                <Table.Th
-                  style={{
-                    width: columnOfActions.width,
-                    textAlign: getTextAlign(columnOfActions.textAlign),
-                  }}
-                >
-                  {columnOfActions.header ?? null}
-                </Table.Th>
-              )}
-            </Table.Tr>
-          </Table.Thead>
-
-          <Table.Tbody>{bodyContent()}</Table.Tbody>
-        </Table>
-      </ScrollArea>
+            <Table.Tbody>{bodyContent()}</Table.Tbody>
+          </Table>
+        </ScrollArea>
+      </Box>
 
       {/* Pagination footer */}
       {showPaginator && (
-        <Group justify="space-between" mt="md" wrap="wrap">
+        <Group className={classes.footer} justify="space-between" mt="md" wrap="wrap">
           <Text size="sm" c="dimmed">
             {paginatedData.length > 0
               ? `Mostrando ${(activePage - 1) * activePageSize + 1} a ${Math.min(activePage * activePageSize, totalRecords)} de ${totalRecords} entradas`
               : `Total: ${totalRecords}`}
           </Text>
 
-          <Pagination value={activePage} onChange={handlePageChange} total={totalPages} size="sm" />
+          <Pagination
+            value={activePage}
+            onChange={handlePageChange}
+            total={totalPages}
+            size="sm"
+            color="brand"
+          />
         </Group>
       )}
 

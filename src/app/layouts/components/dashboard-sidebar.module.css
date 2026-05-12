@@ -1,0 +1,70 @@
+.sidebarRoot {
+  height: 100%;
+  overflow: hidden;
+  background: var(--app-color-surface);
+}
+
+.brandMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: 800;
+  flex-shrink: 0;
+  background: var(--app-gradient-brand);
+  box-shadow: 0 12px 26px rgba(124, 92, 255, 0.2);
+}
+
+.navItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  color: var(--app-color-text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    border-color 140ms ease;
+}
+
+.navItem:hover {
+  color: var(--mantine-color-brand-6);
+  background: var(--app-color-brand-soft);
+}
+
+.navItem[data-active='true'] {
+  color: var(--mantine-color-brand-6);
+  background: var(--app-color-brand-soft);
+  border-color: var(--app-color-brand-outline);
+}
+
+.navItemCollapsed {
+  justify-content: center;
+  gap: 0;
+}
+
+.navIcon {
+  color: var(--app-color-text-muted);
+  transition: color 140ms ease;
+}
+
+.navItem:hover .navIcon,
+.navItem[data-active='true'] .navIcon {
+  color: var(--mantine-color-brand-6);
+}
+
+.sectionLabel {
+  color: var(--app-color-text-muted);
+  letter-spacing: 0;
+}
+
+.separator {
+  opacity: 0.72;
+  border-color: var(--app-color-border);
+}
