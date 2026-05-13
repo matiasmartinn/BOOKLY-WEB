@@ -46,7 +46,6 @@ const SERVICE_TYPE_FIELD_TYPE_LABELS: Record<ServiceTypeFieldType, string> = {
 export const ADMIN_SERVICE_TYPE_FIELD_TYPE_OPTIONS = [
   { value: String(ServiceTypeFieldType.Text), label: 'Texto' },
   { value: String(ServiceTypeFieldType.Number), label: 'Numero' },
-  { value: String(ServiceTypeFieldType.Checkbox), label: 'Booleano' },
 ];
 
 export const formatAdminNumber = (value?: number | null) => numberFormatter.format(value ?? 0);

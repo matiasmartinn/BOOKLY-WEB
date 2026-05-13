@@ -8,19 +8,13 @@ import type {
 } from 'features/service-types/services';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
-import type {
-  ServiceTypeDto,
-  ServiceTypeFieldDefinitionDto,
-} from 'shared/models';
+import type { ServiceTypeDto, ServiceTypeFieldDefinitionDto } from 'shared/models';
 
 import {
   createServiceTypeFieldFormSchema,
   type ServiceTypeFieldFormValues,
 } from '../schema/service-type-field-form.schema';
-import {
-  ADMIN_SERVICE_TYPE_FIELD_TYPE_OPTIONS,
-  getServiceTypeFieldTypeLabel,
-} from '../utils';
+import { ADMIN_SERVICE_TYPE_FIELD_TYPE_OPTIONS, getServiceTypeFieldTypeLabel } from '../utils';
 
 interface AdminServiceTypeFieldFormProps {
   mode: 'create' | 'edit';
@@ -68,11 +62,7 @@ export function AdminServiceTypeFieldForm({
     const currentFieldType = field ? String(field.fieldType) : null;
     const options = [...ADMIN_SERVICE_TYPE_FIELD_TYPE_OPTIONS];
 
-    if (
-      field &&
-      currentFieldType &&
-      !options.some((option) => option.value === currentFieldType)
-    ) {
+    if (field && currentFieldType && !options.some((option) => option.value === currentFieldType)) {
       options.push({
         value: currentFieldType,
         label: getServiceTypeFieldTypeLabel(field.fieldType),
@@ -175,11 +165,7 @@ export function AdminServiceTypeFieldForm({
               error={errors.fieldType?.message}
               disabled={activeMutation.isPending || mode === 'edit'}
               allowDeselect={false}
-              description={
-                mode === 'edit'
-                  ? 'El tipo no se edita desde esta pantalla para evitar cambios de contrato.'
-                  : undefined
-              }
+              description={mode === 'edit' ? 'El tipo no se puede editar.' : undefined}
             />
           )}
         />

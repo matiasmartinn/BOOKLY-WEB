@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  Divider,
   Group,
   SimpleGrid,
   Stack,
@@ -284,9 +283,6 @@ export function AppointmentForm({
             disabled={isPending}
           />
         ) : null}
-
-        <Divider />
-
         <Group justify="flex-end" align="center" wrap="wrap" gap="sm">
           <Group gap="sm">
             {onCancel ? (
