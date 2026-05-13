@@ -8,7 +8,7 @@ export function AppLayout() {
 
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: { base: 72, sm: 88 } }}
       padding={0}
       styles={{
         header: {

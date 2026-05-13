@@ -13,3 +13,12 @@
     transform: translateY(0);
   }
 }
+
+.btnAction:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.btnPrimary:hover {
+  background: #515aba !important;
+}

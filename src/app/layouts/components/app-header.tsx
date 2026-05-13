@@ -5,32 +5,26 @@ import { useAuthStore } from 'store/use-auth-store';
 
 const headerActionStyles = {
   root: {
-    height: 34,
-    paddingInline: 12,
+    height: 40,
+    paddingInline: 14,
     borderRadius: 10,
     color: 'rgba(248, 250, 252, 0.92)',
     background: 'transparent',
     borderColor: 'transparent',
+    border: '1px solid rgba(255, 255, 255, 0.25)',
     boxShadow: 'none',
-    '&:hover': {
-      background: 'rgba(255, 255, 255, 0.08)',
-      borderColor: 'rgba(255, 255, 255, 0.12)',
-    },
   },
 } as const;
 
 const headerPrimaryStyles = {
   root: {
-    height: 34,
-    paddingInline: 14,
+    height: 40,
+    paddingInline: 18,
     borderRadius: 10,
     color: '#ffffff',
     background: '#5963c7',
     border: '1px solid rgba(255, 255, 255, 0.1)',
     boxShadow: 'none',
-    '&:hover': {
-      background: '#515aba',
-    },
   },
 } as const;
 
@@ -46,9 +40,9 @@ export function AppHeader() {
               style={{
                 display: 'grid',
                 placeItems: 'center',
-                width: 32,
-                height: 32,
-                borderRadius: 10,
+                width: 38,
+                height: 38,
+                borderRadius: 12,
                 color: '#ffffff',
                 fontWeight: 800,
                 background:
@@ -65,7 +59,7 @@ export function AppHeader() {
               component={Link}
               to="/"
               td="none"
-              size="md"
+              size="lg"
               fw={800}
               style={{
                 color: 'rgba(255, 255, 255, 0.98)',
@@ -80,20 +74,22 @@ export function AppHeader() {
             <Group gap={8} wrap="nowrap">
               <Button
                 component={Link}
+                to={PATHS.auth.register}
+                size="sm"
+                styles={headerPrimaryStyles}
+                className="btnPrimary"
+              >
+                Registrarse
+              </Button>
+              <Button
+                component={Link}
                 to={PATHS.auth.login}
                 size="sm"
                 variant="outline"
                 styles={headerActionStyles}
+                className="btnAction"
               >
                 Iniciar sesion
-              </Button>
-              <Button
-                component={Link}
-                to={PATHS.auth.register}
-                size="sm"
-                styles={headerPrimaryStyles}
-              >
-                Registrarse
               </Button>
             </Group>
           ) : (
@@ -102,6 +98,7 @@ export function AppHeader() {
               to={PATHS.dashboard.overview}
               size="sm"
               styles={headerPrimaryStyles}
+              className="btnAction"
             >
               Ir al dashboard
             </Button>

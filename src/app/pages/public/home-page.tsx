@@ -8,7 +8,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  Badge,
   Box,
   Button,
   Container,
@@ -107,10 +106,6 @@ export function HomePage() {
             className={classes.heroGrid}
           >
             <Stack gap="lg" className={classes.heroCopy}>
-              <Badge variant="outline" radius="xl" className={classes.heroBadge}>
-                Gestion de turnos con foco operativo
-              </Badge>
-
               <Stack gap="md">
                 <Title order={1} className={classes.heroTitle}>
                   Turnos, agenda y equipo en un mismo lugar.
@@ -172,7 +167,6 @@ export function HomePage() {
         <Container size="lg">
           <Stack gap="lg">
             <SectionHeader
-              eyebrow="Producto"
               title="Una agenda mas clara para trabajar con menos friccion."
               description="Cuatro bloques concentran lo importante: turnos, disponibilidad, equipo y lectura del negocio."
             />
@@ -217,9 +211,6 @@ export function HomePage() {
           <Paper radius="lg" className={classes.finalCta}>
             <SimpleGrid cols={{ base: 1, md: 2 }} spacing={{ base: 'lg', md: 36 }}>
               <Stack gap={8}>
-                <Badge variant="outline" radius="xl" className={classes.finalBadge}>
-                  Empieza con Bookly
-                </Badge>
                 <Title order={2} className={classes.finalTitle}>
                   Ordena la agenda antes de que el dia se disperse.
                 </Title>
