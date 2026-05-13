@@ -1,15 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Alert,
-  Button,
-  Divider,
-  Group,
-  SimpleGrid,
-  Stack,
-  Text,
-  Textarea,
-  TextInput,
-} from '@mantine/core';
+import { Alert, Button, Group, SimpleGrid, Stack, Text, Textarea, TextInput } from '@mantine/core';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 
 import { useUpdateAppointment } from '../hooks';
@@ -157,8 +147,6 @@ export function AppointmentEditForm({
             </SimpleGrid>
           </Stack>
         ) : null}
-
-        <Divider />
 
         <Group justify="flex-end" wrap="wrap" gap="sm">
           {onCancel ? (
