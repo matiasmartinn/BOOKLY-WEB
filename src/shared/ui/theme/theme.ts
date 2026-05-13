@@ -37,7 +37,7 @@ export const appTheme = createTheme({
             transform: 'translateY(-1px)',
             boxShadow: '0 8px 18px rgba(15, 23, 42, 0.08)',
           },
-          '&:focus-visible': {
+          '&:focusVisible': {
             outline: `2px solid var(--mantine-color-brand-5)`,
             outlineOffset: rem(2),
           },
@@ -164,7 +164,7 @@ export const appTheme = createTheme({
       },
       styles: {
         root: {
-          '&:focus-visible': {
+          '&:focusVisible': {
             outline: `2px solid var(--mantine-color-brand-5)`,
             outlineOffset: rem(2),
           },

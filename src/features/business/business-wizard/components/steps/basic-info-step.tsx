@@ -47,6 +47,11 @@ export function BasicInfoStep() {
     [businessTypesData],
   );
 
+  const selectedBusinessType = useMemo(
+    () => businessTypesData?.find((type) => type.id === serviceTypeId) ?? null,
+    [businessTypesData, serviceTypeId],
+  );
+
   return (
     <Stack gap="lg">
       <TextInput
@@ -66,6 +71,22 @@ export function BasicInfoStep() {
         value={serviceTypeId ? String(serviceTypeId) : null}
         disabled={isLoading}
         error={errors.serviceTypeId?.message}
+        leftSection={
+          selectedBusinessType ? (
+            <ThemeIcon
+              size="sm"
+              radius="xl"
+              variant="light"
+              style={{
+                color: getServiceTypeColor(selectedBusinessType.colorHex),
+                backgroundColor: `${getServiceTypeColor(selectedBusinessType.colorHex)}1A`,
+              }}
+            >
+              <FontAwesomeIcon icon={getServiceTypeIcon(selectedBusinessType.iconKey)} size="xs" />
+            </ThemeIcon>
+          ) : null
+        }
+        leftSectionPointerEvents="none"
         renderOption={({ option }) => {
           const item = option as (typeof businessTypeOptions)[number];
 

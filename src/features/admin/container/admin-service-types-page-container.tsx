@@ -1,12 +1,9 @@
-import { Alert, Select, Stack, Tabs, Text } from '@mantine/core';
+import { Alert, Group, Select, Stack, Tabs, ThemeIcon, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { GenericModal } from 'shared/components';
 import { PageCard } from 'shared/layout';
-import type {
-  ServiceTypeDto,
-  ServiceTypeFieldDefinitionDto,
-} from 'shared/models';
+import type { ServiceTypeDto, ServiceTypeFieldDefinitionDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
 import {
   useCreateServiceTypeField,
@@ -14,6 +11,8 @@ import {
   useGetServiceTypeFields,
   useUpdateServiceTypeField,
 } from 'features/service-types/hooks';
+import { getServiceTypeColor, getServiceTypeIcon } from 'shared/utils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
   AdminServiceTypeFieldForm,
@@ -36,10 +35,7 @@ type AdminServiceTypesTab = 'service-types' | 'service-type-fields';
 const sortByName = (left: ServiceTypeDto, right: ServiceTypeDto) =>
   left.name.localeCompare(right.name, 'es-AR', { sensitivity: 'base' });
 
-const sortFields = (
-  left: ServiceTypeFieldDefinitionDto,
-  right: ServiceTypeFieldDefinitionDto,
-) => {
+const sortFields = (left: ServiceTypeFieldDefinitionDto, right: ServiceTypeFieldDefinitionDto) => {
   const sortOrderDifference = left.sortOrder - right.sortOrder;
 
   if (sortOrderDifference !== 0) {
@@ -61,10 +57,8 @@ export function AdminServiceTypesPageContainer() {
   const [selectedServiceType, setSelectedServiceType] = useState<ServiceTypeDto | null>(null);
   const [selectedFieldServiceTypeId, setSelectedFieldServiceTypeId] = useState<number | null>(null);
   const [selectedField, setSelectedField] = useState<ServiceTypeFieldDefinitionDto | null>(null);
-  const [serviceTypeFormMode, setServiceTypeFormMode] =
-    useState<ServiceTypeFormMode>('create');
-  const [fieldFormMode, setFieldFormMode] =
-    useState<ServiceTypeFieldFormMode>('create');
+  const [serviceTypeFormMode, setServiceTypeFormMode] = useState<ServiceTypeFormMode>('create');
+  const [fieldFormMode, setFieldFormMode] = useState<ServiceTypeFieldFormMode>('create');
   const [localServiceTypes, setLocalServiceTypes] = useState<ServiceTypeDto[]>([]);
   const [serviceTypeFormOpened, serviceTypeFormHandlers] = useDisclosure(false);
   const [serviceTypeStatusOpened, serviceTypeStatusHandlers] = useDisclosure(false);
@@ -104,16 +98,10 @@ export function AdminServiceTypesPageContainer() {
       serviceTypes.map((serviceType) => ({
         value: String(serviceType.id),
         label: serviceType.name,
+        iconKey: serviceType.iconKey,
+        colorHex: serviceType.colorHex,
       })),
     [serviceTypes],
-  );
-
-  const selectedFieldServiceType = useMemo(
-    () =>
-      serviceTypeFieldsQuery.data ??
-      serviceTypes.find((serviceType) => serviceType.id === selectedFieldServiceTypeId) ??
-      null,
-    [selectedFieldServiceTypeId, serviceTypeFieldsQuery.data, serviceTypes],
   );
 
   const serviceTypeFields = useMemo(
@@ -145,6 +133,11 @@ export function AdminServiceTypesPageContainer() {
       return upsertServiceType(current, serviceType);
     });
   };
+
+  const selectedFieldServiceType = useMemo(
+    () => serviceTypes.find((serviceType) => serviceType.id === selectedFieldServiceTypeId) ?? null,
+    [selectedFieldServiceTypeId, serviceTypes],
+  );
 
   const handleCreate = () => {
     createServiceTypeMutation.reset();
@@ -291,7 +284,9 @@ export function AdminServiceTypesPageContainer() {
       <Stack gap="md">
         <Tabs
           value={activeTab}
-          onChange={(value) => setActiveTab((value as AdminServiceTypesTab | null) ?? 'service-types')}
+          onChange={(value) =>
+            setActiveTab((value as AdminServiceTypesTab | null) ?? 'service-types')
+          }
         >
           <Tabs.List>
             <Tabs.Tab value="service-types">Tipos de servicio</Tabs.Tab>
@@ -328,20 +323,58 @@ export function AdminServiceTypesPageContainer() {
                     label="Tipo de servicio"
                     description="Selecciona el tipo de servicio sobre el que quieres configurar campos dinamicos."
                     data={serviceTypeOptions}
-                    value={selectedFieldServiceTypeId != null ? String(selectedFieldServiceTypeId) : null}
+                    value={
+                      selectedFieldServiceTypeId != null ? String(selectedFieldServiceTypeId) : null
+                    }
                     onChange={(value) => {
                       setSelectedFieldServiceTypeId(value ? Number(value) : null);
                       setSelectedField(null);
                     }}
                     allowDeselect={false}
+                    leftSection={
+                      selectedFieldServiceType ? (
+                        <ThemeIcon
+                          size="sm"
+                          radius="xl"
+                          variant="light"
+                          style={{
+                            color: getServiceTypeColor(selectedFieldServiceType.colorHex),
+                            backgroundColor: `${getServiceTypeColor(selectedFieldServiceType.colorHex)}1A`,
+                          }}
+                        >
+                          <FontAwesomeIcon
+                            icon={getServiceTypeIcon(selectedFieldServiceType.iconKey)}
+                            size="xs"
+                          />
+                        </ThemeIcon>
+                      ) : null
+                    }
+                    leftSectionPointerEvents="none"
+                    renderOption={({ option }) => {
+                      const item = option as (typeof serviceTypeOptions)[number];
+
+                      const icon = getServiceTypeIcon(item.iconKey);
+                      const color = getServiceTypeColor(item.colorHex);
+
+                      return (
+                        <Group gap="sm" wrap="nowrap">
+                          <ThemeIcon
+                            size="sm"
+                            radius="xl"
+                            variant="light"
+                            style={{
+                              color,
+                              backgroundColor: `${color}1A`,
+                            }}
+                          >
+                            <FontAwesomeIcon icon={icon} size="xs" />
+                          </ThemeIcon>
+
+                          <Text size="sm">{item.label}</Text>
+                        </Group>
+                      );
+                    }}
                   />
-
-                  {selectedFieldServiceType ? (
-                    <Text size="sm" c="dimmed">
-                      Gestionando campos para <Text span fw={600} c="inherit">{selectedFieldServiceType.name}</Text>.
-                    </Text>
-                  ) : null}
-
                   {selectedFieldServiceTypeId == null ? (
                     <Alert color="yellow" variant="light">
                       Selecciona un tipo de servicio para administrar sus campos.
@@ -372,9 +405,7 @@ export function AdminServiceTypesPageContainer() {
         opened={serviceTypeFormOpened}
         onClose={handleCloseServiceTypeForm}
         title={
-          serviceTypeFormMode === 'create'
-            ? 'Nuevo tipo de servicio'
-            : 'Editar tipo de servicio'
+          serviceTypeFormMode === 'create' ? 'Nuevo tipo de servicio' : 'Editar tipo de servicio'
         }
         size="lg"
       >
