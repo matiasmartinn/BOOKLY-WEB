@@ -7,17 +7,6 @@ import { persist } from 'zustand/middleware';
 
 import { useBusinessStore } from './use-business-store';
 
-function isAccessTokenExpired(session: AuthSession | null): boolean {
-  if (!session?.accessTokenExpiresAt) {
-    return true;
-  }
-
-  const expiresAt = Date.parse(session.accessTokenExpiresAt);
-  return Number.isNaN(expiresAt) || expiresAt <= Date.now();
-}
-
-type LegacyAuthSession = AuthSession & { refreshToken?: string };
-
 interface AuthStore {
   session: AuthSession | null;
   user: UserModel | null;
@@ -32,28 +21,13 @@ interface AuthStore {
   finishHydration: () => void;
 }
 
-function sanitizeAuthSession(session: LegacyAuthSession | null | undefined): AuthSession | null {
-  if (!session) {
-    return null;
-  }
-
-  const sanitizedSession = { ...session };
-  delete sanitizedSession.refreshToken;
-  return sanitizedSession;
-}
-
-function getPersistedAuthState(
-  persistedState: unknown,
-): Pick<AuthStore, 'session' | 'user' | 'isAuthenticated'> {
+// El access token vive solo en memoria: lo unico que se persiste es el perfil
+// del usuario, como pista para reintentar /auth/refresh al recargar la app.
+function getPersistedAuthState(persistedState: unknown): Pick<AuthStore, 'user'> {
   const state = persistedState as Partial<AuthStore> | undefined;
-  const session = sanitizeAuthSession(state?.session as LegacyAuthSession | null | undefined);
-  const user = state?.user ?? null;
-  const hasValidSession = Boolean(session && user);
 
   return {
-    session: hasValidSession ? session : null,
-    user: hasValidSession ? user : null,
-    isAuthenticated: hasValidSession,
+    user: state?.user ?? null,
   };
 }
 
@@ -102,22 +76,12 @@ export const useAuthStore = create<AuthStore>()(
 
       restoreSession: async () => {
         try {
-          const { session, user } = get();
-
-          if (!session || !user) {
+          if (!get().user) {
             get().clearSession();
             return;
           }
 
-          if (!isAccessTokenExpired(session)) {
-            set({ isAuthenticated: true });
-            return;
-          }
-
-          const refreshedSession = await get().refreshSession();
-          if (!refreshedSession) {
-            get().clearSession();
-          }
+          await get().refreshSession();
         } catch {
           get().clearSession();
         } finally {
@@ -161,11 +125,9 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'auth',
-      version: 3,
+      version: 4,
       partialize: (state) => ({
-        session: state.session,
         user: state.user,
-        isAuthenticated: state.isAuthenticated,
       }),
       migrate: getPersistedAuthState,
       merge: (persistedState, currentState) => ({
