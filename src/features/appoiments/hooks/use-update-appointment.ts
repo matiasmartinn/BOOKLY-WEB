@@ -5,6 +5,8 @@ import { useBusinessStore } from 'store/use-business-store';
 
 import { appointmentService } from '../services';
 
+import { invalidateAppointmentQueries } from './query-keys';
+
 export interface UpdateAppointmentValues {
   clientName: string;
   clientPhone: string;
@@ -25,9 +27,7 @@ export const useUpdateAppointment = (appointmentId: number) => {
           clientNotes: values.clientNotes?.trim() || undefined,
         }),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', selectedService?.id],
-      });
+      invalidateAppointmentQueries(queryClient, selectedService?.id);
     },
   });
 };

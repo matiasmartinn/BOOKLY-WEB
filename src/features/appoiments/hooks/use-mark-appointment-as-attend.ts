@@ -4,6 +4,8 @@ import { useBusinessStore } from 'store/use-business-store';
 
 import { appointmentService } from '../services';
 
+import { invalidateAppointmentQueries } from './query-keys';
+
 export const useMarkAppointmentAsAttended = (appointmentId: number) => {
   const queryClient = useQueryClient();
   const selectedService = useBusinessStore((s) => s.selectedService);
@@ -11,13 +13,7 @@ export const useMarkAppointmentAsAttended = (appointmentId: number) => {
   return useMutation<void, ProblemDetails>({
     mutationFn: () => appointmentService.markAsAttended(appointmentId),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', selectedService?.id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', 'history', 'service', selectedService?.id],
-      });
+      invalidateAppointmentQueries(queryClient, selectedService?.id, { history: true });
     },
   });
 };

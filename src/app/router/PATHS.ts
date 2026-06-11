@@ -13,7 +13,6 @@ export const PATHS = {
     adminInvitation: '/auth/admin-invitation',
     secretaryInvitation: '/auth/secretary-invitation',
     secretarySetup: '/auth/secretary-password-form',
-    auth: '/auth/create-business',
   },
   dashboard: {
     overview: '/dashboard',

@@ -6,6 +6,8 @@ import { useBusinessStore } from 'store/use-business-store';
 
 import { appointmentService } from '../services';
 
+import { invalidateAppointmentQueries } from './query-keys';
+
 export interface RescheduleAppointmentValues {
   slot: string;
 }
@@ -20,17 +22,7 @@ export const useRescheduleAppointment = (appointmentId: number) => {
         startDateTime: normalizeBusinessLocalDateTime(values.slot) ?? values.slot,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', selectedService?.id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', 'available-dates', selectedService?.id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', 'available-slots', selectedService?.id],
-      });
+      invalidateAppointmentQueries(queryClient, selectedService?.id, { availability: true });
     },
   });
 };

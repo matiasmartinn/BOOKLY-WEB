@@ -17,5 +17,6 @@ export const usePublicAvailableDates = (
     queryKey: publicBookingQueryKeys.availableDates(slug, code, from, to),
     queryFn: () => publicBookingService.getAvailableDates(slug!, code!, from, to),
     enabled: Boolean(slug && code),
+    staleTime: 0,
   });
 };

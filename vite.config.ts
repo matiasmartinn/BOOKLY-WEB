@@ -33,7 +33,6 @@ export default defineConfig({
           mantine: [
             '@mantine/core',
             '@mantine/hooks',
-            '@mantine/form',
             '@mantine/dates',
             '@mantine/notifications',
           ],

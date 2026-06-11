@@ -1,10 +1,10 @@
-import { Alert, Button, Skeleton, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Alert, Button, ScrollArea, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { formatTime } from 'shared/utils';
 
-import classes from './public-booking-schedule-section.module.css';
+import classes from './schedule-slot-picker.module.css';
 
-interface PublicBookingScheduleSectionProps {
+interface ScheduleSlotPickerProps {
   availableDateSet: Set<string>;
   calendarDate: string | null;
   dateError?: string;
@@ -19,11 +19,15 @@ interface PublicBookingScheduleSectionProps {
   onSlotChange: (value: string) => void;
   selectedDate: string | null;
   selectedSlot: string;
-  slotError?: string;
   slots: string[];
+  disabled?: boolean;
+  slotError?: string;
+  datesErrorMessage?: string;
+  slotsErrorMessage?: string;
+  withSlotsScrollArea?: boolean;
 }
 
-export function PublicBookingScheduleSection({
+export function ScheduleSlotPicker({
   availableDateSet,
   calendarDate,
   dateError,
@@ -38,20 +42,49 @@ export function PublicBookingScheduleSection({
   onSlotChange,
   selectedDate,
   selectedSlot,
-  slotError,
   slots,
-}: PublicBookingScheduleSectionProps) {
+  disabled = false,
+  slotError,
+  datesErrorMessage = 'No se pudieron cargar las fechas disponibles.',
+  slotsErrorMessage = 'No se pudieron cargar los horarios disponibles para la fecha elegida.',
+  withSlotsScrollArea = false,
+}: ScheduleSlotPickerProps) {
   const getDayProps = (date: string) =>
     availableDateSet.has(date.trim()) ? { className: classes.availableDay } : {};
 
   const shouldDisableDate = (date: string) => !availableDateSet.has(date.trim());
   const showSlots = selectedDate && !isLoadingSlots && !isFetchingSlots && !isSlotsError;
 
+  const slotsGrid = (
+    <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="sm">
+      {slots.map((slot) => {
+        const selected = selectedSlot === slot;
+
+        return (
+          <Button
+            key={slot}
+            type="button"
+            variant={selected ? 'filled' : 'default'}
+            color={selected ? 'brand' : undefined}
+            radius="md"
+            className={classes.slotButton}
+            data-selected={selected}
+            onClick={() => onSlotChange(slot)}
+            disabled={isPending}
+            fullWidth
+          >
+            {formatTime(slot)}
+          </Button>
+        );
+      })}
+    </SimpleGrid>
+  );
+
   return (
     <Stack gap="md">
       {isAvailableDatesError ? (
         <Alert color="red" variant="light">
-          No se pudieron cargar las fechas disponibles.
+          {datesErrorMessage}
         </Alert>
       ) : null}
 
@@ -69,7 +102,7 @@ export function PublicBookingScheduleSection({
         clearable={false}
         valueFormat="DD/MM/YYYY"
         excludeDate={shouldDisableDate}
-        disabled={isPending || isLoadingAvailableDates}
+        disabled={disabled || isPending || isLoadingAvailableDates}
       />
 
       <Stack gap="xs">
@@ -94,7 +127,7 @@ export function PublicBookingScheduleSection({
 
         {selectedDate && isSlotsError ? (
           <Alert color="red" variant="light">
-            No se pudieron cargar los horarios disponibles para la fecha elegida.
+            {slotsErrorMessage}
           </Alert>
         ) : null}
 
@@ -105,28 +138,13 @@ export function PublicBookingScheduleSection({
         ) : null}
 
         {showSlots && slots.length > 0 ? (
-          <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="sm">
-            {slots.map((slot) => {
-              const selected = selectedSlot === slot;
-
-              return (
-                <Button
-                  key={slot}
-                  type="button"
-                  variant={selected ? 'filled' : 'default'}
-                  color={selected ? 'brand' : undefined}
-                  radius="md"
-                  className={classes.slotButton}
-                  data-selected={selected}
-                  onClick={() => onSlotChange(slot)}
-                  disabled={isPending}
-                  fullWidth
-                >
-                  {formatTime(slot)}
-                </Button>
-              );
-            })}
-          </SimpleGrid>
+          withSlotsScrollArea ? (
+            <ScrollArea.Autosize mah={220} offsetScrollbars scrollbarSize={8}>
+              {slotsGrid}
+            </ScrollArea.Autosize>
+          ) : (
+            slotsGrid
+          )
         ) : null}
 
         {slotError ? (

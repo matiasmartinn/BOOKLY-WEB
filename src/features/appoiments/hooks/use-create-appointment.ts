@@ -5,6 +5,8 @@ import { useBusinessStore } from 'store/use-business-store';
 
 import { appointmentService, type CreateAppointmentDto } from '../services';
 
+import { invalidateAppointmentQueries } from './query-keys';
+
 export const useCreateAppointment = () => {
   const selectedService = useBusinessStore((s) => s.selectedService);
   const queryClient = useQueryClient();
@@ -12,20 +14,9 @@ export const useCreateAppointment = () => {
   return useMutation<AppointmentDto, ProblemDetails, CreateAppointmentDto>({
     mutationFn: (dto) => appointmentService.create(dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', selectedService?.id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', 'history', 'service', selectedService?.id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', 'available-dates', selectedService?.id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', 'available-slots', selectedService?.id],
+      invalidateAppointmentQueries(queryClient, selectedService?.id, {
+        history: true,
+        availability: true,
       });
     },
   });

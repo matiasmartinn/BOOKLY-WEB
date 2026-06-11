@@ -1,18 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Alert,
-  Box,
-  Button,
-  Group,
-  SimpleGrid,
-  Stack,
-  Text,
-  Textarea,
-  TextInput,
-} from '@mantine/core';
+import { Alert, Box, Button, Group, Stack, Text } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { DynamicFieldsSection } from 'shared/components';
+import { ClientDataFields, DynamicFieldsSection } from 'shared/components';
 import {
   getActiveDynamicFieldDefinitions,
   mapAdditionalFieldsToFieldValues,
@@ -235,44 +225,7 @@ export function AppointmentForm({
             </Text>
           </Stack>
 
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-            <TextInput
-              label="Cliente"
-              placeholder="Juan Perez"
-              withAsterisk
-              {...register('clientName')}
-              error={errors.clientName?.message}
-              disabled={isPending}
-            />
-
-            <TextInput
-              label="Telefono"
-              placeholder="3364..."
-              withAsterisk
-              {...register('clientPhone')}
-              error={errors.clientPhone?.message}
-              disabled={isPending}
-            />
-          </SimpleGrid>
-
-          <TextInput
-            label="Email"
-            placeholder="cliente@correo.com"
-            withAsterisk
-            {...register('clientEmail')}
-            error={errors.clientEmail?.message}
-            disabled={isPending}
-          />
-
-          <Textarea
-            label="Notas"
-            placeholder="Observaciones del cliente"
-            minRows={3}
-            autosize
-            {...register('clientNotes')}
-            error={errors.clientNotes?.message}
-            disabled={isPending}
-          />
+          <ClientDataFields register={register} errors={errors} disabled={isPending} />
         </Stack>
 
         {canUseDynamicFields ? (

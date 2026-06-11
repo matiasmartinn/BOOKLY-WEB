@@ -31,10 +31,10 @@ import {
 } from '@mantine/core';
 import { PATHS } from 'app/router/PATHS';
 import { BusinessOptions } from 'features/business/components';
+import { useLogout } from 'features/auth/hooks';
 import { SubscriptionSidebarBanner } from 'features/subscriptions/components';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuthStore } from 'store/use-auth-store';
 
 import classes from './dashboard-sidebar.module.css';
 
@@ -597,8 +597,7 @@ export function DashboardSidebar({
 }: DashboardSidebarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const logout = useAuthStore((state) => state.logout);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { logout: handleLogout, isLoggingOut } = useLogout();
 
   const visibleSections = NAV_SECTIONS_BY_ROLE[user.role]
     .map((section) => ({
@@ -617,21 +616,6 @@ export function DashboardSidebar({
   const handleNavigate = (path: string) => {
     navigate(path);
     onNavigate?.();
-  };
-
-  const handleLogout = async () => {
-    if (isLoggingOut) {
-      return;
-    }
-
-    setIsLoggingOut(true);
-    try {
-      await logout();
-      navigate(PATHS.auth.login, { replace: true });
-      onNavigate?.();
-    } finally {
-      setIsLoggingOut(false);
-    }
   };
 
   return (
@@ -764,7 +748,7 @@ export function DashboardSidebar({
           user={user}
           collapsed={collapsed}
           onLogout={() => {
-            void handleLogout();
+            void handleLogout(onNavigate);
           }}
           isLoggingOut={isLoggingOut}
         />

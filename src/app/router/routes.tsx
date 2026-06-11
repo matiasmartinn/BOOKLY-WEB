@@ -1,3 +1,4 @@
+import { Center, Loader } from '@mantine/core';
 import { lazy, Suspense } from 'react';
 import { Navigate, type RouteObject } from 'react-router-dom';
 import { AuthLayout } from 'app/layouts/auth-layout';
@@ -153,7 +154,11 @@ const UnavailabilitiesPage = lazy(() =>
   })),
 );
 
-const PageLoader = () => <div />;
+const PageLoader = () => (
+  <Center mih="50dvh">
+    <Loader size="sm" />
+  </Center>
+);
 
 const withSuspense = (element: React.ReactNode) => (
   <Suspense fallback={<PageLoader />}>{element}</Suspense>

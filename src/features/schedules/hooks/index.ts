@@ -1,2 +1,2 @@
 export * from './use-selected-service-schedules';
-export * from './useSaveSchedules';
+export * from './use-save-schedules';

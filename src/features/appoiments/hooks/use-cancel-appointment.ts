@@ -4,6 +4,8 @@ import { useBusinessStore } from 'store/use-business-store';
 
 import { appointmentService } from '../services';
 
+import { invalidateAppointmentQueries } from './query-keys';
+
 export interface CancelAppointmentValues {
   reason?: string;
 }
@@ -18,20 +20,9 @@ export const useCancelAppointment = (appointmentId: number) => {
         reason: values?.reason?.trim() || undefined,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', selectedService?.id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', 'history', 'service', selectedService?.id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', 'available-dates', selectedService?.id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ['appointments', 'available-slots', selectedService?.id],
+      invalidateAppointmentQueries(queryClient, selectedService?.id, {
+        history: true,
+        availability: true,
       });
     },
   });

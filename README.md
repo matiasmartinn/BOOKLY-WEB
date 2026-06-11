@@ -63,7 +63,7 @@ src/
 
 - `app/`: concentra el router, los guards, los layouts y la inicialización del cliente de API.
 - `features/`: encapsula lógica por dominio de interfaz, incluyendo hooks, servicios, componentes, esquemas y contenedores.
-- `shared/`: contiene primitivas reutilizables como `Page`, `PageShell`, `PageCard`, `GenericModal`, `GenericTable`, `FormSection` y utilidades transversales.
+- `shared/`: contiene primitivas reutilizables como `Page`, `PageCard`, `GenericModal`, `GenericTable`, `FormSection` y utilidades transversales.
 - `store/`: usa Zustand para persistir sesión, restaurar autenticación y manejar el servicio activo según el rol.
 
 ## Decisiones técnicas destacadas

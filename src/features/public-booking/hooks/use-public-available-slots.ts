@@ -14,4 +14,5 @@ export const usePublicAvailableSlots = (
     queryKey: publicBookingQueryKeys.availableSlots(slug, code, selectedDate),
     queryFn: () => publicBookingService.getAvailableSlots(slug!, code!, selectedDate!),
     enabled: Boolean(slug && code && selectedDate),
+    staleTime: 0,
   });

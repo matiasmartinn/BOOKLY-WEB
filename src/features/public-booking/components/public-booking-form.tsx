@@ -1,17 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Alert,
-  Button,
-  Divider,
-  SimpleGrid,
-  Stack,
-  Text,
-  TextInput,
-  Textarea,
-} from '@mantine/core';
+import { Alert, Button, Divider, Stack, Text } from '@mantine/core';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { DynamicFieldsSection } from 'shared/components';
+import { ClientDataFields, DynamicFieldsSection, ScheduleSlotPicker } from 'shared/components';
 import type { AppointmentDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
 import {
@@ -33,8 +24,6 @@ import {
 } from '../schema/public-appointment.schema';
 import type { PublicBookingProblemState, PublicServiceBookingDto } from '../types/public-booking';
 import { resolvePublicBookingProblemState } from '../utils';
-
-import { PublicBookingScheduleSection } from './public-booking-schedule-section';
 
 interface PublicBookingFormProps {
   service: PublicServiceBookingDto;
@@ -251,7 +240,7 @@ export function PublicBookingForm({
             </Text>
           </Stack>
 
-          <PublicBookingScheduleSection
+          <ScheduleSlotPicker
             availableDateSet={availableDateSet}
             calendarDate={calendarDate}
             dateError={errors.date?.message}
@@ -276,43 +265,12 @@ export function PublicBookingForm({
             <Text fw={600}>Tus datos</Text>
           </Stack>
 
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-            <TextInput
-              label="Nombre"
-              placeholder="Juan Perez"
-              withAsterisk
-              {...register('clientName')}
-              error={errors.clientName?.message}
-              disabled={isPending}
-            />
-
-            <TextInput
-              label="Telefono"
-              placeholder="3364..."
-              withAsterisk
-              {...register('clientPhone')}
-              error={errors.clientPhone?.message}
-              disabled={isPending}
-            />
-          </SimpleGrid>
-
-          <TextInput
-            label="Email"
-            placeholder="cliente@correo.com"
-            withAsterisk
-            {...register('clientEmail')}
-            error={errors.clientEmail?.message}
+          <ClientDataFields
+            register={register}
+            errors={errors}
             disabled={isPending}
-          />
-
-          <Textarea
-            label="Notas"
-            placeholder="Observaciones para el servicio"
-            minRows={3}
-            autosize
-            {...register('clientNotes')}
-            error={errors.clientNotes?.message}
-            disabled={isPending}
+            nameLabel="Nombre"
+            notesPlaceholder="Observaciones para el servicio"
           />
         </Stack>
 
