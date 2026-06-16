@@ -88,9 +88,11 @@ export function DashboardLayout() {
     ? {
         name: `${authUser.firstName} ${authUser.lastName}`.trim(),
         initials: getInitials(authUser.firstName, authUser.lastName),
-        role: sidebarRole,
+        // Rol desconocido: el guard cierra la sesion; mientras tanto se muestra
+        // la navegacion de menor privilegio.
+        role: sidebarRole ?? 'secretary',
       }
-    : { name: '', initials: '', role: 'owner' };
+    : { name: '', initials: '', role: 'secretary' };
 
   return (
     <AppShell

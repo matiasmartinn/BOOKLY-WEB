@@ -1,3 +1,4 @@
+import { isApiError } from 'app/api';
 import { queryClient } from 'app/api/query-client';
 import type { LoginRequest } from 'features/auth/login-form/login.schema';
 import { authService, type AuthSession } from 'features/auth/services';
@@ -82,8 +83,13 @@ export const useAuthStore = create<AuthStore>()(
           }
 
           await get().refreshSession();
-        } catch {
-          get().clearSession();
+        } catch (error) {
+          // Solo descartar la sesion si el backend la rechazo explicitamente.
+          // Ante error de red o 5xx se conserva el user persistido para que el
+          // proximo reload reintente el refresh con la cookie.
+          if (isApiError(error) && (error.status === 401 || error.status === 403)) {
+            get().clearSession();
+          }
         } finally {
           get().finishHydration();
         }
@@ -134,8 +140,12 @@ export const useAuthStore = create<AuthStore>()(
         ...currentState,
         ...getPersistedAuthState(persistedState),
       }),
-      onRehydrateStorage: () => (state) => {
-        if (!state) {
+      onRehydrateStorage: () => (state, error) => {
+        if (!state || error) {
+          // Rehidratacion fallida (storage corrupto/bloqueado): desbloquear la app
+          // igual. queueMicrotask difiere la llamada porque este callback corre
+          // sincronicamente durante create(), antes de que useAuthStore exista.
+          queueMicrotask(() => useAuthStore.getState().finishHydration());
           return;
         }
 

@@ -28,8 +28,14 @@ const ADMIN_PATHS = new Set<string>([
   PATHS.dashboard.adminServiceTypes,
 ]);
 
-export function normalizeUserRole(role?: string): UserRole {
+// Devuelve null ante un rol desconocido o ausente: la sesion se considera
+// invalida y los guards la cierran, nunca se asume un rol por defecto.
+export function normalizeUserRole(role?: string): UserRole | null {
   const normalizedRole = role?.trim().toLowerCase();
+
+  if (normalizedRole === 'owner') {
+    return 'owner';
+  }
 
   if (normalizedRole === 'secretary') {
     return 'secretary';
@@ -39,7 +45,14 @@ export function normalizeUserRole(role?: string): UserRole {
     return 'admin';
   }
 
-  return 'owner';
+  return null;
+}
+
+// React Router matchea rutas sin distinguir mayusculas ni trailing slash;
+// toda comparacion contra PATHS debe hacerse sobre el pathname normalizado.
+function normalizePathname(pathname: string): string {
+  const normalized = pathname.toLowerCase().replace(/\/+$/, '');
+  return normalized === '' ? '/' : normalized;
 }
 
 export function buildServicePermissions(
@@ -47,6 +60,18 @@ export function buildServicePermissions(
   selectedService: BusinessDto | null,
 ): ServicePermissions {
   const role = normalizeUserRole(user?.role);
+
+  if (role === null) {
+    return {
+      viewAppointments: false,
+      createAppointments: false,
+      editAppointments: false,
+      cancelAppointments: false,
+      rescheduleAppointments: false,
+      markAttendance: false,
+      manageSchedules: false,
+    };
+  }
 
   if (role === 'owner') {
     return {
@@ -92,6 +117,18 @@ export function buildSidebarPermissions(
   selectedService: BusinessDto | null,
 ): SidebarPermissions {
   const role = normalizeUserRole(user?.role);
+
+  if (role === null) {
+    return {
+      viewAppointments: false,
+      viewSchedules: false,
+      viewService: false,
+      viewUnavailability: false,
+      viewStatus: false,
+      viewTeam: false,
+      viewSettings: false,
+    };
+  }
 
   if (role === 'owner') {
     return {
@@ -167,14 +204,15 @@ export function resolveDashboardPath(
   role: UserRole,
   permissions: SidebarPermissions,
 ): string {
+  const normalizedPath = normalizePathname(pathname);
   const defaultPath = getDefaultDashboardPath(role, permissions);
 
-  if (pathname === PATHS.dashboard.overview) {
+  if (normalizedPath === PATHS.dashboard.overview) {
     return defaultPath;
   }
 
-  if (canAccessDashboardPath(pathname, role, permissions)) {
-    return pathname;
+  if (canAccessDashboardPath(normalizedPath, role, permissions)) {
+    return normalizedPath;
   }
 
   return defaultPath;
@@ -200,15 +238,17 @@ export function canAccessDashboardPath(
   role: UserRole,
   permissions: SidebarPermissions,
 ): boolean {
-  if (pathname === PATHS.dashboard.welcome) {
+  const normalizedPath = normalizePathname(pathname);
+
+  if (normalizedPath === PATHS.dashboard.welcome) {
     return !hasFunctionalDashboardAccess(role, permissions);
   }
 
-  if (ACCOUNT_PATHS.has(pathname)) {
+  if (ACCOUNT_PATHS.has(normalizedPath)) {
     return permissions.viewSettings;
   }
 
-  if (ADMIN_PATHS.has(pathname)) {
+  if (ADMIN_PATHS.has(normalizedPath)) {
     return role === 'admin';
   }
 
@@ -217,10 +257,10 @@ export function canAccessDashboardPath(
   }
 
   if (role === 'admin') {
-    return ADMIN_PATHS.has(pathname);
+    return ADMIN_PATHS.has(normalizedPath);
   }
 
-  switch (pathname) {
+  switch (normalizedPath) {
     case PATHS.dashboard.appointments:
       return permissions.viewAppointments;
     case PATHS.dashboard.schedules:

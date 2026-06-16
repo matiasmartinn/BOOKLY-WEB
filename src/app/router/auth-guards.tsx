@@ -40,6 +40,15 @@ export function RequireOwner() {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
+  const role = user ? normalizeUserRole(user.role) : null;
+  const hasInvalidRole = hasHydrated && isAuthenticated && Boolean(user) && role === null;
+
+  useEffect(() => {
+    if (hasInvalidRole) {
+      useAuthStore.getState().clearSession();
+    }
+  }, [hasInvalidRole]);
+
   if (!hasHydrated) {
     return <AuthGuardFallback />;
   }
@@ -48,7 +57,12 @@ export function RequireOwner() {
     return <Navigate to={PATHS.auth.login} replace />;
   }
 
-  if (normalizeUserRole(user.role) !== 'owner') {
+  if (hasInvalidRole) {
+    // Rol desconocido: la sesion se esta limpiando; el proximo render redirige a login.
+    return <AuthGuardFallback />;
+  }
+
+  if (role !== 'owner') {
     return <Navigate to={PATHS.dashboard.overview} replace />;
   }
 
@@ -62,11 +76,20 @@ export function RequireDashboardAccess() {
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const { selectedService, initialized, isLoading, loadServices } = useBusinessStore();
 
+  const role = authUser ? normalizeUserRole(authUser.role) : null;
+  const hasInvalidRole = hasHydrated && isAuthenticated && Boolean(authUser) && role === null;
+
   useEffect(() => {
     if (authUser && !initialized && !isLoading) {
       void loadServices(authUser);
     }
   }, [authUser, initialized, isLoading, loadServices]);
+
+  useEffect(() => {
+    if (hasInvalidRole) {
+      useAuthStore.getState().clearSession();
+    }
+  }, [hasInvalidRole]);
 
   if (!hasHydrated) {
     return <AuthGuardFallback />;
@@ -76,11 +99,15 @@ export function RequireDashboardAccess() {
     return <Navigate to={PATHS.auth.login} replace state={{ from: location }} />;
   }
 
+  if (role === null) {
+    // Rol desconocido: la sesion se esta limpiando; el proximo render redirige a login.
+    return <AuthGuardFallback />;
+  }
+
   if (!initialized) {
     return <AuthGuardFallback />;
   }
 
-  const role = normalizeUserRole(authUser.role);
   const permissions = buildSidebarPermissions(authUser, selectedService);
   const resolvedPath = resolveDashboardPath(location.pathname, role, permissions);
 

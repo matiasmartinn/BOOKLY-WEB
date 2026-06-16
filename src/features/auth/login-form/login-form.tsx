@@ -57,6 +57,12 @@ function getRedirectTarget(state: unknown): string {
   }
 
   const role = normalizeUserRole(authUser.role);
+
+  if (role === null) {
+    // Rol desconocido: el guard del dashboard limpia la sesion y redirige a login.
+    return PATHS.dashboard.overview;
+  }
+
   const permissions = buildSidebarPermissions(authUser, selectedService);
   const defaultPath = resolveDashboardPath(PATHS.dashboard.overview, role, permissions);
 
