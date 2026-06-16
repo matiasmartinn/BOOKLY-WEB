@@ -7,7 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { Alert, Button, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { PATHS } from 'app/router/PATHS';
-import { useAppointmentSummary } from 'features/appoiments/hooks';
+import { useAppointmentSummary, useResolveExpiredAppointments } from 'features/appoiments/hooks';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageCard } from 'shared/layout';
@@ -48,6 +48,7 @@ const isUpcomingAppointment = (
 };
 
 export function OverviewPageContainer() {
+  useResolveExpiredAppointments();
   const navigate = useNavigate();
   const selectedService = useBusinessStore((state) => state.selectedService);
   const todayDate = useMemo(() => getCurrentBusinessDateOnly(), []);

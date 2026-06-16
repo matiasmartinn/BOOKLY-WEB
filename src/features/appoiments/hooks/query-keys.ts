@@ -5,11 +5,17 @@ import type { AppointmentDayQueryDto, AppointmentQueryDto } from '../services';
 export const appointmentQueryKeys = {
   all: () => ['appointments'] as const,
   byService: (serviceId?: number) => ['appointments', serviceId] as const,
-  detail: (appointmentId?: number) => ['appointments', 'detail', appointmentId] as const,
+  detailRoot: () => ['appointments', 'detail'] as const,
+  detail: (appointmentId?: number) =>
+    [...appointmentQueryKeys.detailRoot(), appointmentId] as const,
+  summaryRoot: () => ['appointments', 'summary'] as const,
   summary: (serviceId?: number, date?: string) =>
-    ['appointments', 'summary', serviceId, date ?? ''] as const,
-  day: (query?: AppointmentDayQueryDto) => ['appointments', 'day', query] as const,
-  search: (query?: AppointmentQueryDto) => ['appointments', 'search', query] as const,
+    [...appointmentQueryKeys.summaryRoot(), serviceId, date ?? ''] as const,
+  dayRoot: () => ['appointments', 'day'] as const,
+  day: (query?: AppointmentDayQueryDto) => [...appointmentQueryKeys.dayRoot(), query] as const,
+  searchRoot: () => ['appointments', 'search'] as const,
+  search: (query?: AppointmentQueryDto) =>
+    [...appointmentQueryKeys.searchRoot(), query] as const,
   historyByService: (serviceId?: number) =>
     ['appointments', 'history', 'service', serviceId] as const,
   availableDatesByService: (serviceId?: number) =>
@@ -33,6 +39,13 @@ export const invalidateAppointmentQueries = (
   options?: InvalidateAppointmentQueriesOptions,
 ) => {
   queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.byService(serviceId) });
+
+  // Las keys de agenda/summary/search llevan el serviceId dentro de un objeto o en
+  // una posicion no prefijable, asi que esas subraices se invalidan completas.
+  queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.dayRoot() });
+  queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.summaryRoot() });
+  queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.searchRoot() });
+  queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.detailRoot() });
 
   if (options?.history) {
     queryClient.invalidateQueries({ queryKey: appointmentQueryKeys.historyByService(serviceId) });

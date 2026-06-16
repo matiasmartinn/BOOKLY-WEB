@@ -43,6 +43,10 @@ export interface AppointmentDayQueryDto {
   serviceId?: number;
 }
 
+export interface ResolveExpiredAppointmentsResultDto {
+  resolvedAppointments: number;
+}
+
 export interface AppointmentQueryDto {
   ownerId?: number;
   serviceId?: number;
@@ -109,4 +113,9 @@ export const appointmentService = {
 
   markAsNoShow: (id: number) =>
     apiClient.patch<void>(`/appointments/${id}/no-show`).then((r) => r.data),
+
+  resolveExpired: () =>
+    apiClient
+      .post<ResolveExpiredAppointmentsResultDto>('/appointments/resolve-expired')
+      .then((r) => r.data),
 };

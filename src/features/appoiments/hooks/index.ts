@@ -10,4 +10,5 @@ export * from './use-get-appointments';
 export * from './use-mark-appointment-as-attend';
 export * from './use-mark-appointment-as-no-show';
 export * from './use-reschedule-appointment';
+export * from './use-resolve-expired-appointments';
 export * from './use-update-appointment';

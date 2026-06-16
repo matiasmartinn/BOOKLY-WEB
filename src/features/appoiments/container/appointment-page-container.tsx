@@ -17,13 +17,19 @@ import {
   AppointmentAttendedModal,
   AppointmentNoShowModal,
 } from '../components/modals';
-import { useAppointmentModals, useAppointmentPermissions, useAppointmentsByDay } from '../hooks';
+import {
+  useAppointmentModals,
+  useAppointmentPermissions,
+  useAppointmentsByDay,
+  useResolveExpiredAppointments,
+} from '../hooks';
 import {
   getVisibleAppointmentDynamicColumns,
   mapAppointmentListToViewModel,
 } from '../mapper/map-appointment-to-viewmodel';
 
 export function AppointmentPageContainer() {
+  useResolveExpiredAppointments();
   const selectedService = useBusinessStore((s) => s.selectedService);
   const [selectedDate, setSelectedDate] = useState<string | null>(getCurrentBusinessDateOnly());
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
