@@ -32,6 +32,7 @@ export interface UpdateBusinessDto {
   durationMinutes?: number;
   capacity?: number;
   mode?: number;
+  attendanceClosingMode?: number;
   price?: number | null;
 }
 

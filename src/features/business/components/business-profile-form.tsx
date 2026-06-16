@@ -5,6 +5,7 @@ import {
   Button,
   Group,
   NumberInput,
+  Radio,
   SimpleGrid,
   Stack,
   Text,
@@ -19,6 +20,11 @@ import type { BusinessDto } from 'shared/models';
 import { useAppToast } from 'shared/ui/toast';
 import { useBusinessStore } from 'store/use-business-store';
 
+import {
+  ATTENDANCE_CLOSING_MODE,
+  ATTENDANCE_CLOSING_MODE_OPTIONS,
+  type AttendanceClosingModeValue,
+} from '../constants/attendance-closing-mode';
 import { useUpdateBusiness } from '../hooks';
 import {
   updateBusinessProfileSchema,
@@ -35,6 +41,9 @@ interface LocalSectionProps {
   children: React.ReactNode;
 }
 
+const isAttendanceClosingMode = (value: number): value is AttendanceClosingModeValue =>
+  ATTENDANCE_CLOSING_MODE_OPTIONS.some((option) => option.value === value);
+
 const mapBusinessToFormValues = (service: BusinessDto): UpdateBusinessProfileFormValues => ({
   name: service.name,
   description: service.description ?? '',
@@ -43,6 +52,10 @@ const mapBusinessToFormValues = (service: BusinessDto): UpdateBusinessProfileFor
   price: service.price ?? undefined,
   placeName: service.placeName ?? '',
   address: service.address ?? '',
+  // Fallback a Manual para datos viejos cacheados que no traigan el campo.
+  attendanceClosingMode: isAttendanceClosingMode(service.attendanceClosingMode)
+    ? service.attendanceClosingMode
+    : ATTENDANCE_CLOSING_MODE.MANUAL,
 });
 
 function LocalSection({ title, description, children }: LocalSectionProps) {
@@ -112,6 +125,7 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
         price: values.price ?? (service.price != null ? null : undefined),
         placeName: values.placeName?.trim() ?? '',
         address: values.address?.trim() ?? '',
+        attendanceClosingMode: values.attendanceClosingMode,
       });
 
       updateService(updatedService);
@@ -231,6 +245,36 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
             {...register('address')}
             error={errors.address?.message}
             disabled={isPending}
+          />
+        </LocalSection>
+
+        <LocalSection
+          title="Gestión de turnos"
+          description="Define qué ocurre con los turnos pendientes vencidos de este servicio."
+        >
+          <Controller
+            name="attendanceClosingMode"
+            control={control}
+            render={({ field }) => (
+              <Radio.Group
+                label="Resolución de turnos pendientes"
+                value={String(field.value)}
+                onChange={(value) => field.onChange(Number(value))}
+                error={errors.attendanceClosingMode?.message}
+              >
+                <Stack gap="sm" mt="xs">
+                  {ATTENDANCE_CLOSING_MODE_OPTIONS.map((option) => (
+                    <Radio
+                      key={option.value}
+                      value={String(option.value)}
+                      label={option.label}
+                      description={option.description}
+                      disabled={isPending}
+                    />
+                  ))}
+                </Stack>
+              </Radio.Group>
+            )}
           />
         </LocalSection>
 

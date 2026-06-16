@@ -36,6 +36,8 @@ export interface ServiceDto {
   durationMinutes: number;
   capacity: number;
   mode: string;
+  attendanceClosingMode: number;
+  attendanceClosingModeName: string;
   isActive: boolean;
   price?: number | null;
   isPublicBookingEnabled: boolean;
