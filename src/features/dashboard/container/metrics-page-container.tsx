@@ -1,13 +1,4 @@
-import {
-  Alert,
-  Badge,
-  Button,
-  Group,
-  Select,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-} from '@mantine/core';
+import { Alert, Badge, Button, Group, Select, SimpleGrid, Skeleton, Stack } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import { useOwnerBusinesses } from 'features/business/hooks';
 import { useMemo, useState } from 'react';
@@ -36,7 +27,6 @@ import { useAuthStore } from 'store/use-auth-store';
 
 import { EmptyChartState, MetricsChartCard, MetricsKpiCard } from '../components';
 import { useAppointmentMetrics } from '../hooks';
-
 
 const DEFAULT_RANGE_DAYS = 30;
 const numberFormatter = new Intl.NumberFormat('es-AR');
@@ -406,7 +396,15 @@ export function MetricsPageContainer() {
             clearable={false}
             disabled={!authUser}
             size="sm"
-            styles={filterFieldStyles}
+            styles={{
+              ...filterFieldStyles,
+              day: {
+                color: 'var(--mantine-color-text)',
+              },
+              weekday: {
+                color: 'var(--mantine-color-text)',
+              },
+            }}
           />
 
           <DatePickerInput
@@ -418,7 +416,15 @@ export function MetricsPageContainer() {
             clearable={false}
             disabled={!authUser}
             size="sm"
-            styles={filterFieldStyles}
+            styles={{
+              ...filterFieldStyles,
+              day: {
+                color: 'var(--mantine-color-text)',
+              },
+              weekday: {
+                color: 'var(--mantine-color-text)',
+              },
+            }}
           />
 
           <Select

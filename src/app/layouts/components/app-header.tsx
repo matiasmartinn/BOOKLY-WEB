@@ -33,7 +33,7 @@ export function AppHeader() {
 
   return (
     <Box h="100%">
-      <Container size="lg" h="100%">
+      <Container size="var(--app-layout-max-width)" h="100%">
         <Group h="100%" justify="space-between" align="center" wrap="nowrap">
           <Group gap="xs" wrap="nowrap">
             <Box
@@ -71,27 +71,16 @@ export function AppHeader() {
           </Group>
 
           {!isAuthenticated ? (
-            <Group gap={8} wrap="nowrap">
-              <Button
-                component={Link}
-                to={PATHS.auth.register}
-                size="sm"
-                styles={headerPrimaryStyles}
-                className="btnPrimary"
-              >
-                Registrarse
-              </Button>
-              <Button
-                component={Link}
-                to={PATHS.auth.login}
-                size="sm"
-                variant="outline"
-                styles={headerActionStyles}
-                className="btnAction"
-              >
-                Iniciar sesion
-              </Button>
-            </Group>
+            <Button
+              component={Link}
+              to={PATHS.auth.login}
+              size="sm"
+              variant="outline"
+              styles={headerActionStyles}
+              className="btnAction"
+            >
+              Iniciar sesion
+            </Button>
           ) : (
             <Button
               component={Link}

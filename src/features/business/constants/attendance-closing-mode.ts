@@ -16,6 +16,6 @@ export const ATTENDANCE_CLOSING_MODE_OPTIONS = [
     value: ATTENDANCE_CLOSING_MODE.AUTO_MARK_AS_ATTENDED,
     label: 'Marcar como asistido automáticamente',
     description:
-      'Los turnos pendientes vencidos de este servicio se marcarán como asistidos cuando se ejecute la resolución.',
+      'Los turnos pendientes vencidos de este servicio se marcarán como asistidos al finalizar el día.',
   },
 ] as const;

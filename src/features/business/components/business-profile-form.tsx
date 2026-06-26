@@ -250,7 +250,7 @@ export function BusinessProfileForm({ service }: BusinessProfileFormProps) {
 
         <LocalSection
           title="Gestión de turnos"
-          description="Define qué ocurre con los turnos pendientes vencidos de este servicio."
+          description="Define qué ocurre con los turnos pendientes de días anteriores de este servicio."
         >
           <Controller
             name="attendanceClosingMode"
